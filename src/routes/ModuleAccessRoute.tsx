@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { MENU_ITEMS } from '../config/menuConfig';
+import { SIDEBAR_MENU_GROUPS } from '../config/menuConfig';
 import type { ErpPackageId } from '../config/erpPackageConfig';
 
 interface ModuleAccessRouteProps {
@@ -13,12 +13,15 @@ export const ModuleAccessRoute: React.FC<ModuleAccessRouteProps> = ({ children }
   const location = useLocation();
 
   const currentPkg: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || 'COMPLETE';
-
-  // Normalize path
   const normalizedPath = location.pathname.replace(/\/$/, '');
-  const matchedMenuItem = MENU_ITEMS.find((m) => m.path === normalizedPath);
 
-  if (matchedMenuItem && !matchedMenuItem.allowedPackages.includes(currentPkg)) {
+  // Find parent group that owns this path
+  const matchingGroup = SIDEBAR_MENU_GROUPS.find((group) =>
+    group.children.some((child) => child.path === normalizedPath)
+  );
+
+  // If path matches a group and current company ERP package is not allowed, block access
+  if (matchingGroup && !matchingGroup.allowedPackages.includes(currentPkg)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
