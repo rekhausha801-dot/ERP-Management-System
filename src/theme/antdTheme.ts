@@ -1,6 +1,5 @@
 import type { ThemeConfig } from 'antd';
 import { colors } from './colors';
-import { typography } from './typography';
 
 export const antdTheme: ThemeConfig = {
   token: {
@@ -11,46 +10,46 @@ export const antdTheme: ThemeConfig = {
     colorError: colors.danger,
     colorTextBase: colors.primaryText,
     colorTextSecondary: colors.secondaryText,
-    colorBgBase: colors.surface,
-    colorBgLayout: colors.background,
-    colorBorder: colors.border,
-    borderRadius: 8,
-    fontFamily: typography.fontFamily,
+    colorBgBase: colors.cardBg,
+    colorBgLayout: colors.canvasBg,
+    colorBorder: 'rgba(110, 86, 207, 0.08)',
+    borderRadius: 14,
+    fontFamily: `-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Segoe UI', Roboto, sans-serif`,
   },
   components: {
     Button: {
-      controlHeight: 38,
-      borderRadius: 6,
+      controlHeight: 40,
+      borderRadius: 12,
       colorPrimary: colors.primary,
       colorPrimaryHover: colors.primaryHover,
-      fontWeight: 500,
+      fontWeight: 600,
     },
     Card: {
-      borderRadiusLG: 8,
-      colorBorderSecondary: colors.border,
+      borderRadiusLG: 20,
+      colorBorderSecondary: 'transparent',
+      boxShadowTertiary: '0 8px 24px rgba(25, 21, 59, 0.03)',
     },
     Menu: {
-      itemSelectedColor: colors.primary,
-      itemSelectedBg: '#F0EAF8',
-      itemHoverBg: '#FAF7FC',
-      itemBorderRadius: 6,
-      itemHeight: 40,
+      darkItemBg: 'transparent',
+      darkItemSelectedBg: 'rgba(255, 255, 255, 0.16)',
+      darkItemColor: '#8F8BA8',
+      darkItemSelectedColor: '#FFFFFF',
+      darkItemHoverBg: 'rgba(255, 255, 255, 0.08)',
+      itemBorderRadius: 12,
+      itemHeight: 42,
     },
     Table: {
-      headerBg: '#FAF7FC',
-      headerColor: colors.primaryText,
-      borderColor: colors.border,
-      rowHoverBg: '#FAF7FC',
+      headerBg: '#FAF8FC',
+      headerColor: '#181433',
+      rowHoverBg: '#F7F4FB',
+      borderRadius: 16,
     },
     Input: {
-      controlHeight: 38,
-      borderRadius: 6,
-      colorBorder: colors.border,
-    },
-    Select: {
-      controlHeight: 38,
-      borderRadius: 6,
-      colorBorder: colors.border,
+      controlHeight: 42,
+      borderRadius: 24,
+      colorBgContainer: '#FFFFFF',
+      colorBorder: 'transparent',
+      hoverBorderColor: colors.primary,
     },
   },
 };

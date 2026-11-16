@@ -3,8 +3,6 @@ import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
-import { Footer } from './Footer';
-import { AppBreadcrumb } from './Breadcrumb';
 import { useAuth } from '../context/AuthContext';
 
 const { Content } = Layout;
@@ -14,29 +12,35 @@ export const CompanyLayout: React.FC = () => {
   const { selectedCompany } = useAuth();
 
   return (
-    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F1FA' }}>
-      <Sidebar
-        collapsed={collapsed}
-        packageType={selectedCompany?.packageType || 'COMPLETE'}
-        companyName={selectedCompany?.name || 'Company ERP'}
-        companyCode={selectedCompany?.code || 'ERP'}
-      />
-      <Layout>
-        <Navbar
+    <div className="erp-app-frame">
+      <div className="erp-inner-window">
+        {/* Deep Dark Navy Sidebar */}
+        <Sidebar
           collapsed={collapsed}
-          onToggleCollapse={() => setCollapsed(!collapsed)}
+          packageType={selectedCompany?.packageType || 'COMPLETE'}
+          companyName={selectedCompany?.name || 'Company ERP'}
+          companyCode={selectedCompany?.code || 'ERP'}
         />
-        <Content
-          style={{
-            margin: '20px 24px 12px',
-            flex: '1 0 auto',
-          }}
-        >
-          <AppBreadcrumb />
-          <Outlet />
-        </Content>
-        <Footer companyName={selectedCompany?.name} />
-      </Layout>
-    </Layout>
+
+        {/* Soft Lavender / Light Violet Inner Canvas */}
+        <Layout style={{ backgroundColor: '#F3F0F9', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+          <Navbar
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed(!collapsed)}
+          />
+
+          <Content
+            style={{
+              padding: '0 28px 28px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              flex: 1,
+            }}
+          >
+            <Outlet />
+          </Content>
+        </Layout>
+      </div>
+    </div>
   );
 };

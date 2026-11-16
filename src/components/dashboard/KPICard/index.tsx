@@ -16,6 +16,7 @@ export interface KPICardProps {
   subtitle?: string;
   icon?: React.ReactNode;
   iconBgColor?: string;
+  onClick?: () => void;
 }
 
 export const KPICard: React.FC<KPICardProps> = ({
@@ -26,58 +27,83 @@ export const KPICard: React.FC<KPICardProps> = ({
   trend,
   subtitle,
   icon,
-  iconBgColor = '#F0EAF8',
+  iconBgColor = 'rgba(110, 86, 207, 0.08)',
+  onClick,
 }) => {
   return (
     <Card
-      bordered
+      bordered={false}
+      onClick={onClick}
       style={{
-        borderRadius: 8,
-        borderColor: '#E7E0F0',
+        borderRadius: 20,
+        backgroundColor: '#FFFFFF',
+        boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)',
         height: '100%',
-        boxShadow: '0 1px 3px rgba(81, 37, 140, 0.04)',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'all 0.2s ease',
       }}
-      styles={{ body: { padding: '18px 20px' } }}
+      onMouseEnter={(e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 12px 28px rgba(110, 86, 207, 0.1)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (onClick) {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(25, 21, 59, 0.04)';
+        }
+      }}
+      styles={{ body: { padding: '20px 22px' } }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <Text style={{ fontSize: 12, color: '#77718A', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            {title}
-          </Text>
-          <div style={{ marginTop: 6, display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            {prefix && <span style={{ fontSize: 18, color: '#242033', fontWeight: 600 }}>{prefix}</span>}
-            <Title level={3} style={{ margin: 0, color: '#242033', fontWeight: 700 }}>
-              {value}
-            </Title>
-            {suffix && <span style={{ fontSize: 13, color: '#77718A' }}>{suffix}</span>}
-          </div>
-          {trend && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
-              {trend.isPositive ? <ArrowUpRight size={14} color="#16A36A" /> : <ArrowDownRight size={14} color="#DC4C4C" />}
-              <span style={{ fontSize: 12, fontWeight: 600, color: trend.isPositive ? '#16A36A' : '#DC4C4C' }}>
-                {trend.value}
-              </span>
-              <span style={{ fontSize: 11, color: '#9E98AD' }}>vs last period</span>
-            </div>
-          )}
-          {subtitle && <div style={{ fontSize: 12, color: '#77718A', marginTop: 4 }}>{subtitle}</div>}
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {icon && (
           <div
             style={{
               width: 44,
               height: 44,
-              borderRadius: 8,
+              borderRadius: 14,
               backgroundColor: iconBgColor,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#51258C',
+              color: '#6E56CF',
             }}
           >
             {icon}
           </div>
         )}
+        {trend && (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '3px 8px',
+              borderRadius: 20,
+              backgroundColor: trend.isPositive ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+            }}
+          >
+            {trend.isPositive ? <ArrowUpRight size={13} color="#10B981" /> : <ArrowDownRight size={13} color="#EF4444" />}
+            <span style={{ fontSize: 11, fontWeight: 700, color: trend.isPositive ? '#10B981' : '#EF4444' }}>
+              {trend.value}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+          {prefix && <span style={{ fontSize: 20, color: '#181433', fontWeight: 700 }}>{prefix}</span>}
+          <Title level={2} style={{ margin: 0, color: '#181433', fontWeight: 800, fontSize: 26, letterSpacing: '-0.02em' }}>
+            {value}
+          </Title>
+          {suffix && <span style={{ fontSize: 13, color: '#7E7A9B' }}>{suffix}</span>}
+        </div>
+        <Text style={{ fontSize: 13, color: '#7E7A9B', fontWeight: 500, display: 'block', marginTop: 4 }}>
+          {title}
+        </Text>
+        {subtitle && <div style={{ fontSize: 11, color: '#A5A1BE', marginTop: 2 }}>{subtitle}</div>}
       </div>
     </Card>
   );

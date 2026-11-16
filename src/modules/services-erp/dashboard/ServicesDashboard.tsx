@@ -1,157 +1,249 @@
 import React from 'react';
-import { Row, Col, Card, Table, Typography, Button } from 'antd';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { LifeBuoy, Wrench, Package, Users, HardHat, ArrowRight } from 'lucide-react';
+import { Row, Col, Card, Table, Typography, Button, Tag, Progress } from 'antd';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, AreaChart, Area } from 'recharts';
+import {
+  LifeBuoy,
+  Wrench,
+  Package,
+  Users,
+  HardHat,
+  ArrowRight,
+  ShieldAlert,
+  Clock,
+  Calendar,
+  DollarSign,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, StatusBadge } from '../../../components';
 import { KPICard } from '../../../components/dashboard/KPICard';
 import { ChartCard } from '../../../components/dashboard/ChartCard';
 import { useAuth } from '../../../context/AuthContext';
 import { MOCK_SERVICES_DATA } from '../../../mocks/services.mock';
-import { MOCK_SERVICE_TICKETS } from '../../../mock/salesServiceData';
+
+const SERVICE_TICKET_TRENDS = [
+  { month: 'Jul', incoming: 120, resolved: 114 },
+  { month: 'Aug', incoming: 145, resolved: 138 },
+  { month: 'Sep', incoming: 130, resolved: 128 },
+  { month: 'Oct', incoming: 160, resolved: 152 },
+  { month: 'Nov', incoming: 175, resolved: 169 },
+  { month: 'Dec', incoming: 190, resolved: 184 },
+];
 
 export const ServicesDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { selectedCompany } = useAuth();
-  const { kpis, monthlyJobsChart, technicianPerformance } = MOCK_SERVICES_DATA;
-
-  const ticketColumns = [
-    {
-      title: 'Ticket #',
-      dataIndex: 'ticketNumber',
-      key: 'ticketNumber',
-      render: (t: string) => <span style={{ fontWeight: 600, color: '#16A36A' }}>{t}</span>,
-    },
-    {
-      title: 'Customer & Asset',
-      dataIndex: 'customerName',
-      key: 'customerName',
-      render: (c: string, r: any) => (
-        <div>
-          <div style={{ fontWeight: 600 }}>{c}</div>
-          <div style={{ fontSize: 12, color: '#77718A' }}>Asset: {r.productOrAsset}</div>
-        </div>
-      ),
-    },
-    {
-      title: 'Assigned Tech',
-      dataIndex: 'assignedTechnician',
-      key: 'assignedTechnician',
-      render: (t: string) => (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <HardHat size={14} color="#7546B8" /> {t}
-        </span>
-      ),
-    },
-    {
-      title: 'Stage',
-      dataIndex: 'stage',
-      key: 'stage',
-      render: (st: string) => <StatusBadge status={st} />,
-    },
-  ];
+  const { kpis, technicianPerformance } = MOCK_SERVICES_DATA;
 
   return (
-    <div>
-      <PageHeader
-        title={`${selectedCompany?.name || 'Company'} – Services ERP`}
-        subtitle="Field service dispatch, technician SLA tracking, AMC coverage, and breakdown tickets."
-      />
+    <div style={{ paddingBottom: 24 }}>
+      {/* Service Header & Status Tag */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#181433' }}>
+            Service Management & Field Operations
+          </h2>
+          <span style={{ fontSize: 12, color: '#7E7A9B' }}>
+            Real-time technician tracking, breakdown SLA compliance, and AMC lifecycle
+          </span>
+        </div>
+        <Tag color="cyan" style={{ borderRadius: 12, padding: '3px 10px', fontWeight: 700, fontSize: 11 }}>
+          PACKAGE: SERVICE ERP ONLY
+        </Tag>
+      </div>
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+      {/* 8 Service Specific Main KPI Cards */}
+      <Row gutter={[14, 14]} style={{ marginBottom: 18 }}>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
-            title="Open Tickets"
+            title="Active Service Tickets"
             value={kpis.openTickets}
-            subtitle="Incident queue"
-            icon={<LifeBuoy size={22} />}
+            trend={{ value: '3 Critical Breaches', isPositive: false }}
+            icon={<LifeBuoy size={20} color="#EF4444" />}
+            iconBgColor="#FEE2E2"
+            onClick={() => navigate('/app/services/tickets')}
           />
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
-            title="Jobs Today"
+            title="Field Jobs Today"
             value={kpis.activeJobs}
-            subtitle="Engineers on site"
-            icon={<Wrench size={22} />}
+            trend={{ value: '42 Technicians Assigned', isPositive: true }}
+            icon={<Wrench size={20} color="#10B981" />}
+            iconBgColor="#E6FDF4"
+            onClick={() => navigate('/app/services/jobs')}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard
+            title="SLA Compliance Rate"
+            value="98.4%"
+            trend={{ value: '+1.2% this quarter', isPositive: true }}
+            icon={<ShieldAlert size={20} color="#6E56CF" />}
+            iconBgColor="#EFEBFF"
+            onClick={() => navigate('/app/services/sla')}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard
+            title="Customer CSAT Score"
+            value="4.85 / 5"
+            trend={{ value: '94% 5-Star Ratings', isPositive: true }}
+            icon={<Users size={20} color="#10B981" />}
+            iconBgColor="#E6FDF4"
+            onClick={() => navigate('/app/services/feedback')}
+          />
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard
+            title="Active AMC Contracts"
+            value="184 Active"
+            trend={{ value: '14 due for renewal', isPositive: true }}
+            icon={<CheckCircle2 size={20} color="#8B5CF6" />}
+            iconBgColor="#EDE9FE"
+            onClick={() => navigate('/app/services/amc')}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard
+            title="Service Revenue (INR)"
+            value="₹48.20 L"
+            trend={{ value: '+12% vs target', isPositive: true }}
+            icon={<DollarSign size={20} color="#10B981" />}
+            iconBgColor="#E6FDF4"
+            onClick={() => navigate('/app/services/billing')}
           />
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
             title="First-Time Fix Rate"
             value={kpis.firstTimeFixRate}
-            trend={{ value: '+2.4%', isPositive: true }}
-            icon={<Package size={22} />}
+            trend={{ value: '+2.4% resolution', isPositive: true }}
+            icon={<Package size={20} color="#6E56CF" />}
+            iconBgColor="#EFEBFF"
+            onClick={() => navigate('/app/services/performance')}
           />
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
-            title="Customer CSAT"
-            value={kpis.csat}
-            trend={{ value: 'Rated 4.8', isPositive: true }}
-            icon={<Users size={22} />}
+            title="Spare Parts Consumption"
+            value="₹8.45 L"
+            trend={{ value: '184 parts utilized', isPositive: true }}
+            icon={<Wrench size={20} color="#F59E0B" />}
+            iconBgColor="#FEF3C7"
+            onClick={() => navigate('/app/services/spare-parts')}
           />
         </Col>
       </Row>
 
-      {/* Chart Section */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        <Col xs={24} lg={16}>
-          <ChartCard title="Monthly Service Tickets & Job Resolutions" subtitle="Incoming requests vs Completed field jobs">
-            <div style={{ height: 260, width: '100%' }}>
+      {/* Middle Row: Service Ticket Resolutions Chart & Technician Leaderboard */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 18 }}>
+        <Col xs={24} lg={15}>
+          <ChartCard title="Monthly Service Tickets: Incoming vs Resolved" subtitle="Field breakdown ticket clearance efficiency">
+            <div style={{ height: 260, width: '100%', marginTop: 8 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyJobsChart} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F0EAF7" />
-                  <XAxis dataKey="month" stroke="#77718A" />
-                  <YAxis stroke="#77718A" />
-                  <Tooltip />
-                  <Bar dataKey="incoming" fill="#E6A23C" radius={[4, 4, 0, 0]} name="Incoming" />
-                  <Bar dataKey="completed" fill="#51258C" radius={[4, 4, 0, 0]} name="Completed" />
+                <BarChart data={SERVICE_TICKET_TRENDS} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="rgba(110, 86, 207, 0.08)" strokeDasharray="3 3" />
+                  <XAxis dataKey="month" stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }} />
+                  <Bar dataKey="incoming" name="Incoming Tickets" fill="#8874E8" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="resolved" name="Resolved Jobs" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </ChartCard>
         </Col>
 
-        <Col xs={24} lg={8}>
-          <Card title="Technician Roster & Ratings" style={{ height: '100%', borderRadius: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {technicianPerformance.map((tech, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '10px 12px',
-                    borderRadius: 6,
-                    backgroundColor: '#FAF7FC',
-                    border: '1px solid #E7E0F0',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 600, color: '#242033', fontSize: 13 }}>{tech.name}</span>
-                    <span style={{ fontWeight: 700, color: '#E6A23C' }}>⭐ {tech.rating}</span>
-                  </div>
-                  <div style={{ fontSize: 11, color: '#77718A', marginTop: 2 }}>{tech.specialization}</div>
-                  <div style={{ fontSize: 12, color: '#51258C', marginTop: 4, fontWeight: 500 }}>
-                    {tech.jobs} Jobs completed
-                  </div>
+        {/* Technician Field Dispatch & Performance */}
+        <Col xs={24} lg={9}>
+          <Card
+            bordered={false}
+            title={<span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Top Field Engineers</span>}
+            extra={<Button type="link" size="small" onClick={() => navigate('/app/services/technicians')} style={{ color: '#10B981', fontWeight: 700 }}>Team &gt;</Button>}
+            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)', height: '100%' }}
+            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '12px 22px 20px' } }}
+          >
+            {[
+              { name: 'Murugan K.', skill: 'HVAC & Drives Expert', rating: '4.95', jobs: '124 Jobs Done', sla: 99 },
+              { name: 'Dinesh V.', skill: 'Hydraulics Specialist', rating: '4.88', jobs: '98 Jobs Done', sla: 97 },
+              { name: 'Suresh R.', skill: 'Automation Engineer', rating: '4.82', jobs: '86 Jobs Done', sla: 96 },
+              { name: 'Balaji M.', skill: 'Electrical Maintenance', rating: '4.78', jobs: '72 Jobs Done', sla: 94 },
+            ].map((tech, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: i < 3 ? '1px solid #FAF7FC' : 'none', fontSize: 12 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#181433' }}>{tech.name}</div>
+                  <div style={{ fontSize: 11, color: '#7E7A9B' }}>{tech.skill} &bull; ⭐ {tech.rating}</div>
                 </div>
-              ))}
-            </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontWeight: 700, color: '#10B981' }}>{tech.jobs}</div>
+                  <Progress percent={tech.sla} size="small" strokeColor="#10B981" showInfo={false} style={{ width: 60, margin: 0 }} />
+                </div>
+              </div>
+            ))}
           </Card>
         </Col>
       </Row>
 
-      {/* Tickets Table */}
-      <Card
-        title="Critical Incident Tickets"
-        style={{ borderRadius: 8 }}
-        extra={
-          <Button type="link" onClick={() => navigate('/app/services/tickets')}>
-            View All Tickets <ArrowRight size={14} />
-          </Button>
-        }
-      >
-        <Table dataSource={MOCK_SERVICE_TICKETS} columns={ticketColumns} rowKey="id" pagination={false} size="middle" />
-      </Card>
+      {/* Bottom Row: Active Dispatch Work Orders */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24}>
+          <Card
+            bordered={false}
+            title={<span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Live Dispatch & Field Work Orders</span>}
+            extra={<Button type="link" size="small" onClick={() => navigate('/app/services/jobs')} style={{ color: '#10B981', fontWeight: 700 }}>Dispatch Console &gt;</Button>}
+            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)' }}
+            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '10px 22px 20px' } }}
+          >
+            <Table
+              dataSource={[
+                { key: '1', ticket: 'TKT-104', asset: 'CNC Spindle Unit 04', customer: 'Precision Engineering Ltd', tech: 'Murugan K.', stage: 'In Progress', priority: 'High', sla: '2 hrs left' },
+                { key: '2', ticket: 'TKT-103', asset: 'Hydraulic Press 50T', customer: 'Metro Rail Workshop', tech: 'Dinesh V.', stage: 'Assigned', priority: 'Urgent', sla: '45 mins left' },
+                { key: '3', ticket: 'TKT-102', asset: 'Rotary Compressor Sys-B', customer: 'Apex Motors Ltd', tech: 'Suresh R.', stage: 'Completed', priority: 'Normal', sla: 'Met On-Time' },
+                { key: '4', ticket: 'TKT-101', asset: 'Servo Drive Assembly', customer: 'Southern Automations', tech: 'Balaji M.', stage: 'Completed', priority: 'Normal', sla: 'Met On-Time' },
+              ]}
+              pagination={false}
+              size="small"
+              columns={[
+                { title: 'Ticket #', dataIndex: 'ticket', key: 'ticket', render: (t) => <span style={{ fontWeight: 700, color: '#10B981' }}>{t}</span> },
+                { title: 'Asset / Equipment', dataIndex: 'asset', key: 'asset', render: (a) => <span style={{ fontWeight: 600 }}>{a}</span> },
+                { title: 'Client Company', dataIndex: 'customer', key: 'customer' },
+                {
+                  title: 'Assigned Engineer',
+                  dataIndex: 'tech',
+                  key: 'tech',
+                  render: (tc) => (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+                      <HardHat size={14} color="#6E56CF" /> {tc}
+                    </span>
+                  ),
+                },
+                {
+                  title: 'Stage',
+                  dataIndex: 'stage',
+                  key: 'stage',
+                  render: (st) => (
+                    <Tag color={st === 'Completed' ? 'green' : st === 'In Progress' ? 'blue' : 'orange'} style={{ borderRadius: 10 }}>
+                      {st}
+                    </Tag>
+                  ),
+                },
+                {
+                  title: 'SLA Status',
+                  dataIndex: 'sla',
+                  key: 'sla',
+                  render: (sl, r) => (
+                    <span style={{ fontWeight: 700, color: r.priority === 'Urgent' ? '#EF4444' : '#181433', fontSize: 12 }}>
+                      {sl}
+                    </span>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

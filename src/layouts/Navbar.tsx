@@ -1,11 +1,9 @@
 import React from 'react';
 import {
-  Layout,
   Dropdown,
   Avatar,
   Badge,
   Input,
-  Space,
   Select,
   Tooltip,
 } from 'antd';
@@ -16,16 +14,13 @@ import {
   SearchOutlined,
   LogoutOutlined,
   SettingOutlined,
-  SwapOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
-import { Building } from 'lucide-react';
+import { Sun, Building2, Sparkles, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';
 import type { ErpPackageId } from '../config/erpPackageConfig';
-
-const { Header } = Layout;
 
 interface NavbarProps {
   collapsed: boolean;
@@ -44,19 +39,20 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
       key: 'user-info',
       disabled: true,
       label: (
-        <div style={{ padding: '4px 0' }}>
-          <div style={{ fontWeight: 600, color: '#242033' }}>{user?.name || 'Administrator'}</div>
-          <div style={{ fontSize: 12, color: '#77718A' }}>{user?.email}</div>
-          <div style={{ marginTop: 4 }}>
+        <div style={{ padding: '8px 6px' }}>
+          <div style={{ fontWeight: 800, color: '#181433', fontSize: 14 }}>{user?.name || 'Administrator'}</div>
+          <div style={{ fontSize: 12, color: '#7E7A9B' }}>{user?.email}</div>
+          <div style={{ marginTop: 6 }}>
             <span
               style={{
                 fontSize: 10,
                 textTransform: 'uppercase',
-                padding: '2px 6px',
-                borderRadius: 4,
-                backgroundColor: pkgMeta.badgeBg,
-                color: pkgMeta.badgeColor,
-                fontWeight: 700,
+                padding: '3px 10px',
+                borderRadius: 20,
+                backgroundColor: 'rgba(110, 86, 207, 0.12)',
+                color: '#6E56CF',
+                fontWeight: 800,
+                letterSpacing: '0.04em',
               }}
             >
               {user?.role} &bull; {pkgMeta.name}
@@ -77,7 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
           {
             key: 'superadmin',
             icon: <SafetyCertificateOutlined />,
-            label: <span style={{ color: '#51258C', fontWeight: 600 }}>Super Admin HQ</span>,
+            label: <span style={{ color: '#6E56CF', fontWeight: 700 }}>Super Admin HQ</span>,
             onClick: () => navigate('/super-admin/dashboard'),
           },
         ]
@@ -96,88 +92,147 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
   ];
 
   return (
-    <Header
+    <div
       style={{
-        padding: '0 24px',
-        background: '#FFFFFF',
-        borderBottom: '1px solid #E7E0F0',
+        padding: '16px 28px 14px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        minHeight: 64,
-        height: 'auto',
-        position: 'sticky',
-        top: 0,
-        zIndex: 9,
+        backgroundColor: '#F3F0F9',
+        flexWrap: 'nowrap',
+        width: '100%',
+        boxSizing: 'border-box',
+        gap: 16,
       }}
     >
-      {/* Left Area: Toggle & Multi-Tenant Company Selector */}
-      <Space size="middle" wrap={false} style={{ alignItems: 'center', flexShrink: 0 }}>
-        <span
+      {/* 1. Left Greeting Area with Elegant Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        <div
           onClick={onToggleCollapse}
           style={{
-            fontSize: 18,
-            cursor: 'pointer',
-            color: '#51258C',
-            padding: '6px',
-            borderRadius: 4,
-            display: 'inline-flex',
+            width: 38,
+            height: 38,
+            borderRadius: 12,
+            backgroundColor: '#FFFFFF',
+            display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(25, 21, 59, 0.05)',
+            color: '#6E56CF',
+            fontSize: 16,
+            flexShrink: 0,
+            transition: 'all 0.2s ease',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         >
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </span>
+        </div>
 
-        {/* Company Quick-Switcher */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <Building size={16} color="#51258C" />
+        <div style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 20,
+              fontWeight: 800,
+              color: '#181433',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Welcome, {user?.name?.split(' ')[0] || 'Ramesh'}!
+          </h1>
+        </div>
+      </div>
+
+      {/* 2. Right Interactive Controls: Matching the Reference Image Clean Pill Aesthetic */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        {/* Search Bar: White Pill with subtle inset feel */}
+        <div style={{ position: 'relative' }}>
+          <Input
+            prefix={<SearchOutlined style={{ color: '#A5A1BE', fontSize: 14, marginRight: 4 }} />}
+            placeholder="Search anything..."
+            style={{
+              width: 160,
+              borderRadius: 30,
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
+              height: 40,
+              border: 'none',
+              fontSize: 12,
+              fontWeight: 500,
+              paddingLeft: 14,
+            }}
+          />
+        </div>
+
+        {/* Company Switcher Pill */}
+        <div
+          style={{
+            height: 40,
+            borderRadius: 30,
+            backgroundColor: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
+            padding: '0 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            flexShrink: 0,
+          }}
+        >
+          <Building2 size={14} color="#6E56CF" />
           <Select
             value={selectedCompany?.id}
             onChange={(val) => selectCompany(val)}
-            style={{ width: 220 }}
-            size="middle"
+            variant="borderless"
+            style={{
+              minWidth: 120,
+              maxWidth: 150,
+              fontWeight: 700,
+              color: '#181433',
+              fontSize: 12,
+            }}
+            popupMatchSelectWidth={false}
           >
             {companies.map((c) => (
               <Select.Option key={c.id} value={c.id}>
-                <span style={{ fontWeight: 600 }}>{c.name}</span>{' '}
-                <span style={{ fontSize: 11, color: '#77718A' }}>({c.packageType})</span>
+                <span style={{ fontWeight: 700 }}>{c.name}</span>
               </Select.Option>
             ))}
           </Select>
         </div>
 
-        {/* Live ERP Package Simulation Switcher */}
-        <Tooltip title="Test how this company operates under another ERP package">
+        {/* ERP Package Switcher Pill */}
+        <Tooltip title="Switch Active Package Subscription">
           <div
             style={{
-              display: 'inline-flex',
+              height: 40,
+              borderRadius: 30,
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
+              padding: '0 10px',
+              display: 'flex',
               alignItems: 'center',
-              whiteSpace: 'nowrap',
               gap: 4,
-              padding: '0 8px',
-              borderRadius: 6,
-              backgroundColor: '#F5F1FA',
-              border: '1px dashed #7546B8',
-              fontSize: 12,
-              height: 32,
+              cursor: 'pointer',
               flexShrink: 0,
             }}
           >
-            <SwapOutlined style={{ color: '#51258C', fontSize: 13, display: 'inline-flex' }} />
-            <span style={{ color: '#51258C', fontWeight: 600, fontSize: 12 }}>Package:</span>
+            <Sparkles size={14} color="#6E56CF" />
             <Select
               value={currentPkg}
-              size="small"
+              size="middle"
               variant="borderless"
               onChange={(val) => {
-                if (selectedCompany) {
-                  updateCompanyPackage(selectedCompany.id, val as any);
-                }
+                if (selectedCompany) updateCompanyPackage(selectedCompany.id, val as any);
               }}
               style={{
-                width: 105,
-                fontWeight: 700,
-                color: '#51258C',
+                width: 90,
+                fontWeight: 800,
+                color: '#6E56CF',
+                fontSize: 12,
               }}
               popupMatchSelectWidth={false}
             >
@@ -187,61 +242,89 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
             </Select>
           </div>
         </Tooltip>
-      </Space>
 
-      {/* Right Area: Search, Notifications & Profile */}
-      <Space size="middle" wrap={false} style={{ alignItems: 'center', flexShrink: 0 }}>
-        <Input
-          prefix={<SearchOutlined style={{ color: '#9E98AD' }} />}
-          placeholder="Search ERP modules, orders..."
-          style={{ width: 200, borderRadius: 20, backgroundColor: '#FAF7FC' }}
-        />
+        {/* Sun / Theme Button: Glowing Soft Purple Circle */}
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
+            transition: 'transform 0.2s ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        >
+          <Sun size={16} />
+        </div>
 
+        {/* Notifications Button: Clean White Circle with Red Badge */}
         <Tooltip title="Notifications">
-          <Badge count={3} offset={[-2, 4]} color="#51258C">
+          <Badge
+            count={3}
+            offset={[-4, 4]}
+            styles={{ indicator: { backgroundColor: '#EF4444', fontWeight: 800, boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)' } }}
+          >
             <div
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#FAF7FC',
                 cursor: 'pointer',
-                color: '#51258C',
+                color: '#6E56CF',
+                boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
+                transition: 'transform 0.2s ease',
+                flexShrink: 0,
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
               <BellOutlined style={{ fontSize: 16 }} />
             </div>
           </Badge>
         </Tooltip>
 
+        {/* User Profile Avatar with Soft Violet Ring Shadow */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
           <div
             style={{
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: 6,
+              padding: 2,
+              borderRadius: 22,
+              transition: 'transform 0.2s ease',
+              flexShrink: 0,
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
-            <Avatar style={{ backgroundColor: '#51258C', fontWeight: 700, fontSize: 13 }}>
-              {user?.name?.charAt(0) || 'U'}
+            <Avatar
+              size={40}
+              style={{
+                background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
+                fontWeight: 800,
+                fontSize: 15,
+                boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
+                color: '#FFFFFF',
+              }}
+            >
+              {user?.name?.charAt(0) || 'R'}
             </Avatar>
-            <div style={{ lineHeight: 1.2, textAlign: 'left' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#242033' }}>
-                {user?.name || 'User'}
-              </div>
-              <div style={{ fontSize: 11, color: '#7546B8' }}>
-                {selectedCompany?.code}
-              </div>
-            </div>
           </div>
         </Dropdown>
-      </Space>
-    </Header>
+      </div>
+    </div>
   );
 };

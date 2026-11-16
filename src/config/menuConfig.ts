@@ -446,6 +446,18 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
       { key: 'ce-reports', label: 'Customer Satisfaction Reports', path: '/app/services/csat-reports', iconName: 'BarChart' },
     ],
   },
+  {
+    key: 'grp-dedicated-portals',
+    label: 'Enterprise Portals',
+    iconName: 'Globe',
+    section: 'common',
+    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    children: [
+      { key: 'portal-cust', label: 'Customer Self-Service', path: '/app/portal/customer', iconName: 'Users' },
+      { key: 'portal-supp', label: 'Supplier Collaboration', path: '/app/portal/supplier', iconName: 'Truck' },
+      { key: 'portal-tech', label: 'Technician Mobile Workspace', path: '/app/portal/technician', iconName: 'HardHat' },
+    ],
+  },
 ];
 
 /**
