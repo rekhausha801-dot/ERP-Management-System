@@ -62,6 +62,7 @@ import { GenericModuleView } from '../pages/GenericModuleView';
 import { CustomerPortal } from '../pages/portals/CustomerPortal';
 import { SupplierPortal } from '../pages/portals/SupplierPortal';
 import { EmployeePortal } from '../pages/portals/EmployeePortal';
+import { FinanceBillingPage } from '../pages/finance/FinanceBillingPage';
 
 // Error Pages & Route Guard
 import { NotFoundPage, UnauthorizedPage, ForbiddenPage } from '../pages/errors/ErrorPages';
@@ -153,9 +154,21 @@ export const AppRoutes: React.FC = () => {
         <Route path="documents/attachments" element={<GenericModuleView title="Attachments" />} />
         <Route path="documents/history" element={<GenericModuleView title="Document History" />} />
 
-        {/* Finance & Accounting */}
-        <Route path="billing" element={<InvoicesPage />} />
+        {/* Finance & Accounts Extended Architecture */}
+        <Route path="billing" element={<FinanceBillingPage />} />
+        <Route path="finance/invoices" element={<FinanceBillingPage />} />
+        <Route path="finance/proforma-invoices" element={<GenericModuleView title="Proforma Invoices" />} />
+        <Route path="finance/recurring-invoices" element={<GenericModuleView title="Recurring Invoices" />} />
+        <Route path="finance/credit-notes" element={<GenericModuleView title="Credit Notes" />} />
+        <Route path="finance/debit-notes" element={<GenericModuleView title="Debit Notes" />} />
+        <Route path="finance/invoice-templates" element={<GenericModuleView title="Invoice Templates" />} />
         <Route path="payments" element={<PaymentsPage />} />
+        <Route path="finance/payment-history" element={<GenericModuleView title="Payment History" />} />
+        <Route path="finance/refunds" element={<GenericModuleView title="Refund Management" />} />
+        <Route path="finance/reconciliation" element={<GenericModuleView title="Payment Reconciliation" />} />
+        <Route path="finance/bank-cash" element={<GenericModuleView title="Bank & Cash Management" />} />
+        <Route path="finance/reports" element={<GenericModuleView title="Financial Reports" />} />
+        <Route path="finance/profit-loss" element={<GenericModuleView title="Profit & Loss" />} />
         <Route path="finance/payment-methods" element={<GenericModuleView title="Payment Methods" />} />
         <Route path="finance/expenses" element={<GenericModuleView title="Expenses" />} />
         <Route path="finance/tax" element={<GenericModuleView title="Tax Management" />} />
