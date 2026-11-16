@@ -10,6 +10,7 @@ import {
   Space,
   Typography,
 } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   LayoutDashboard,
   Building2,
@@ -40,7 +41,7 @@ export const MainLayout: React.FC = () => {
   const location = useLocation();
   const { user, logout, selectedCompany, selectCompany, companies } = useAuth();
 
-  const menuItems = [
+  const menuItems: MenuProps['items'] = [
     {
       key: '/dashboard',
       icon: <LayoutDashboard size={18} />,
@@ -108,7 +109,7 @@ export const MainLayout: React.FC = () => {
     },
   ];
 
-  const profileMenuItems = [
+  const profileMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
       label: (
@@ -123,7 +124,7 @@ export const MainLayout: React.FC = () => {
       disabled: true,
     },
     {
-      type: 'divider' as const,
+      type: 'divider',
     },
     {
       key: 'settings',
@@ -143,18 +144,14 @@ export const MainLayout: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', width: '100vw' }}>
       {/* Sidebar */}
       <Sider
         width={250}
         theme="dark"
         style={{
           backgroundColor: '#0d233a',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          left: 0,
-          zIndex: 10,
+          flex: '0 0 250px',
         }}
       >
         <div
@@ -208,7 +205,7 @@ export const MainLayout: React.FC = () => {
       </Sider>
 
       {/* Main Layout */}
-      <Layout>
+      <Layout style={{ minWidth: 0, flex: 1, backgroundColor: '#f4f6f9' }}>
         {/* Top Header */}
         <Header
           style={{
@@ -222,6 +219,7 @@ export const MainLayout: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 9,
+            width: '100%',
           }}
         >
           {/* Company Selector */}
@@ -288,9 +286,10 @@ export const MainLayout: React.FC = () => {
         {/* Dynamic Page Content */}
         <Content
           style={{
-            margin: '24px 24px 0',
-            minHeight: 280,
-            paddingBottom: 24,
+            padding: '24px',
+            backgroundColor: '#f4f6f9',
+            width: '100%',
+            flex: '1 0 auto',
           }}
         >
           <Outlet />
