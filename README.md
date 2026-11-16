@@ -1,5 +1,3 @@
-# ERP Management System
-
 - React.js
 - TypeScript
 - Vite
