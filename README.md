@@ -1,86 +1,12 @@
-# ERP Management System – Enterprise Suite
+# ERP Management System
 
-A modern, enterprise-grade, multi-entity **ERP Management System** frontend built with **React**, **TypeScript**, **Vite**, and **Ant Design (antd)**.
+## Frontend Technologies
 
----
-
-## 🚀 Tech Stack
-
-- **Framework**: React.js 19 with TypeScript
-- **Bundler**: Vite
-- **UI Component Library**: Ant Design (`antd`)
-- **Icons**: Lucide React (`lucide-react`) & Ant Design Icons (`@ant-design/icons`)
-- **Routing**: React Router DOM v7
-- **HTTP Client**: Axios
-- **Dates**: Dayjs
-
----
-
-## 🏢 Core Modules
-
-1. **Dashboard** – Executive KPIs, multi-entity performance, active projects & activity feed
-2. **Company Management** – Multi-entity / corporate subsidiaries management
-3. **Employee Management** – Staff directory, salary, departments, and roles
-4. **Worker Management** – On-site skilled labor, daily wages, and site assignments
-5. **Attendance Management** – Check-in/out records, status logs, and shifts
-6. **Project Management** – Project budgets, client information, progress tracking
-7. **Works Management** – Work orders, job allocations, task priorities
-8. **Payroll Management** – Salary calculations, deductions, allowances, payslips
-9. **Inventory Management** – Stock levels, SKU tracking, reorder indicators
-10. **Purchase Management** – Vendor purchase orders, procurement status
-11. **Billing Management** – Client invoices, payment tracking, overdue status
-12. **Reports** – Business intelligence, financial analytics, CSV/PDF exports
-13. **Settings** – System configurations, permissions, organization profile
-
----
-
-## 📁 Project Structure
-
-```text
-frontend/
-├── public/
-├── src/
-│   ├── assets/          # Static assets & media
-│   ├── components/      # Reusable ERP UI components (PageHeader, DataTable, StatCard, FilterToolbar, StatusBadge)
-│   ├── constants/       # Global ERP constants
-│   ├── context/         # AuthContext & Multi-Company State
-│   ├── hooks/           # Custom React hooks
-│   ├── layouts/         # MainLayout with responsive enterprise Sidebar & Header
-│   ├── pages/           # Module pages (Dashboard, Companies, Employees, etc.)
-│   ├── routes/          # Protected and Public Route definitions
-│   ├── services/        # Mock data & API service layer
-│   ├── styles/          # Navy Blue Enterprise theme and global styles
-│   ├── types/           # TypeScript domain definitions
-│   ├── utils/           # Utility functions
-│   ├── App.tsx          # Root Application with Ant Design ConfigProvider
-│   └── main.tsx         # Entry point
-```
-
----
-
-## 🛠️ Getting Started
-
-### 1. Navigate to frontend folder
-```bash
-cd frontend
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Start Development Server
-```bash
-npm run dev
-```
-
-The application will be live at `http://localhost:5173`.
-
----
-
-## 🎨 Enterprise Design Language
-- **Primary Color**: Navy Blue (`#0d233a`)
-- **Accent Colors**: Subtle Gold (`#d4af37`), Tech Blue (`#1890ff`)
-- **Card Backgrounds**: Pure White (`#ffffff`) with soft elevation shadows
-- **Page Background**: Light Enterprise Grey (`#f4f6f9`)
+- React.js
+- TypeScript
+- Vite
+- Ant Design (antd)
+- React Router DOM
+- Axios
+- CSS3
+- Lucide React Icons
