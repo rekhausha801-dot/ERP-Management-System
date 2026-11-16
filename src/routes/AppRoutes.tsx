@@ -58,6 +58,11 @@ import {
 // Generic Active Module Viewer for newly structured sub-modules
 import { GenericModuleView } from '../pages/GenericModuleView';
 
+// Dedicated Sub-Portals
+import { CustomerPortal } from '../pages/portals/CustomerPortal';
+import { SupplierPortal } from '../pages/portals/SupplierPortal';
+import { EmployeePortal } from '../pages/portals/EmployeePortal';
+
 // Error Pages & Route Guard
 import { NotFoundPage, UnauthorizedPage, ForbiddenPage } from '../pages/errors/ErrorPages';
 import { ModuleAccessRoute } from './ModuleAccessRoute';
@@ -318,6 +323,11 @@ export const AppRoutes: React.FC = () => {
         <Route path="services/customer-ratings" element={<ModuleAccessRoute><GenericModuleView title="Customer Ratings" /></ModuleAccessRoute>} />
         <Route path="services/complaints" element={<ModuleAccessRoute><GenericModuleView title="Complaints" /></ModuleAccessRoute>} />
         <Route path="services/csat-reports" element={<ModuleAccessRoute><GenericModuleView title="Customer Satisfaction Reports" /></ModuleAccessRoute>} />
+
+        {/* Dedicated Specialized Portals */}
+        <Route path="portal/customer" element={<CustomerPortal />} />
+        <Route path="portal/supplier" element={<SupplierPortal />} />
+        <Route path="portal/technician" element={<EmployeePortal />} />
       </Route>
 
       {/* Redirects & 404 */}

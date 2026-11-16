@@ -73,9 +73,46 @@ export const Login: React.FC = () => {
         }}
         styles={{ body: { padding: '28px 32px' } }}
       >
-        {errorMsg && (
-          <Alert message={errorMsg} type="error" showIcon closable style={{ marginBottom: 20 }} />
-        )}
+        {/* Package Tabs for Dedicated Login Experiences */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#7E7A9B', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8, textAlign: 'center' }}>
+            Choose ERP Subscription Gateway
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, backgroundColor: '#F3F0F9', padding: 4, borderRadius: 12 }}>
+            {[
+              { id: 'COMPLETE', label: 'Complete ERP', sub: 'Sales + Service' },
+              { id: 'SALES', label: 'Sales ERP', sub: 'Sales Only' },
+              { id: 'SERVICE', label: 'Service ERP', sub: 'Services Only' },
+            ].map((pkg) => {
+              const active = selectedCompId ? SAMPLE_COMPANIES.find(c => c.id === selectedCompId)?.packageType === pkg.id : pkg.id === 'COMPLETE';
+              const targetComp = SAMPLE_COMPANIES.find(c => c.packageType === pkg.id) || SAMPLE_COMPANIES[0];
+              return (
+                <div
+                  key={pkg.id}
+                  onClick={() => {
+                    setSelectedCompId(targetComp.id);
+                    selectCompany(targetComp.id);
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 9,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: active ? '#FFFFFF' : 'transparent',
+                    boxShadow: active ? '0 3px 10px rgba(110, 86, 207, 0.15)' : 'none',
+                    border: active ? '1px solid rgba(110, 86, 207, 0.2)' : '1px solid transparent',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div style={{ fontSize: 12, fontWeight: 800, color: active ? '#6E56CF' : '#181433' }}>
+                    {pkg.label}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#7E7A9B' }}>{pkg.sub}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <Form
           layout="vertical"

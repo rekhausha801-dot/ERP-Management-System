@@ -1,15 +1,13 @@
 :root {
-  --erp-primary: #51258C;
-  --erp-primary-hover: #401C6F;
-  --erp-secondary: #7546B8;
-  --erp-background: #F5F1FA;
-  --erp-surface: #FFFFFF;
-  --erp-border: #E7E0F0;
-  --erp-primary-text: #242033;
-  --erp-secondary-text: #77718A;
-  --erp-success: #16A36A;
-  --erp-warning: #E6A23C;
-  --erp-danger: #DC4C4C;
+  --erp-sidebar-bg: #19153B;
+  --erp-canvas-bg: #F3F0F9;
+  --erp-card-bg: #FFFFFF;
+  --erp-primary: #6E56CF;
+  --erp-primary-hover: #5B43C2;
+  --erp-primary-gradient: linear-gradient(135deg, #7C66DC 0%, #583EC7 100%);
+  --erp-primary-text: #181433;
+  --erp-secondary-text: #7E7A9B;
+  --erp-border: #EAE6F4;
 }
 
 html,
@@ -17,36 +15,96 @@ body,
 #root {
   width: 100% !important;
   max-width: 100% !important;
-  min-height: 100vh;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
-  background-color: var(--erp-background);
-  color: var(--erp-primary-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #F3F0F9;
+  color: #181433;
+  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-.ant-btn-primary {
-  background-color: var(--erp-primary) !important;
-  box-shadow: 0 2px 4px rgba(81, 37, 140, 0.2) !important;
+/* Fullscreen App Layout */
+.erp-app-frame {
+  height: 100vh;
+  max-height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  overflow: hidden;
 }
 
-.ant-btn-primary:hover {
-  background-color: var(--erp-primary-hover) !important;
+.erp-inner-window {
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  background: #F3F0F9;
+  overflow: hidden;
 }
 
-/* Custom Scrollbars */
+/* Custom Soft Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--erp-background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D8CEE6;
-  border-radius: 3px;
+  background: rgba(110, 86, 207, 0.2);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--erp-secondary);
+  background: rgba(110, 86, 207, 0.4);
+}
+
+/* Ant Design Dark Menu Overrides for Ultra-Premium Violet Sidebar */
+.erp-dark-sidebar .ant-menu-dark {
+  background: transparent !important;
+}
+
+.erp-dark-sidebar .ant-menu-dark .ant-menu-sub {
+  background: transparent !important;
+}
+
+.erp-dark-sidebar .ant-menu-dark .ant-menu-item,
+.erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-title {
+  margin: 4px 0 !important;
+  border-radius: 12px !important;
+  color: #9B96B5 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.erp-dark-sidebar .ant-menu-dark .ant-menu-item:hover,
+.erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+/* Active Selected Item - Glossy Pill with Soft Purple Glow matching reference */
+.erp-dark-sidebar .ant-menu-dark .ant-menu-item-selected {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.10) 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-open > .ant-menu-submenu-title {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+/* Submenu Child Indentation & Visual Hierarchy */
+.erp-dark-sidebar .ant-menu-sub .ant-menu-item {
+  padding-left: 42px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  font-size: 12.5px !important;
 }

@@ -20,18 +20,23 @@ export const ChartCard: React.FC<ChartCardProps> = ({
     <Card
       title={
         <div>
-          <Title level={5} style={{ margin: 0, color: '#242033', fontWeight: 600 }}>
+          <Title level={5} style={{ margin: 0, color: '#181433', fontWeight: 700, fontSize: 16 }}>
             {title}
           </Title>
-          {subtitle && <Text style={{ fontSize: 12, color: '#77718A' }}>{subtitle}</Text>}
+          {subtitle && <Text style={{ fontSize: 12, color: '#7E7A9B' }}>{subtitle}</Text>}
         </div>
       }
       extra={extra}
-      bordered
+      bordered={false}
       style={{
-        borderRadius: 8,
-        borderColor: '#E7E0F0',
+        borderRadius: 20,
+        backgroundColor: '#FFFFFF',
+        boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)',
         height: '100%',
+      }}
+      styles={{
+        header: { borderBottom: 'none', padding: '20px 24px 0' },
+        body: { padding: '16px 24px 24px' },
       }}
     >
       {children}
