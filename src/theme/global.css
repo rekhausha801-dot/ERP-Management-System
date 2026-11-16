@@ -1,0 +1,52 @@
+:root {
+  --erp-primary: #51258C;
+  --erp-primary-hover: #401C6F;
+  --erp-secondary: #7546B8;
+  --erp-background: #F5F1FA;
+  --erp-surface: #FFFFFF;
+  --erp-border: #E7E0F0;
+  --erp-primary-text: #242033;
+  --erp-secondary-text: #77718A;
+  --erp-success: #16A36A;
+  --erp-warning: #E6A23C;
+  --erp-danger: #DC4C4C;
+}
+
+html,
+body,
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: var(--erp-background);
+  color: var(--erp-primary-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ant-btn-primary {
+  background-color: var(--erp-primary) !important;
+  box-shadow: 0 2px 4px rgba(81, 37, 140, 0.2) !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--erp-primary-hover) !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--erp-background);
+}
+::-webkit-scrollbar-thumb {
+  background: #D8CEE6;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--erp-secondary);
+}

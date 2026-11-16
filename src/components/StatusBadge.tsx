@@ -1,44 +1,71 @@
 import React from 'react';
 import { Tag } from 'antd';
 
-export type StatusType =
-  | 'active'
-  | 'inactive'
-  | 'in_progress'
-  | 'completed'
-  | 'pending'
-  | 'paid'
-  | 'cancelled'
-  | 'on_hold'
-  | 'present'
-  | 'absent'
-  | 'leave';
-
 interface StatusBadgeProps {
-  status: StatusType | string;
+  status: string;
 }
 
-const statusColorMap: Record<string, { color: string; label: string }> = {
-  active: { color: 'success', label: 'Active' },
-  inactive: { color: 'default', label: 'Inactive' },
-  in_progress: { color: 'processing', label: 'In Progress' },
-  completed: { color: 'success', label: 'Completed' },
-  pending: { color: 'warning', label: 'Pending' },
-  paid: { color: 'success', label: 'Paid' },
-  cancelled: { color: 'error', label: 'Cancelled' },
-  on_hold: { color: 'default', label: 'On Hold' },
-  present: { color: 'success', label: 'Present' },
-  absent: { color: 'error', label: 'Absent' },
-  leave: { color: 'warning', label: 'On Leave' },
-};
-
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  const config = statusColorMap[status.toLowerCase()] || {
-    color: 'default',
-    label: status.replace(/_/g, ' ').toUpperCase(),
-  };
+  const norm = status.toLowerCase();
 
-  return <Tag color={config.color}>{config.label}</Tag>;
+  let color = 'default';
+
+  if (
+    norm.includes('active') ||
+    norm.includes('completed') ||
+    norm.includes('paid') ||
+    norm.includes('approved') ||
+    norm.includes('qualified') ||
+    norm.includes('resolved') ||
+    norm.includes('available') ||
+    norm.includes('in stock') ||
+    norm.includes('success')
+  ) {
+    color = 'success';
+  } else if (
+    norm.includes('pending') ||
+    norm.includes('working') ||
+    norm.includes('progress') ||
+    norm.includes('sent') ||
+    norm.includes('review') ||
+    norm.includes('scheduled') ||
+    norm.includes('inspecting') ||
+    norm.includes('partially') ||
+    norm.includes('low stock') ||
+    norm.includes('expiring')
+  ) {
+    color = 'warning';
+  } else if (
+    norm.includes('inactive') ||
+    norm.includes('overdue') ||
+    norm.includes('failed') ||
+    norm.includes('rejected') ||
+    norm.includes('lost') ||
+    norm.includes('emergency') ||
+    norm.includes('out of stock') ||
+    norm.includes('expired')
+  ) {
+    color = 'error';
+  } else if (
+    norm.includes('new') ||
+    norm.includes('draft') ||
+    norm.includes('open') ||
+    norm.includes('en route')
+  ) {
+    color = 'processing';
+  }
+
+  return (
+    <Tag
+      color={color}
+      style={{
+        fontWeight: 600,
+        borderRadius: 4,
+        padding: '2px 8px',
+        textTransform: 'capitalize',
+      }}
+    >
+      {status}
+    </Tag>
+  );
 };
-
-export default StatusBadge;

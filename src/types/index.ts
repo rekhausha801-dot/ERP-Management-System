@@ -1,132 +1,215 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'superadmin' | 'admin' | 'manager' | 'accountant' | 'staff';
-  avatar?: string;
-  companyId?: string;
-}
+export * from './erp';
 
-export interface Company {
+// Sales ERP Interfaces
+export interface Lead {
   id: string;
-  name: string;
-  code: string;
-  registrationNumber: string;
-  taxId: string;
+  leadNumber: string;
+  contactName: string;
+  companyName: string;
   email: string;
   phone: string;
-  address: string;
-  status: 'active' | 'inactive';
-  logo?: string;
-}
-
-export interface Employee {
-  id: string;
-  employeeCode: string;
-  name: string;
-  email: string;
-  phone: string;
-  department: string;
-  designation: string;
-  joiningDate: string;
-  salary: number;
-  status: 'active' | 'on_leave' | 'terminated';
-  companyId: string;
-}
-
-export interface Worker {
-  id: string;
-  workerCode: string;
-  name: string;
-  phone: string;
-  skillCategory: string; // e.g. Electrician, Mason, Carpenter
-  dailyWage: number;
-  currentSiteId?: string;
-  status: 'active' | 'inactive';
-  companyId: string;
-}
-
-export interface Attendance {
-  id: string;
-  date: string;
-  personType: 'employee' | 'worker';
-  personId: string;
-  personName: string;
-  checkIn: string;
-  checkOut?: string;
-  status: 'present' | 'absent' | 'half_day' | 'leave';
-  companyId: string;
-}
-
-export interface Project {
-  id: string;
-  code: string;
-  name: string;
-  clientName: string;
-  startDate: string;
-  endDate: string;
-  budget: number;
-  spent: number;
-  status: 'planning' | 'in_progress' | 'on_hold' | 'completed';
-  progress: number;
-  companyId: string;
-}
-
-export interface WorkTask {
-  id: string;
-  projectId: string;
-  projectName: string;
-  title: string;
+  source: 'Website' | 'Referral' | 'Exhibition' | 'Cold Outreach' | 'Campaign';
+  status: 'New' | 'Contacted' | 'Qualified' | 'Proposal' | 'Negotiation' | 'Lost';
+  estimatedValue: number;
   assignedTo: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'todo' | 'in_progress' | 'review' | 'done';
-  dueDate: string;
+  createdAt: string;
 }
 
-export interface InventoryItem {
+export interface Enquiry {
   id: string;
-  sku: string;
-  name: string;
+  enquiryNumber: string;
+  clientName: string;
+  subject: string;
   category: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;
-  minStockLevel: number;
-  status: 'in_stock' | 'low_stock' | 'out_of_stock';
-  companyId: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  status: 'Open' | 'In Review' | 'Quoted' | 'Closed';
+  date: string;
 }
 
-export interface PurchaseOrder {
+export interface Quotation {
+  id: string;
+  quoteNumber: string;
+  customerName: string;
+  issueDate: string;
+  validUntil: string;
+  totalAmount: number;
+  taxAmount: number;
+  grandTotal: number;
+  status: 'Draft' | 'Sent' | 'Approved' | 'Rejected' | 'Expired';
+}
+
+export interface SalesOrder {
   id: string;
   orderNumber: string;
-  supplierName: string;
+  customerName: string;
   orderDate: string;
+  expectedDelivery: string;
   totalAmount: number;
-  status: 'draft' | 'pending' | 'received' | 'cancelled';
-  companyId: string;
+  paymentStatus: 'Unpaid' | 'Partially Paid' | 'Paid';
+  deliveryStatus: 'Pending' | 'Processing' | 'Shipped' | 'Delivered';
 }
 
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  clientName: string;
-  issueDate: string;
+  customerName: string;
+  invoiceDate: string;
   dueDate: string;
   amount: number;
-  tax: number;
-  status: 'draft' | 'sent' | 'paid' | 'overdue';
-  companyId: string;
+  paidAmount: number;
+  balanceDue: number;
+  status: 'Draft' | 'Sent' | 'Paid' | 'Partially Paid' | 'Overdue';
 }
 
-export interface PayrollRecord {
+export interface Payment {
   id: string;
-  month: string;
-  employeeId: string;
-  employeeName: string;
-  basicSalary: number;
-  allowances: number;
-  deductions: number;
-  netSalary: number;
-  status: 'pending' | 'processed' | 'paid';
-  companyId: string;
+  receiptNumber: string;
+  customerName: string;
+  invoiceNumber: string;
+  paymentDate: string;
+  paymentMethod: 'Bank Transfer' | 'Credit Card' | 'Cheque' | 'Cash' | 'UPI';
+  amount: number;
+  referenceNumber: string;
+  status: 'Completed' | 'Pending' | 'Failed';
+}
+
+export interface Customer {
+  id: string;
+  code: string;
+  name: string;
+  type: 'Business' | 'Individual';
+  contactPerson: string;
+  email: string;
+  phone: string;
+  city: string;
+  creditLimit: number;
+  currentBalance: number;
+  status: 'Active' | 'Inactive';
+}
+
+export interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  category: string;
+  brand: string;
+  unitPrice: number;
+  costPrice: number;
+  stockQty: number;
+  reorderLevel: number;
+  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+}
+
+export interface ReturnItem {
+  id: string;
+  returnNumber: string;
+  orderNumber: string;
+  customerName: string;
+  returnDate: string;
+  reason: 'Defective' | 'Wrong Item' | 'Customer Cancel' | 'Exchange';
+  amount: number;
+  status: 'Requested' | 'Inspecting' | 'Approved' | 'Refunded' | 'Rejected';
+}
+
+// Service ERP Interfaces
+export interface ServiceTicket {
+  id: string;
+  ticketNumber: string;
+  customerName: string;
+  productOrAsset: string;
+  issueDescription: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Emergency';
+  stage: 'Open' | 'Assigned' | 'In Progress' | 'On Hold' | 'Resolved' | 'Closed';
+  assignedTechnician: string;
+  createdAt: string;
+  dueDate: string;
+}
+
+export interface Job {
+  id: string;
+  jobNumber: string;
+  ticketNumber: string;
+  clientName: string;
+  siteLocation: string;
+  scheduledDate: string;
+  technicianName: string;
+  jobType: 'Installation' | 'Repair' | 'Maintenance' | 'Inspection';
+  status: 'Scheduled' | 'En Route' | 'Working' | 'Completed' | 'Cancelled';
+}
+
+export interface Technician {
+  id: string;
+  code: string;
+  name: string;
+  phone: string;
+  email: string;
+  specialization: string;
+  experienceYears: number;
+  currentJobsCount: number;
+  rating: number;
+  status: 'Available' | 'On Job' | 'On Leave';
+}
+
+export interface AMCContract {
+  id: string;
+  contractNumber: string;
+  clientName: string;
+  contractTitle: string;
+  startDate: string;
+  endDate: string;
+  annualValue: number;
+  visitsIncluded: number;
+  visitsCompleted: number;
+  status: 'Active' | 'Expiring Soon' | 'Expired' | 'Renewed';
+}
+
+export interface WarrantyClaim {
+  id: string;
+  claimNumber: string;
+  productSerial: string;
+  productName: string;
+  customerName: string;
+  purchaseDate: string;
+  warrantyExpiry: string;
+  claimDate: string;
+  defectCategory: string;
+  status: 'Submitted' | 'Verified' | 'Under Inspection' | 'Approved' | 'Rejected';
+}
+
+export interface SparePart {
+  id: string;
+  partNumber: string;
+  name: string;
+  compatibleWith: string;
+  unitPrice: number;
+  quantityOnHand: number;
+  minAlertQty: number;
+  locationBin: string;
+  status: 'Available' | 'Low Stock' | 'Out of Stock';
+}
+
+export interface ServiceBilling {
+  id: string;
+  billNumber: string;
+  ticketNumber: string;
+  customerName: string;
+  laborCharge: number;
+  partsCharge: number;
+  travelCharge: number;
+  tax: number;
+  totalBill: number;
+  paymentStatus: 'Pending' | 'Paid' | 'Waived Under Warranty';
+  date: string;
+}
+
+export interface CustomerFeedback {
+  id: string;
+  ticketOrJobNumber: string;
+  customerName: string;
+  technicianName: string;
+  rating: number; // 1-5
+  timelinessScore: number;
+  comments: string;
+  date: string;
+  recommend: boolean;
 }

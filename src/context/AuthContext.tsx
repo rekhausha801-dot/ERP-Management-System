@@ -1,109 +1,102 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { Company, User } from '../types';
+import type { Company } from '../mocks/companies.mock';
+import type { User } from '../mocks/users.mock';
+import { SAMPLE_COMPANIES } from '../mocks/companies.mock';
+import { MOCK_USERS } from '../mocks/users.mock';
+import type { ErpPackageId } from '../config/erpPackageConfig';
 
 interface AuthContextType {
   user: User | null;
   selectedCompany: Company | null;
   companies: Company[];
-  login: (email: string, role?: User['role']) => boolean;
+  login: (email: string, role?: User['role'], companyId?: string) => boolean;
   logout: () => void;
   selectCompany: (companyId: string) => void;
+  updateCompanyPackage: (companyId: string, newPackage: ErpPackageId) => void;
+  addCompany: (newCompany: Omit<Company, 'id'>) => Company;
   isAuthenticated: boolean;
+  isSuperAdmin: boolean;
 }
-
-const mockCompanies: Company[] = [
-  {
-    id: 'comp-1',
-    name: 'Apex Global Industries Ltd',
-    code: 'AGI',
-    registrationNumber: 'REG-2023-8901',
-    taxId: 'TAX-US-4829',
-    email: 'contact@apexglobal.com',
-    phone: '+1 800-456-7890',
-    address: '100 Enterprise Blvd, Suite 400, New York, NY',
-    status: 'active',
-  },
-  {
-    id: 'comp-2',
-    name: 'Vanguard Engineering & Construction',
-    code: 'VEC',
-    registrationNumber: 'REG-2021-4412',
-    taxId: 'TAX-US-1029',
-    email: 'ops@vanguardeng.com',
-    phone: '+1 800-234-5678',
-    address: '45 Tech Valley Road, Austin, TX',
-    status: 'active',
-  },
-  {
-    id: 'comp-3',
-    name: 'Horizon Logistics & Supply Chain',
-    code: 'HLSC',
-    registrationNumber: 'REG-2022-7721',
-    taxId: 'TAX-US-8831',
-    email: 'support@horizonlogistics.com',
-    phone: '+1 800-987-6543',
-    address: '88 Harbor Way, Seattle, WA',
-    status: 'active',
-  },
-];
-
-const mockDefaultUser: User = {
-  id: 'usr-1',
-  name: 'Devi Admin',
-  email: 'admin@apexglobal.com',
-  role: 'superadmin',
-  companyId: 'comp-1',
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [companies, setCompanies] = useState<Company[]>(() => {
+    const saved = localStorage.getItem('universal_erp_companies_v2');
+    return saved ? JSON.parse(saved) : SAMPLE_COMPANIES;
+  });
+
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('erp_user');
-    return saved ? JSON.parse(saved) : mockDefaultUser;
+    const saved = localStorage.getItem('universal_erp_user_v2');
+    return saved ? JSON.parse(saved) : MOCK_USERS[1]; // Default to ABC Traders admin
   });
 
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(() => {
-    const saved = localStorage.getItem('erp_selected_company');
-    return saved ? JSON.parse(saved) : mockCompanies[0];
+    const savedId = localStorage.getItem('universal_erp_company_id_v2');
+    const found = companies.find((c) => c.id === savedId);
+    return found || companies[0] || null;
   });
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('erp_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('erp_user');
-    }
+    localStorage.setItem('universal_erp_companies_v2', JSON.stringify(companies));
+  }, [companies]);
+
+  useEffect(() => {
+    if (user) localStorage.setItem('universal_erp_user_v2', JSON.stringify(user));
+    else localStorage.removeItem('universal_erp_user_v2');
   }, [user]);
 
   useEffect(() => {
-    if (selectedCompany) {
-      localStorage.setItem('erp_selected_company', JSON.stringify(selectedCompany));
-    }
+    if (selectedCompany) localStorage.setItem('universal_erp_company_id_v2', selectedCompany.id);
   }, [selectedCompany]);
 
-  const login = (email: string, role: User['role'] = 'superadmin') => {
+  const selectCompany = (companyId: string) => {
+    const target = companies.find((c) => c.id === companyId);
+    if (target) setSelectedCompany(target);
+  };
+
+  const login = (email: string, role: User['role'] = 'company_admin', companyId?: string) => {
+    const chosenCompanyId = companyId || selectedCompany?.id || companies[0]?.id;
     const newUser: User = {
       id: 'usr-' + Date.now(),
       name: email.split('@')[0].toUpperCase(),
       email,
       role,
-      companyId: selectedCompany?.id || mockCompanies[0].id,
+      companyId: role === 'superadmin' ? undefined : chosenCompanyId,
+      status: 'active',
     };
     setUser(newUser);
+    if (chosenCompanyId) selectCompany(chosenCompanyId);
     return true;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('erp_user');
+    localStorage.removeItem('universal_erp_user_v2');
   };
 
-  const selectCompany = (companyId: string) => {
-    const comp = mockCompanies.find((c) => c.id === companyId);
-    if (comp) {
-      setSelectedCompany(comp);
-    }
+  const updateCompanyPackage = (companyId: string, newPackage: ErpPackageId) => {
+    setCompanies((prev) =>
+      prev.map((c) => {
+        if (c.id === companyId) {
+          const updated = { ...c, packageType: newPackage };
+          if (selectedCompany?.id === companyId) {
+            setSelectedCompany(updated);
+          }
+          return updated;
+        }
+        return c;
+      })
+    );
+  };
+
+  const addCompany = (newCompanyData: Omit<Company, 'id'>): Company => {
+    const newCompany: Company = {
+      ...newCompanyData,
+      id: 'comp-' + Date.now(),
+    };
+    setCompanies((prev) => [...prev, newCompany]);
+    return newCompany;
   };
 
   return (
@@ -111,11 +104,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         selectedCompany,
-        companies: mockCompanies,
+        companies,
         login,
         logout,
         selectCompany,
+        updateCompanyPackage,
+        addCompany,
         isAuthenticated: !!user,
+        isSuperAdmin: user?.role === 'superadmin',
       }}
     >
       {children}
@@ -125,8 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 };

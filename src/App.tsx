@@ -2,25 +2,20 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { AppRoutes } from './routes';
-import './styles/global.css';
+import { antdTheme } from './theme/antdTheme';
+import './theme/global.css';
 
 export const App: React.FC = () => {
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: '#0d233a',
-          colorLink: '#1890ff',
-          borderRadius: 6,
-          fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`,
-        },
-      }}
-    >
+    <ConfigProvider theme={antdTheme}>
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <NotificationProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </NotificationProvider>
       </AuthProvider>
     </ConfigProvider>
   );
