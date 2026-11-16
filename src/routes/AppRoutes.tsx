@@ -132,6 +132,7 @@ export const AppRoutes: React.FC = () => {
         {/* --- COMMON MODULES --- */}
         {/* Dashboard */}
         <Route path="dashboard" element={<UnifiedDashboard />} />
+        <Route path="dashboard-overview" element={<UnifiedDashboard />} />
         <Route path="notifications" element={<GenericModuleView title="Notifications" />} />
         <Route path="calendar" element={<GenericModuleView title="Company Calendar" />} />
 
@@ -183,6 +184,8 @@ export const AppRoutes: React.FC = () => {
 
         {/* Reports & Analytics */}
         <Route path="reports" element={<ReportsPage />} />
+        <Route path="reports/sales" element={<GenericModuleView title="Sales Reports" />} />
+        <Route path="reports/service" element={<GenericModuleView title="Service Reports" />} />
         <Route path="reports/customers" element={<GenericModuleView title="Customer Reports" />} />
         <Route path="reports/financial" element={<GenericModuleView title="Financial Reports" />} />
         <Route path="reports/activities" element={<GenericModuleView title="Activity Reports" />} />
@@ -276,10 +279,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="services/request-history" element={<ModuleAccessRoute><GenericModuleView title="Request History" /></ModuleAccessRoute>} />
 
         <Route path="services/tickets" element={<ModuleAccessRoute><ServiceTicketsPage /></ModuleAccessRoute>} />
+        <Route path="services/ticket-categories" element={<ModuleAccessRoute><GenericModuleView title="Ticket Categories" /></ModuleAccessRoute>} />
+        <Route path="services/ticket-assignments" element={<ModuleAccessRoute><GenericModuleView title="Ticket Assignments" /></ModuleAccessRoute>} />
+        <Route path="services/ticket-status" element={<ModuleAccessRoute><GenericModuleView title="Ticket Status" /></ModuleAccessRoute>} />
         <Route path="services/ticket-priorities" element={<ModuleAccessRoute><GenericModuleView title="Ticket Priorities" /></ModuleAccessRoute>} />
         <Route path="services/ticket-escalations" element={<ModuleAccessRoute><GenericModuleView title="Ticket Escalations" /></ModuleAccessRoute>} />
         <Route path="services/sla-management" element={<ModuleAccessRoute><GenericModuleView title="SLA Management" /></ModuleAccessRoute>} />
         <Route path="services/ticket-history" element={<ModuleAccessRoute><GenericModuleView title="Ticket History" /></ModuleAccessRoute>} />
+        <Route path="services/enquiries" element={<ModuleAccessRoute><GenericModuleView title="Service Enquiries" /></ModuleAccessRoute>} />
+        <Route path="services/quotations" element={<ModuleAccessRoute><GenericModuleView title="Service Quotations" /></ModuleAccessRoute>} />
+        <Route path="services/orders" element={<ModuleAccessRoute><GenericModuleView title="Service Orders" /></ModuleAccessRoute>} />
 
         <Route path="services/jobs" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
         <Route path="services/work-orders" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
@@ -295,11 +304,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="services/dispatch-management" element={<ModuleAccessRoute><GenericModuleView title="Dispatch Management" /></ModuleAccessRoute>} />
 
         <Route path="services/technicians" element={<ModuleAccessRoute><ServiceTechniciansPage /></ModuleAccessRoute>} />
+        <Route path="services/technician-assignments" element={<ModuleAccessRoute><GenericModuleView title="Technician Assignments" /></ModuleAccessRoute>} />
         <Route path="services/technician-teams" element={<ModuleAccessRoute><GenericModuleView title="Technician Teams" /></ModuleAccessRoute>} />
         <Route path="services/technician-skills" element={<ModuleAccessRoute><GenericModuleView title="Technician Skills" /></ModuleAccessRoute>} />
         <Route path="services/technician-attendance" element={<ModuleAccessRoute><GenericModuleView title="Technician Attendance" /></ModuleAccessRoute>} />
         <Route path="services/technician-workload" element={<ModuleAccessRoute><GenericModuleView title="Technician Workload" /></ModuleAccessRoute>} />
         <Route path="services/technician-performance" element={<ModuleAccessRoute><GenericModuleView title="Technician Performance" /></ModuleAccessRoute>} />
+        <Route path="services/history" element={<ModuleAccessRoute><GenericModuleView title="Service History" /></ModuleAccessRoute>} />
 
         <Route path="services/field-service" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
         <Route path="services/visit-management" element={<ModuleAccessRoute><GenericModuleView title="Visit Management" /></ModuleAccessRoute>} />

@@ -28,8 +28,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     section: 'common',
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
-      { key: 'bo-dashboard', label: 'Dashboard', path: '/app/dashboard', iconName: 'LayoutDashboard' },
-      { key: 'bo-overview', label: 'Dashboard Overview', path: '/app/dashboard-overview', iconName: 'BarChart3' },
+      { key: 'bo-dashboard', label: 'Dashboard Overview', path: '/app/dashboard', iconName: 'LayoutDashboard' },
       { key: 'bo-notifications', label: 'Notifications', path: '/app/notifications', iconName: 'Bell' },
       { key: 'bo-calendar', label: 'Company Calendar', path: '/app/calendar', iconName: 'Calendar' },
     ],
