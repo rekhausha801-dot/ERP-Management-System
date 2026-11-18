@@ -142,7 +142,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               whiteSpace: 'nowrap',
             }}
           >
-            Welcome, {user?.name?.split(' ')[0] || 'Ramesh'}!
+            Welcome, {user?.name ? user.name.split(' ')[0] : 'Janani'}!
           </h1>
         </div>
       </div>
@@ -320,7 +320,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
                 color: '#FFFFFF',
               }}
             >
-              {user?.name?.charAt(0) || 'R'}
+              {user?.name?.charAt(0) || 'J'}
             </Avatar>
           </div>
         </Dropdown>

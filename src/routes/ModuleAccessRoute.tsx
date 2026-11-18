@@ -15,10 +15,20 @@ export const ModuleAccessRoute: React.FC<ModuleAccessRouteProps> = ({ children }
   const currentPkg: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || 'COMPLETE';
   const normalizedPath = location.pathname.replace(/\/$/, '');
 
+  // Recursive helper to check if a group owns the path
+  const groupContainsPath = (group: any): boolean => {
+    const checkChildren = (items: any[]): boolean => {
+      for (const item of items) {
+        if (item.path === normalizedPath) return true;
+        if (item.children && checkChildren(item.children)) return true;
+      }
+      return false;
+    };
+    return checkChildren(group.children || []);
+  };
+
   // Find parent group that owns this path
-  const matchingGroup = SIDEBAR_MENU_GROUPS.find((group) =>
-    group.children.some((child) => child.path === normalizedPath)
-  );
+  const matchingGroup = SIDEBAR_MENU_GROUPS.find((group) => groupContainsPath(group));
 
   // If path matches a group and current company ERP package is not allowed, block access
   if (matchingGroup && !matchingGroup.allowedPackages.includes(currentPkg)) {
