@@ -16,22 +16,25 @@ export const MainLayout: React.FC = () => {
   const packageType = (selectedCompany?.packageType as any) || 'COMPLETE';
 
   return (
-    <Layout style={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
+    <Layout style={{ height: '100vh', maxHeight: '100vh', overflow: 'hidden', backgroundColor: '#F3F0F9', display: 'flex', flexDirection: 'row' }}>
       <Sidebar
         collapsed={collapsed}
         packageType={packageType}
         companyName={selectedCompany?.name || 'Company ERP'}
         companyCode={selectedCompany?.code || 'ERP'}
       />
-      <Layout>
+      <Layout style={{ height: '100vh', maxHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minWidth: 0, backgroundColor: '#F3F0F9' }}>
         <Navbar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
         />
         <Content
           style={{
-            margin: '16px 20px 8px',
-            flex: '1 0 auto',
+            padding: '0 24px 20px',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            flex: 1,
+            minHeight: 0,
           }}
         >
           <Outlet />

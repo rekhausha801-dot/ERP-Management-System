@@ -156,14 +156,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       className="erp-dark-sidebar"
       style={{
         backgroundColor: '#19153B', // Midnight Deep Purple matching screenshot
-        height: '100%',
+        height: '100vh',
+        maxHeight: '100vh',
         zIndex: 10,
-        position: 'relative',
+        position: 'sticky',
+        top: 0,
+        left: 0,
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: '100vh', overflow: 'hidden' }}>
         {/* Brand Title (ERP Enterprise Platform) */}
         <div
           style={{
@@ -171,6 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
+            flexShrink: 0,
           }}
         >
           <div style={{ fontSize: 22, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
@@ -183,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Highlighted Primary "Business Overview" Pill Button */}
         {!collapsed && (
-          <div style={{ padding: '0 16px 14px' }}>
+          <div style={{ padding: '0 16px 14px', flexShrink: 0 }}>
             <div
               onClick={() => navigate('/app/dashboard')}
               style={{
@@ -209,8 +214,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {/* Collapsible Dark Navigation Menu with Card Inside Scrollable Area */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 10px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ flex: 1 }}>
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            padding: '4px 10px',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div style={{ flex: '1 0 auto' }}>
             <Menu
               theme="dark"
               mode="inline"
@@ -228,7 +243,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Bottom Banner Card: Placed at the very end of scroll so it reveals on scroll down */}
           {!collapsed && (
-            <div style={{ padding: '16px 4px 8px', marginTop: 12 }}>
+            <div style={{ padding: '16px 4px 8px', marginTop: 12, flexShrink: 0 }}>
+
               <div
                 style={{
                   position: 'relative',
@@ -352,6 +368,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'color 0.2s',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
           onMouseLeave={(e) => (e.currentTarget.style.color = '#8F8BA8')}
