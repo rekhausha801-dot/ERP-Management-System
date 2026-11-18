@@ -9,7 +9,7 @@ const { Text } = Typography;
 // Generates dynamic professional enterprise records matching the module name
 export function getMockRecordsForModule(moduleName: string) {
   const norm = moduleName.toLowerCase();
-  
+
   if (norm.includes('employee') || norm.includes('department') || norm.includes('attendance') || norm.includes('leave')) {
     return [
       { key: '1', code: 'EMP-1001', name: 'Vikram Seth', department: 'Enterprise Sales', designation: 'Senior Account Executive', status: 'Active', joiningDate: '2023-04-15', attendance: 'Present (98%)', email: 'vikram@enterprise.com' },
@@ -57,10 +57,10 @@ export function getMockRecordsForModule(moduleName: string) {
 
   // Default dynamic commercial/service enterprise data
   return [
-    { key: '1', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Standard Entry 1`, category: 'Enterprise Core', amount: '₹4,50,000', status: 'Active / Approved', date: '2026-11-16', updatedBy: 'Admin Team' },
-    { key: '2', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Verified Record 2`, category: 'Enterprise Core', amount: '₹12,80,000', status: 'Pending Review', date: '2026-11-15', updatedBy: 'Compliance HQ' },
-    { key: '3', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Scheduled Execution 3`, category: 'Operational Unit', amount: '₹1,95,000', status: 'Processing', date: '2026-11-14', updatedBy: 'Operations GM' },
-    { key: '4', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Archived Summary 4`, category: 'Audited Ledger', amount: '₹8,20,000', status: 'Completed', date: '2026-11-12', updatedBy: 'Finance Lead' },
+    { key: '1', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Standard Entry 1`, category: 'Enterprise Core', ...(norm.includes('pricing') ? { amount: '₹4,50,000' } : {}), status: 'Active / Approved', date: '2026-11-16', updatedBy: 'Admin Team' },
+    { key: '2', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Verified Record 2`, category: 'Enterprise Core', ...(norm.includes('pricing') ? { amount: '₹12,80,000' } : {}), status: 'Pending Review', date: '2026-11-15', updatedBy: 'Compliance HQ' },
+    { key: '3', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Scheduled Execution 3`, category: 'Operational Unit', ...(norm.includes('pricing') ? { amount: '₹1,95,000' } : {}), status: 'Processing', date: '2026-11-14', updatedBy: 'Operations GM' },
+    { key: '4', code: `REC-${Math.floor(1000 + Math.random() * 9000)}`, name: `${moduleName} Archived Summary 4`, category: 'Audited Ledger', ...(norm.includes('pricing') ? { amount: '₹8,20,000' } : {}), status: 'Completed', date: '2026-11-12', updatedBy: 'Finance Lead' },
   ];
 }
 
@@ -115,14 +115,14 @@ export const GenericModuleView: React.FC<{
     key: 'actions',
     dataIndex: 'actions',
     render: () => (
-      <Space size="small">
-        <Tooltip title="View Detailed Record">
-          <Button size="small" type="text" icon={<Eye size={14} color="#6E56CF" />} onClick={() => message.info(`Inspecting details for ${autoTitle}`)} />
-        </Tooltip>
-        <Tooltip title="Edit Record">
-          <Button size="small" type="text" icon={<Edit size={14} color="#10B981" />} onClick={() => message.info(`Editing entry in ${autoTitle}`)} />
-        </Tooltip>
-      </Space>
+      <Button
+        type="link"
+        size="small"
+        style={{ padding: 0, fontWeight: 500, color: '#1677ff' }}
+        onClick={() => message.info(`Viewing details for ${autoTitle}`)}
+      >
+        View
+      </Button>
     ),
   }];
 

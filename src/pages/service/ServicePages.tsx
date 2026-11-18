@@ -50,6 +50,20 @@ export const ServiceTicketsPage: React.FC = () => {
     { title: 'Assigned Tech', dataIndex: 'assignedTechnician', key: 'assignedTechnician', render: (t: string) => <Tag color="green">{t}</Tag> },
     { title: 'Due Date', dataIndex: 'dueDate', key: 'dueDate' },
     { title: 'Stage', dataIndex: 'stage', key: 'stage', render: (st: string) => <StatusBadge status={st} /> },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, r: ServiceTicket) => (
+        <Button
+          type="link"
+          size="small"
+          style={{ padding: 0, fontWeight: 500, color: '#1677ff' }}
+          onClick={() => message.info(`Viewing details for Ticket ${r.ticketNumber}`)}
+        >
+          View
+        </Button>
+      ),
+    },
   ];
 
   return (
