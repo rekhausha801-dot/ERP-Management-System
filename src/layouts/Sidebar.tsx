@@ -103,21 +103,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const menuGroups = getMenuGroupsForPackage(packageType);
   const pkgMeta = ERP_PACKAGES[packageType] || ERP_PACKAGES.COMPLETE;
 
+  const buildAntMenuItem = (item: any): any => {
+    if (item.children && item.children.length > 0) {
+      return {
+        key: item.key,
+        icon: item.iconName ? renderIcon(item.iconName) : undefined,
+        label: <span style={{ fontWeight: 600 }}>{item.label}</span>,
+        children: item.children.map(buildAntMenuItem),
+      };
+    }
+    return {
+      key: item.path || item.key,
+      icon: item.iconName ? renderIcon(item.iconName) : undefined,
+      label: item.label,
+    };
+  };
+
   const antMenuItems = menuGroups.map((group) => ({
     key: group.key,
     icon: renderIcon(group.iconName),
     label: <span style={{ fontWeight: 600 }}>{group.label}</span>,
-    children: group.children.map((child) => ({
-      key: child.path,
-      icon: child.iconName ? renderIcon(child.iconName) : undefined,
-      label: child.label,
-    })),
+    children: group.children.map(buildAntMenuItem),
   }));
 
-  const activeGroup = menuGroups.find((g) =>
-    g.children.some((c) => c.path === location.pathname)
-  );
-  const defaultOpenKeys = activeGroup ? [activeGroup.key] : [menuGroups[0]?.key];
+  // Recursive search to find active open key
+  const findActiveKeys = (): string[] => {
+    for (const group of menuGroups) {
+      for (const child of group.children) {
+        if (child.path === location.pathname) {
+          return [group.key];
+        }
+        if (child.children) {
+          for (const sub of child.children) {
+            if (sub.path === location.pathname) {
+              return [group.key, child.key];
+            }
+          }
+        }
+      }
+    }
+    return [menuGroups[0]?.key];
+  };
+
+  const defaultOpenKeys = findActiveKeys();
 
   return (
     <Sider

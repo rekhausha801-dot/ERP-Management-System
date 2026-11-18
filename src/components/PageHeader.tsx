@@ -12,6 +12,7 @@ export interface PageHeaderProps {
   onActionClick?: () => void;
   actions?: React.ReactNode;
   extraActions?: React.ReactNode;
+  extra?: React.ReactNode;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -22,7 +23,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   onActionClick,
   actions,
   extraActions,
+  extra,
 }) => {
+  const rightActions = extra || actions || extraActions;
+
   return (
     <div style={{ marginBottom: 20 }}>
       {breadcrumbs && breadcrumbs.length > 0 && (
@@ -53,8 +57,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           )}
         </div>
         <Space wrap>
-          {actions}
-          {extraActions}
+          {rightActions}
           {actionLabel && (
             <Button
               type="primary"

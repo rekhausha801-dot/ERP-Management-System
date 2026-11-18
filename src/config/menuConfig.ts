@@ -3,9 +3,10 @@ import type { ErpPackageId } from './erpPackageConfig';
 export interface SubMenuItemConfig {
   key: string;
   label: string;
-  path: string;
+  path?: string;
   iconName?: string;
   allowedRoles?: string[];
+  children?: SubMenuItemConfig[];
 }
 
 export interface MenuGroupConfig {
@@ -19,7 +20,7 @@ export interface MenuGroupConfig {
 
 export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
   // ==========================================
-  // 1. BUSINESS OVERVIEW (COMMON)
+  // 01. BUSINESS OVERVIEW (COMMON)
   // ==========================================
   {
     key: 'grp-business-overview',
@@ -28,14 +29,14 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     section: 'common',
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
-      { key: 'bo-dashboard', label: 'Dashboard Overview', path: '/app/dashboard', iconName: 'LayoutDashboard' },
+      { key: 'bo-dashboard', label: 'Dashboard', path: '/app/dashboard', iconName: 'LayoutDashboard' },
       { key: 'bo-notifications', label: 'Notifications', path: '/app/notifications', iconName: 'Bell' },
       { key: 'bo-calendar', label: 'Company Calendar', path: '/app/calendar', iconName: 'Calendar' },
     ],
   },
 
   // ==========================================
-  // 2. CUSTOMER MANAGEMENT (COMMON)
+  // 02. CUSTOMER MANAGEMENT (COMMON)
   // ==========================================
   {
     key: 'grp-customer-mgmt',
@@ -45,15 +46,13 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'cm-customers', label: 'Customers', path: '/app/customers', iconName: 'Users' },
-      { key: 'cm-groups', label: 'Customer Groups', path: '/app/customers/groups', iconName: 'Users' },
+      { key: 'cm-groups', label: 'Customer Groups', path: '/app/customers/groups', iconName: 'Boxes' },
       { key: 'cm-contacts', label: 'Customer Contacts', path: '/app/customers/contacts', iconName: 'UserCheck' },
-      { key: 'cm-activities', label: 'Customer Activities', path: '/app/customers/activities', iconName: 'History' },
-      { key: 'cm-followups', label: 'Customer Follow-ups', path: '/app/customers/follow-ups', iconName: 'Calendar' },
     ],
   },
 
   // ==========================================
-  // 3. COMMUNICATION (COMMON)
+  // 03. COMMUNICATION (COMMON)
   // ==========================================
   {
     key: 'grp-communication',
@@ -65,12 +64,11 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
       { key: 'comm-messages', label: 'Messages', path: '/app/communication/messages', iconName: 'MessageSquare' },
       { key: 'comm-emails', label: 'Email History', path: '/app/communication/emails', iconName: 'FileText' },
       { key: 'comm-announcements', label: 'Announcements', path: '/app/communication/announcements', iconName: 'FileText' },
-      { key: 'comm-tasks', label: 'Tasks & Reminders', path: '/app/communication/tasks', iconName: 'CheckSquare' },
     ],
   },
 
   // ==========================================
-  // 4. DOCUMENT MANAGEMENT (COMMON)
+  // 04. DOCUMENT MANAGEMENT (COMMON)
   // ==========================================
   {
     key: 'grp-documents',
@@ -81,13 +79,11 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     children: [
       { key: 'dm-docs', label: 'Documents', path: '/app/documents', iconName: 'FileText' },
       { key: 'dm-templates', label: 'Document Templates', path: '/app/documents/templates', iconName: 'FileSpreadsheet' },
-      { key: 'dm-attachments', label: 'Attachments', path: '/app/documents/attachments', iconName: 'FileText' },
-      { key: 'dm-history', label: 'Document History', path: '/app/documents/history', iconName: 'History' },
     ],
   },
 
   // ==========================================
-  // 5. SALES MANAGEMENT (SALES & COMPLETE)
+  // 05. SALES MANAGEMENT (SALES & COMPLETE)
   // ==========================================
   {
     key: 'grp-sales-mgmt',
@@ -98,7 +94,6 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     children: [
       { key: 'sm-overview', label: 'Sales Overview', path: '/app/sales/dashboard', iconName: 'TrendingUp' },
       { key: 'sm-targets', label: 'Sales Targets', path: '/app/sales/targets', iconName: 'Target' },
-      { key: 'sm-performance', label: 'Sales Performance', path: '/app/sales/performance', iconName: 'BarChart3' },
       { key: 'sm-team', label: 'Sales Team', path: '/app/sales/team', iconName: 'Briefcase' },
       { key: 'sm-commissions', label: 'Sales Commissions', path: '/app/sales/commissions', iconName: 'CreditCard' },
       { key: 'sm-activities', label: 'Sales Activities', path: '/app/sales/activities', iconName: 'History' },
@@ -106,7 +101,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
   },
 
   // ==========================================
-  // 6. CRM MANAGEMENT (SALES & COMPLETE)
+  // 06. CRM MANAGEMENT (SALES & COMPLETE)
   // ==========================================
   {
     key: 'grp-crm-mgmt',
@@ -117,67 +112,16 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     children: [
       { key: 'crm-pipeline', label: 'CRM Pipeline', path: '/app/sales/crm', iconName: 'TrendingUp' },
       { key: 'crm-leads', label: 'Leads', path: '/app/sales/leads', iconName: 'Users' },
-      { key: 'crm-sources', label: 'Lead Sources', path: '/app/sales/lead-sources', iconName: 'FileText' },
-      { key: 'crm-assignments', label: 'Lead Assignments', path: '/app/sales/lead-assignments', iconName: 'UserCheck' },
-      { key: 'crm-followups', label: 'Lead Follow-ups', path: '/app/sales/lead-follow-ups', iconName: 'Calendar' },
-      { key: 'crm-conversion', label: 'Lead Conversion', path: '/app/sales/lead-conversion', iconName: 'CheckCircle' },
+      { key: 'crm-enquiries', label: 'Enquiries', path: '/app/sales/enquiries', iconName: 'HelpCircle' },
+      { key: 'crm-quotations', label: 'Quotations', path: '/app/sales/quotations', iconName: 'FileSpreadsheet' },
+      { key: 'crm-orders', label: 'Sales Orders', path: '/app/sales/orders', iconName: 'ShoppingBag' },
+      { key: 'crm-delivery', label: 'Delivery Management', path: '/app/sales/delivery-management', iconName: 'Truck' },
+      { key: 'crm-returns', label: 'Sales Returns', path: '/app/sales/returns', iconName: 'Undo2' },
     ],
   },
 
   // ==========================================
-  // 7. ENQUIRY MANAGEMENT (ALL ERP EDITIONS)
-  // ==========================================
-  {
-    key: 'grp-enquiry-mgmt',
-    label: 'Enquiry Management',
-    iconName: 'HelpCircle',
-    section: 'common',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
-    children: [
-      { key: 'enq-list', label: 'Enquiries', path: '/app/sales/enquiries', iconName: 'HelpCircle' },
-      { key: 'enq-assignments', label: 'Enquiry Assignments', path: '/app/sales/enquiry-assignments', iconName: 'UserCheck' },
-      { key: 'enq-followups', label: 'Enquiry Follow-ups', path: '/app/sales/enquiry-follow-ups', iconName: 'Calendar' },
-      { key: 'enq-status', label: 'Enquiry Status', path: '/app/sales/enquiry-status', iconName: 'History' },
-    ],
-  },
-
-  // ==========================================
-  // 8. QUOTATION MANAGEMENT (ALL ERP EDITIONS)
-  // ==========================================
-  {
-    key: 'grp-quotation-mgmt',
-    label: 'Quotation Management',
-    iconName: 'FileSpreadsheet',
-    section: 'common',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
-    children: [
-      { key: 'quot-list', label: 'Quotations', path: '/app/sales/quotations', iconName: 'FileSpreadsheet' },
-      { key: 'quot-templates', label: 'Quotation Templates', path: '/app/sales/quotation-templates', iconName: 'FileText' },
-      { key: 'quot-approvals', label: 'Quotation Approvals', path: '/app/sales/quotation-approvals', iconName: 'FileCheck' },
-      { key: 'quot-history', label: 'Quotation History', path: '/app/sales/quotation-history', iconName: 'History' },
-    ],
-  },
-
-  // ==========================================
-  // 9. ORDER MANAGEMENT (SALES & COMPLETE)
-  // ==========================================
-  {
-    key: 'grp-order-mgmt',
-    label: 'Order Management',
-    iconName: 'ShoppingBag',
-    section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES'],
-    children: [
-      { key: 'ord-sales-orders', label: 'Sales Orders', path: '/app/sales/orders', iconName: 'ShoppingBag' },
-      { key: 'ord-approvals', label: 'Order Approvals', path: '/app/sales/order-approvals', iconName: 'FileCheck' },
-      { key: 'ord-tracking', label: 'Order Tracking', path: '/app/sales/order-tracking', iconName: 'Truck' },
-      { key: 'ord-delivery', label: 'Delivery Management', path: '/app/sales/delivery-management', iconName: 'Truck' },
-      { key: 'ord-returns', label: 'Sales Returns', path: '/app/sales/returns', iconName: 'Undo2' },
-    ],
-  },
-
-  // ==========================================
-  // 10. SERVICE MANAGEMENT (SERVICE & COMPLETE)
+  // 07. SERVICE MANAGEMENT (SERVICE & COMPLETE)
   // ==========================================
   {
     key: 'grp-service-mgmt',
@@ -189,31 +133,20 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
       { key: 'sm-service-overview', label: 'Service Overview', path: '/app/services/dashboard', iconName: 'Wrench' },
       { key: 'sm-requests', label: 'Service Requests', path: '/app/services/requests', iconName: 'FileText' },
       { key: 'sm-tickets', label: 'Service Tickets', path: '/app/services/tickets', iconName: 'Ticket' },
-      { key: 'sm-categories', label: 'Ticket Categories', path: '/app/services/ticket-categories', iconName: 'Boxes' },
-      { key: 'sm-assignments', label: 'Ticket Assignments', path: '/app/services/ticket-assignments', iconName: 'UserCheck' },
-      { key: 'sm-priorities', label: 'Ticket Priorities', path: '/app/services/ticket-priorities', iconName: 'ShieldAlert' },
-      { key: 'sm-status', label: 'Ticket Status', path: '/app/services/ticket-status', iconName: 'History' },
-      { key: 'sm-enquiries', label: 'Service Enquiries', path: '/app/services/enquiries', iconName: 'HelpCircle' },
       { key: 'sm-quotations', label: 'Service Quotations', path: '/app/services/quotations', iconName: 'FileSpreadsheet' },
       { key: 'sm-orders', label: 'Service Orders', path: '/app/services/orders', iconName: 'ShoppingBag' },
       { key: 'sm-work-orders', label: 'Work Order Management', path: '/app/services/jobs', iconName: 'Briefcase' },
       { key: 'sm-scheduling', label: 'Service Scheduling', path: '/app/services/scheduling', iconName: 'Calendar' },
       { key: 'sm-technicians', label: 'Technician Management', path: '/app/services/technicians', iconName: 'HardHat' },
-      { key: 'sm-tech-assignments', label: 'Technician Assignments', path: '/app/services/technician-assignments', iconName: 'UserCheck' },
-      { key: 'sm-visits', label: 'Service Visits', path: '/app/services/visit-management', iconName: 'MapPin' },
-      { key: 'sm-reports', label: 'Service Reports', path: '/app/services/field-reports', iconName: 'FileText' },
-      { key: 'sm-parts-used', label: 'Parts & Materials Used', path: '/app/services/parts-consumption', iconName: 'Cpu' },
       { key: 'sm-warranty', label: 'Warranty Management', path: '/app/services/warranty', iconName: 'ShieldAlert' },
-      { key: 'sm-amc', label: 'AMC Management', path: '/app/services/amc', iconName: 'FileCheck' },
-      { key: 'sm-contracts', label: 'Service Contracts', path: '/app/services/service-contracts', iconName: 'FileText' },
+      { key: 'sm-amc', label: 'AMC & Contracts', path: '/app/services/amc', iconName: 'FileCheck' },
       { key: 'sm-sla', label: 'SLA Management', path: '/app/services/sla-management', iconName: 'ShieldAlert' },
       { key: 'sm-feedback', label: 'Customer Feedback', path: '/app/services/feedback', iconName: 'ThumbsUp' },
-      { key: 'sm-history', label: 'Service History', path: '/app/services/history', iconName: 'History' },
     ],
   },
 
   // ==========================================
-  // 11. PRODUCT MANAGEMENT (SALES & COMPLETE)
+  // 08. PRODUCT MANAGEMENT (SALES & COMPLETE)
   // ==========================================
   {
     key: 'grp-product-mgmt',
@@ -223,16 +156,13 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'prod-list', label: 'Products', path: '/app/sales/products', iconName: 'Package' },
-      { key: 'prod-categories', label: 'Product Categories', path: '/app/sales/product-categories', iconName: 'Boxes' },
-      { key: 'prod-brands', label: 'Brands', path: '/app/sales/brands', iconName: 'Tag' },
-      { key: 'prod-uom', label: 'Units of Measurement', path: '/app/sales/uom', iconName: 'SlidersHorizontal' },
       { key: 'prod-price-lists', label: 'Price Lists', path: '/app/sales/price-lists', iconName: 'CreditCard' },
       { key: 'prod-discounts', label: 'Discounts & Offers', path: '/app/sales/discounts', iconName: 'CreditCard' },
     ],
   },
 
   // ==========================================
-  // 12. INVENTORY MANAGEMENT (SALES & COMPLETE)
+  // 09. INVENTORY MANAGEMENT (SALES & COMPLETE)
   // ==========================================
   {
     key: 'grp-inventory-mgmt',
@@ -244,15 +174,12 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
       { key: 'inv-overview', label: 'Inventory Overview', path: '/app/sales/inventory', iconName: 'Boxes' },
       { key: 'inv-stock', label: 'Stock Management', path: '/app/sales/stock-management', iconName: 'Boxes' },
       { key: 'inv-transfers', label: 'Stock Transfers', path: '/app/sales/stock-transfers', iconName: 'Truck' },
-      { key: 'inv-adjustments', label: 'Stock Adjustments', path: '/app/sales/stock-adjustments', iconName: 'SlidersHorizontal' },
       { key: 'inv-warehouses', label: 'Warehouse Management', path: '/app/sales/warehouses', iconName: 'Building' },
-      { key: 'inv-low-stock', label: 'Low Stock Alerts', path: '/app/sales/low-stock-alerts', iconName: 'ShieldAlert' },
-      { key: 'inv-history', label: 'Stock History', path: '/app/sales/stock-history', iconName: 'History' },
     ],
   },
 
   // ==========================================
-  // 13. PURCHASE MANAGEMENT (SALES & COMPLETE)
+  // 10. PURCHASE MANAGEMENT (SALES & COMPLETE)
   // ==========================================
   {
     key: 'grp-purchase-mgmt',
@@ -261,17 +188,17 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     section: 'sales',
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
-      { key: 'pur-list', label: 'Purchases', path: '/app/sales/purchases', iconName: 'ShoppingCart' },
+      { key: 'pur-overview', label: 'Purchase Overview', path: '/app/sales/purchases', iconName: 'ShoppingCart' },
+      { key: 'pur-requisitions', label: 'Purchase Requisitions', path: '/app/sales/purchase-requisitions', iconName: 'FileText' },
+      { key: 'pur-suppliers', label: 'Supplier Management', path: '/app/sales/suppliers', iconName: 'Users' },
       { key: 'pur-orders', label: 'Purchase Orders', path: '/app/sales/purchase-orders', iconName: 'ShoppingBag' },
       { key: 'pur-grn', label: 'Goods Received Notes (GRN)', path: '/app/sales/grn', iconName: 'FileCheck' },
-      { key: 'pur-suppliers', label: 'Suppliers', path: '/app/sales/suppliers', iconName: 'Users' },
-      { key: 'pur-payments', label: 'Supplier Payments', path: '/app/sales/supplier-payments', iconName: 'CreditCard' },
       { key: 'pur-returns', label: 'Purchase Returns', path: '/app/sales/purchase-returns', iconName: 'Undo2' },
     ],
   },
 
   // ==========================================
-  // 14. FINANCE & ACCOUNTS (ALL ERP EDITIONS)
+  // 11. FINANCE & ACCOUNTS (ALL ERP EDITIONS)
   // ==========================================
   {
     key: 'grp-finance-accounts',
@@ -282,28 +209,19 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     children: [
       { key: 'fin-dashboard', label: 'Finance Dashboard', path: '/app/billing', iconName: 'BarChart3' },
       { key: 'fin-all-invoices', label: 'All Invoices', path: '/app/finance/invoices', iconName: 'Receipt' },
-      { key: 'fin-sales-invoices', label: 'Sales Invoices', path: '/app/sales/invoices', iconName: 'FileText' },
-      { key: 'fin-service-invoices', label: 'Service Invoices', path: '/app/services/service-invoices', iconName: 'Receipt' },
-      { key: 'fin-proforma', label: 'Proforma Invoices', path: '/app/finance/proforma-invoices', iconName: 'FileText' },
-      { key: 'fin-recurring', label: 'Recurring Invoices', path: '/app/finance/recurring-invoices', iconName: 'History' },
-      { key: 'fin-templates', label: 'Invoice Templates', path: '/app/finance/invoice-templates', iconName: 'FileSpreadsheet' },
-      { key: 'fin-credit-notes', label: 'Credit Notes', path: '/app/finance/credit-notes', iconName: 'CreditCard' },
-      { key: 'fin-debit-notes', label: 'Debit Notes', path: '/app/finance/debit-notes', iconName: 'CreditCard' },
-      { key: 'fin-payments', label: 'Receive Payments', path: '/app/payments', iconName: 'CreditCard' },
-      { key: 'fin-pay-history', label: 'Payment History', path: '/app/finance/payment-history', iconName: 'History' },
-      { key: 'fin-refunds', label: 'Refund Management', path: '/app/finance/refunds', iconName: 'Undo2' },
+      { key: 'fin-receive-payments', label: 'Receive Payments', path: '/app/payments', iconName: 'CreditCard' },
       { key: 'fin-reconciliation', label: 'Payment Reconciliation', path: '/app/finance/reconciliation', iconName: 'FileCheck' },
       { key: 'fin-receivables', label: 'Accounts Receivable', path: '/app/finance/receivables', iconName: 'TrendingUp' },
       { key: 'fin-payables', label: 'Accounts Payable', path: '/app/finance/payables', iconName: 'CreditCard' },
       { key: 'fin-expenses', label: 'Expenses', path: '/app/finance/expenses', iconName: 'Receipt' },
       { key: 'fin-tax', label: 'Tax & GST Management', path: '/app/finance/tax', iconName: 'Receipt' },
       { key: 'fin-bank', label: 'Bank & Cash Management', path: '/app/finance/bank-cash', iconName: 'CreditCard' },
-      { key: 'fin-pnl', label: 'Profit & Loss', path: '/app/finance/profit-loss', iconName: 'BarChart3' },
+      { key: 'fin-reports', label: 'Financial Reports', path: '/app/finance/profit-loss', iconName: 'BarChart3' },
     ],
   },
 
   // ==========================================
-  // 15. APPROVAL MANAGEMENT (COMMON)
+  // 12. APPROVAL MANAGEMENT (COMMON)
   // ==========================================
   {
     key: 'grp-approvals',
@@ -319,7 +237,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
   },
 
   // ==========================================
-  // 16. REPORTS & ANALYTICS (COMMON)
+  // 13. REPORTS & ANALYTICS (COMMON)
   // ==========================================
   {
     key: 'grp-reports',
@@ -339,7 +257,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
   },
 
   // ==========================================
-  // 17. ENTERPRISE PORTALS (COMMON)
+  // 14. ENTERPRISE PORTALS (COMMON)
   // ==========================================
   {
     key: 'grp-enterprise-portals',
@@ -348,14 +266,36 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     section: 'common',
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
-      { key: 'portal-customer', label: 'Customer Self-Service', path: '/app/portal/customer', iconName: 'Users' },
-      { key: 'portal-supplier', label: 'Supplier Collaboration', path: '/app/portal/supplier', iconName: 'Truck' },
+      { key: 'portal-customer', label: 'Customer Self-Service Portal', path: '/app/portal/customer', iconName: 'Users' },
+      { key: 'portal-supplier', label: 'Supplier Collaboration Portal', path: '/app/portal/supplier', iconName: 'Truck' },
       { key: 'portal-technician', label: 'Technician Mobile Workspace', path: '/app/portal/technician', iconName: 'HardHat' },
     ],
   },
 
   // ==========================================
-  // 18. SETTINGS (COMMON)
+  // 15. EMPLOYEE & HR MANAGEMENT (CONSOLIDATED 9 MAIN PAGES)
+  // ==========================================
+  {
+    key: 'grp-hr-mgmt',
+    label: 'Employee & HR Management',
+    iconName: 'Users',
+    section: 'common',
+    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    children: [
+      { key: 'hr-dash', label: 'HR Dashboard', path: '/app/hr/dashboard', iconName: 'BarChart3' },
+      { key: 'hr-employees', label: 'Employee Management', path: '/app/hr/employees', iconName: 'Users' },
+      { key: 'hr-attendance', label: 'Attendance Management', path: '/app/hr/attendance', iconName: 'Clock' },
+      { key: 'hr-leave', label: 'Leave Management', path: '/app/hr/leave', iconName: 'Calendar' },
+      { key: 'hr-payroll', label: 'Payroll Management', path: '/app/hr/payroll', iconName: 'CreditCard' },
+      { key: 'hr-tasks', label: 'Task Management', path: '/app/hr/tasks', iconName: 'CheckSquare' },
+      { key: 'hr-performance', label: 'Performance Management', path: '/app/hr/performance', iconName: 'Award' },
+      { key: 'hr-expenses', label: 'Expense & Reimbursement', path: '/app/hr/expenses', iconName: 'Receipt' },
+      { key: 'hr-exit', label: 'Employee Exit Management', path: '/app/hr/exit', iconName: 'History' },
+    ],
+  },
+
+  // ==========================================
+  // 16. SETTINGS (COMMON)
   // ==========================================
   {
     key: 'grp-settings',
