@@ -135,8 +135,8 @@ export const OfficeStaffPortalPage: React.FC = () => {
         );
       case 'Approved':
         return (
-          <Tag color="green" style={{ fontWeight: 700 }}>
-            <CheckCircle size={12} style={{ display: 'inline', marginRight: 4 }} />
+          <Tag color="#4C1D95" style={{ backgroundColor: '#F3E8FF', borderColor: '#DDD6FE', color: '#4C1D95', fontWeight: 700 }}>
+            <CheckCircle size={12} style={{ display: 'inline', marginRight: 4, color: '#4C1D95' }} />
             Approved
           </Tag>
         );
@@ -335,8 +335,8 @@ export const OfficeStaffPortalPage: React.FC = () => {
             <Statistic
               title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Approved & Tickets Created</span>}
               value={approvedCount}
-              prefix={<CheckCircle size={16} color="#10B981" style={{ marginRight: 6 }} />}
-              valueStyle={{ fontWeight: 800, color: '#10B981' }}
+              prefix={<CheckCircle size={16} color="#4C1D95" style={{ marginRight: 6 }} />}
+              valueStyle={{ fontWeight: 800, color: '#4C1D95' }}
             />
           </Card>
         </Col>
@@ -472,7 +472,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
                         ),
                       },
                       {
-                        color: 'green',
+                        color: '#4C1D95',
                         children: (
                           <div style={{ fontSize: 12 }}>
                             <strong>4. Ticket Generation:</strong> Unique Service Ticket generated upon approval automatically.
@@ -813,7 +813,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
               <Descriptions.Item label="Request Date">{selectedReq.requestDate}</Descriptions.Item>
               {selectedReq.assignedTechnician && (
                 <Descriptions.Item label="Assigned Technician" span={2}>
-                  <Tag color="green" style={{ fontWeight: 600 }}>{selectedReq.assignedTechnician}</Tag>
+                  <Tag color="#4C1D95" style={{ backgroundColor: '#F3E8FF', borderColor: '#DDD6FE', color: '#4C1D95', fontWeight: 600 }}>{selectedReq.assignedTechnician}</Tag>
                 </Descriptions.Item>
               )}
             </Descriptions>
@@ -823,7 +823,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
             </div>
             <Timeline
               items={selectedReq.timeline.map((item) => ({
-                color: item.status === 'Approved' ? 'green' : item.status === 'Rejected' ? 'red' : 'blue',
+                color: item.status === 'Approved' ? '#4C1D95' : item.status === 'Rejected' ? 'red' : 'blue',
                 children: (
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: '#181433' }}>

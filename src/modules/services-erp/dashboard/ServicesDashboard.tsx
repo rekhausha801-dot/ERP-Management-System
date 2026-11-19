@@ -141,8 +141,8 @@ export const ServicesDashboard: React.FC = () => {
             title="Field Jobs Today"
             value={kpis.activeJobs}
             trend={{ value: '42 Technicians Assigned', isPositive: true }}
-            icon={<FiTool size={20} color="#10B981" />}
-            iconBgColor="#E6FDF4"
+            icon={<FiTool size={20} color="#4C1D95" />}
+            iconBgColor="#F3E8FF"
             onClick={() => navigate('/app/services/jobs')}
           />
         </Col>
@@ -182,8 +182,8 @@ export const ServicesDashboard: React.FC = () => {
             title="Service Revenue (INR)"
             value="₹48.20 L"
             trend={{ value: '+12% vs target', isPositive: true }}
-            icon={<TbCurrencyRupee size={22} color="#10B981" />}
-            iconBgColor="#E6FDF4"
+            icon={<TbCurrencyRupee size={22} color="#4C1D95" />}
+            iconBgColor="#F3E8FF"
             onClick={() => navigate('/app/services/billing')}
           />
         </Col>
@@ -353,7 +353,15 @@ export const ServicesDashboard: React.FC = () => {
                   dataIndex: 'status',
                   key: 'status',
                   render: (st) => (
-                    <Tag color={st === 'Approved' ? 'green' : st === 'Rejected' ? 'red' : st === 'More Information Required' ? 'purple' : 'orange'}>
+                    <Tag
+                      color={st === 'Approved' ? '#4C1D95' : st === 'Rejected' ? 'red' : st === 'More Information Required' ? 'purple' : 'orange'}
+                      style={{
+                        backgroundColor: st === 'Approved' ? '#F3E8FF' : undefined,
+                        borderColor: st === 'Approved' ? '#DDD6FE' : undefined,
+                        color: st === 'Approved' ? '#4C1D95' : undefined,
+                        fontWeight: st === 'Approved' ? 700 : 500,
+                      }}
+                    >
                       {st}
                     </Tag>
                   ),
@@ -384,7 +392,7 @@ export const ServicesDashboard: React.FC = () => {
           <Card
             bordered={false}
             title={<span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Live Dispatch & Field Work Orders</span>}
-            extra={<Button type="link" size="small" onClick={() => navigate('/app/services/jobs')} style={{ color: '#10B981', fontWeight: 700 }}>Dispatch Console &gt;</Button>}
+            extra={<Button type="link" size="small" onClick={() => navigate('/app/services/jobs')} style={{ color: '#4C1D95', fontWeight: 700 }}>Dispatch Console &gt;</Button>}
             style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)' }}
             styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '10px 22px 20px' } }}
           >
@@ -398,7 +406,7 @@ export const ServicesDashboard: React.FC = () => {
               pagination={false}
               size="small"
               columns={[
-                { title: 'Ticket #', dataIndex: 'ticket', key: 'ticket', render: (t) => <span style={{ fontWeight: 700, color: '#10B981' }}>{t}</span> },
+                { title: 'Ticket #', dataIndex: 'ticket', key: 'ticket', render: (t) => <span style={{ fontWeight: 700, color: '#4C1D95' }}>{t}</span> },
                 { title: 'Asset / Equipment', dataIndex: 'asset', key: 'asset', render: (a) => <span style={{ fontWeight: 600 }}>{a}</span> },
                 { title: 'Client Company', dataIndex: 'customer', key: 'customer' },
                 {
@@ -416,7 +424,16 @@ export const ServicesDashboard: React.FC = () => {
                   dataIndex: 'stage',
                   key: 'stage',
                   render: (st) => (
-                    <Tag color={st === 'Completed' ? 'green' : st === 'In Progress' ? 'blue' : 'orange'} style={{ borderRadius: 10 }}>
+                    <Tag
+                      color={st === 'Completed' ? '#4C1D95' : st === 'In Progress' ? 'blue' : 'orange'}
+                      style={{
+                        borderRadius: 10,
+                        backgroundColor: st === 'Completed' ? '#F3E8FF' : undefined,
+                        borderColor: st === 'Completed' ? '#DDD6FE' : undefined,
+                        color: st === 'Completed' ? '#4C1D95' : undefined,
+                        fontWeight: st === 'Completed' ? 700 : 500,
+                      }}
+                    >
                       {st}
                     </Tag>
                   ),

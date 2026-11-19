@@ -335,13 +335,13 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
     },
     ...(isSuperAdmin
       ? [
-          {
-            key: 'superadmin',
-            icon: <SafetyCertificateOutlined />,
-            label: <span style={{ color: '#6E56CF', fontWeight: 700 }}>Super Admin HQ</span>,
-            onClick: () => navigate('/super-admin/dashboard'),
-          },
-        ]
+        {
+          key: 'superadmin',
+          icon: <SafetyCertificateOutlined />,
+          label: <span style={{ color: '#6E56CF', fontWeight: 700 }}>Super Admin HQ</span>,
+          onClick: () => navigate('/super-admin/dashboard'),
+        },
+      ]
       : []),
     { type: 'divider' as const },
     {
@@ -407,7 +407,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               whiteSpace: 'nowrap',
             }}
           >
-            Welcome, {user?.name ? user.name.split(' ')[0] : 'Janani'}!
+            Welcome, {user?.name ? user.name.replace(/\s*\(.*?\)\s*/g, '').split('@')[0].split(' ')[0] : 'Janani'}!
           </h1>
         </div>
       </div>
