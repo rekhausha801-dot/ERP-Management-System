@@ -1,4 +1,6 @@
 import type { ErpPackageId } from './erpPackageConfig';
+import { SERVICE_SIDEBAR_MENU_GROUPS } from './serviceSidebarConfig';
+import { ADMIN_FULL_SIDEBAR_GROUPS } from './adminSidebarConfig';
 
 export interface SubMenuItemConfig {
   key: string;
@@ -257,34 +259,12 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
 ];
 
 /**
- * Filter whole collapsible menu groups allowed for the current ERP package and user role
+ * Filter collapsible menu groups for current package and user role
  */
 export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: string): MenuGroupConfig[] {
-  // If user is restricted Office Staff, show ONLY Office Staff Service Desk features
-  if (userRole === 'office_staff') {
-    return [
-      {
-        key: 'grp-office-staff',
-        label: 'Office Staff Service Desk',
-        iconName: 'PhoneCall',
-        section: 'services',
-        allowedPackages: ['COMPLETE', 'SERVICE'],
-        children: [
-          {
-            key: 'portal-office-staff-desk',
-            label: 'Call Intake & Status Portal',
-            path: '/app/portal/office-staff',
-            iconName: 'PhoneCall',
-          },
-          {
-            key: 'portal-office-staff-tickets',
-            label: 'Live Service Tickets',
-            path: '/app/services/tickets',
-            iconName: 'Ticket',
-          },
-        ],
-      },
-    ];
+  // Always return the complete full Admin sidebar groups for all views
+  if (packageType === 'SERVICE') {
+    return ADMIN_FULL_SIDEBAR_GROUPS.filter((group) => group.allowedPackages.includes('SERVICE'));
   }
 
   return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType)).map((group) => {

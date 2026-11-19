@@ -120,12 +120,8 @@ import { ModuleAccessRoute } from './ModuleAccessRoute';
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  // If role is office_staff and at root /app, direct to their dedicated portal
-  if (user?.role === 'office_staff' && window.location.pathname === '/app') {
-    return <Navigate to="/app/portal/office-staff" replace />;
-  }
   return <>{children}</>;
 };
 

@@ -24,16 +24,9 @@ export const Login: React.FC = () => {
       setLoading(false);
       selectCompany(selectedCompId);
       
-      const isStaff = values.email.toLowerCase().includes('staff');
-      const role = isStaff ? 'office_staff' : 'company_admin';
-
-      login(values.email, role as any, selectedCompId);
-
-      if (isStaff) {
-        navigate('/app/portal/office-staff');
-      } else {
-        navigate('/app/dashboard');
-      }
+      const role = 'company_admin';
+      login(values.email, role, selectedCompId);
+      navigate('/app/dashboard');
     }, 600);
   };
 
@@ -42,14 +35,6 @@ export const Login: React.FC = () => {
     selectCompany(comp.id);
     login(`admin@${comp.code.toLowerCase()}.com`, 'company_admin', comp.id);
     navigate('/app/dashboard');
-  };
-
-  const handleQuickStaffLogin = () => {
-    const serviceComp = SAMPLE_COMPANIES.find(c => c.packageType === 'SERVICE') || SAMPLE_COMPANIES[0];
-    setSelectedCompId(serviceComp.id);
-    selectCompany(serviceComp.id);
-    login('staff@pqrsolutions.com', 'office_staff', serviceComp.id);
-    navigate('/app/portal/office-staff');
   };
 
   return (
@@ -239,32 +224,6 @@ export const Login: React.FC = () => {
         </Divider>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {/* Quick Office Staff Service Desk Login */}
-          <div
-            onClick={handleQuickStaffLogin}
-            style={{
-              padding: '10px 12px',
-              borderRadius: 8,
-              border: '1.5px solid #7C3AED',
-              backgroundColor: '#F5F3FF',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              transition: 'all 0.2s',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#5B21B6' }}>
-                Office Staff (Service Request Intake)
-              </div>
-              <div style={{ fontSize: 11, color: '#6D28D9' }}>
-                Restricted portal: Phone intake, status tracking & submissions only
-              </div>
-            </div>
-            <ArrowRight size={15} color="#7C3AED" />
-          </div>
-
           {SAMPLE_COMPANIES.map((comp) => {
             const meta = ERP_PACKAGES[comp.packageType as ErpPackageId] || ERP_PACKAGES.COMPLETE;
             return (

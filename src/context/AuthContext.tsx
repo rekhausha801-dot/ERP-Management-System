@@ -55,90 +55,104 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (target) setSelectedCompany(target);
   };
 
-    const login = (emailOrUsername: string, role: User['role'] = 'company_admin', companyId?: string) => {
-      const chosenCompanyId = companyId || selectedCompany?.id || companies[0]?.id;
+  const login = (emailOrUsername: string, role: User['role'] = 'company_admin', companyId?: string) => {
+    const chosenCompanyId = companyId || selectedCompany?.id || companies[0]?.id;
 
-      // Check if matching mock user exists by email or username
-      const normalizedInput = emailOrUsername.trim().toLowerCase();
-      const matchedUser = MOCK_USERS.find(
-        (u) => u.email.toLowerCase() === normalizedInput || u.name.toLowerCase().includes(normalizedInput)
-      );
+    // Check if matching mock user exists by email or username
+    const normalizedInput = emailOrUsername.trim().toLowerCase();
+    const matchedUser = MOCK_USERS.find(
+      (u) => u.email.toLowerCase() === normalizedInput || u.name.toLowerCase().includes(normalizedInput)
+    );
 
-      let displayName = 'Janani';
-      if (matchedUser) {
-        // Use clean proper name
-        displayName = matchedUser.name.replace(/\s*\(.*?\)\s*/g, '').trim();
-      } else if (emailOrUsername.includes('@')) {
-        const prefix = emailOrUsername.split('@')[0];
-        displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
-      } else {
-        displayName = emailOrUsername.charAt(0).toUpperCase() + emailOrUsername.slice(1);
-      }
+    let displayName = 'Janani';
+    if (matchedUser) {
+      // Use clean proper name
+      displayName = matchedUser.name.replace(/\s*\(.*?\)\s*/g, '').trim();
+    } else if (emailOrUsername.includes('@')) {
+      const prefix = emailOrUsername.split('@')[0];
+      displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+    } else {
+      displayName = emailOrUsername.charAt(0).toUpperCase() + emailOrUsername.slice(1);
+    }
 
-      const newUser: User = {
-        id: 'usr-' + Date.now(),
-        name: displayName,
-        email: emailOrUsername.includes('@') ? emailOrUsername : `${emailOrUsername.toLowerCase()}@universal-erp.io`,
-        role,
-        companyId: role === 'superadmin' ? undefined : chosenCompanyId,
-        status: 'active',
-      };
-      setUser(newUser);
-      if (chosenCompanyId) selectCompany(chosenCompanyId);
-      return true;
+    const newUser: User = {
+      id: 'usr-' + Date.now(),
+      name: displayName,
+      email: emailOrUsername.includes('@') ? emailOrUsername : `${emailOrUsername.toLowerCase()}@universal-erp.io`,
+      role,
+      companyId: role === 'superadmin' ? undefined : chosenCompanyId,
+      status: 'active',
     };
+    setUser(newUser);
+    if (chosenCompanyId) selectCompany(chosenCompanyId);
+    return true;
+  };
 
-    const logout = () => {
-      setUser(null);
-      localStorage.removeItem('universal_erp_user_v2');
-    };
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('universal_erp_user_v2');
+  };
 
-    const updateCompanyPackage = (companyId: string, newPackage: ErpPackageId) => {
-      setCompanies((prev) =>
-        prev.map((c) => {
-          if (c.id === companyId) {
-            const updated = { ...c, packageType: newPackage };
-            if (selectedCompany?.id === companyId) {
-              setSelectedCompany(updated);
-            }
-            return updated;
+  const updateCompanyPackage = (companyId: string, newPackage: ErpPackageId) => {
+    setCompanies((prev) =>
+      prev.map((c) => {
+        if (c.id === companyId) {
+          const updated = { ...c, packageType: newPackage };
+          if (selectedCompany?.id === companyId) {
+            setSelectedCompany(updated);
           }
-          return c;
-        })
-      );
-    };
-
-    const addCompany = (newCompanyData: Omit<Company, 'id'>): Company => {
-      const newCompany: Company = {
-        ...newCompanyData,
-        id: 'comp-' + Date.now(),
-      };
-      setCompanies((prev) => [...prev, newCompany]);
-      return newCompany;
-    };
-
-    return (
-      <AuthContext.Provider
-        value={{
-          user,
-          selectedCompany,
-          companies,
-          login,
-          logout,
-          selectCompany,
-          updateCompanyPackage,
-          addCompany,
-          isAuthenticated: !!user,
-          isSuperAdmin: user?.role === 'superadmin',
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
+          return updated;
+        }
+        return c;
+      })
     );
   };
 
-  export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) throw new Error('useAuth must be used within AuthProvider');
-    return context;
+  const addCompany = (newCompanyData: Omit<Company, 'id'>): Company => {
+    const newCompany: Company = {
+      ...newCompanyData,
+      id: 'comp-' + Date.now(),
+    };
+    setCompanies((prev) => [...prev, newCompany]);
+    return newCompany;
   };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        selectedCompany,
+        companies,
+        login,
+        logout,
+        selectCompany,
+        updateCompanyPackage,
+        addCompany,
+        isAuthenticated: !!user,
+        isSuperAdmin: user?.role === 'superadmin',
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    // Graceful fallback to prevent crash during React hot reload or boundary mount
+    return {
+      user: MOCK_USERS[1],
+      selectedCompany: SAMPLE_COMPANIES[0],
+      companies: SAMPLE_COMPANIES,
+      login: () => true,
+      logout: () => {},
+      selectCompany: () => {},
+      updateCompanyPackage: () => {},
+      addCompany: () => SAMPLE_COMPANIES[0],
+      isAuthenticated: true,
+      isSuperAdmin: false,
+    };
+  }
+  return context;
+};

@@ -45,28 +45,7 @@ import { getStoredServiceRequests } from '../../services/serviceWorkflowStorage'
 
 // 1. Service Requests & Tickets
 export const ServiceTicketsPage: React.FC = () => {
-  const [data, setData] = useState<ServiceTicket[]>(() => {
-    // Merge mock tickets with any approved workflow requests
-    const approvedWorkflowTickets: ServiceTicket[] = getStoredServiceRequests()
-      .filter((r) => r.status === 'Approved' && r.generatedTicketId)
-      .map((r) => ({
-        id: r.id,
-        ticketNumber: r.generatedTicketId || 'TCK-2026-999',
-        customerName: r.companyName ? `${r.customerName} (${r.companyName})` : r.customerName,
-        productOrAsset: r.serviceType,
-        issueDescription: r.requestDescription,
-        priority: (r.priority === 'Urgent' ? 'Emergency' : r.priority) as any,
-        stage: 'Assigned',
-        assignedTechnician: r.assignedTechnician || 'Murugan Selvam',
-        createdAt: r.requestDate,
-        dueDate: 'Within 24 Hours',
-      }));
-
-    // Avoid duplicate IDs
-    const existingIds = new Set(approvedWorkflowTickets.map(t => t.ticketNumber));
-    const uniqueMocks = MOCK_SERVICE_TICKETS.filter(m => !existingIds.has(m.ticketNumber));
-    return [...approvedWorkflowTickets, ...uniqueMocks];
-  });
+  const [data, setData] = useState<ServiceTicket[]>(MOCK_SERVICE_TICKETS);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
