@@ -2,24 +2,20 @@ import React from 'react';
 import { Row, Col, Card, Table, Typography, Button, Tag, Progress } from 'antd';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, AreaChart, Area } from 'recharts';
 import {
-  FiLifeBuoy,
-  FiTool,
-  FiPackage,
-  FiUsers,
-  FiShield,
-  FiCheckCircle,
-  FiDollarSign,
-  FiArrowRight,
-  FiClock,
-  FiUserCheck,
-  FiStar,
-} from 'react-icons/fi';
-import {
-  TbCurrencyRupee,
-  TbTools,
-  TbHelmet,
-} from 'react-icons/tb';
-import { FaStar } from 'react-icons/fa';
+  LifeBuoy,
+  Wrench,
+  Package,
+  Users,
+  ShieldCheck,
+  CheckCircle2,
+  DollarSign,
+  ArrowRight,
+  Clock,
+  UserCheck,
+  Star,
+  IndianRupee,
+  HardHat,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { KPICard } from '../../../components/dashboard/KPICard';
 import { ChartCard } from '../../../components/dashboard/ChartCard';
@@ -83,7 +79,7 @@ export const ServicesDashboard: React.FC = () => {
                 color: '#FFFFFF',
               }}
             >
-              <FiClock size={18} />
+              <Clock size={18} />
             </div>
             <div>
               <div style={{ fontWeight: 800, color: '#92400E', fontSize: 14 }}>
@@ -124,14 +120,14 @@ export const ServicesDashboard: React.FC = () => {
         </Tag>
       </div>
 
-      {/* 8 Service Specific Main KPI Cards with React Icons */}
+      {/* 8 Service Specific Main KPI Cards */}
       <Row gutter={[14, 14]} style={{ marginBottom: 18 }}>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
             title="Active Service Tickets"
             value={kpis.openTickets}
             trend={{ value: '3 Critical Breaches', isPositive: false }}
-            icon={<FiLifeBuoy size={20} color="#EF4444" />}
+            icon={<LifeBuoy size={20} color="#EF4444" />}
             iconBgColor="#FEE2E2"
             onClick={() => navigate('/app/services/tickets')}
           />
@@ -151,7 +147,7 @@ export const ServicesDashboard: React.FC = () => {
             title="SLA Compliance Rate"
             value="98.4%"
             trend={{ value: '+1.2% this quarter', isPositive: true }}
-            icon={<FiShield size={20} color="#6E56CF" />}
+            icon={<ShieldCheck size={20} color="#6E56CF" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/services/sla')}
           />
@@ -161,7 +157,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Customer CSAT Score"
             value="4.85 / 5"
             trend={{ value: '94% 5-Star Ratings', isPositive: true }}
-            icon={<FaStar size={20} color="#F59E0B" />}
+            icon={<Star size={20} color="#F59E0B" fill="#F59E0B" />}
             iconBgColor="#FEF3C7"
             onClick={() => navigate('/app/services/feedback')}
           />
@@ -172,7 +168,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Active AMC Contracts"
             value="184 Active"
             trend={{ value: '14 due for renewal', isPositive: true }}
-            icon={<FiCheckCircle size={20} color="#8B5CF6" />}
+            icon={<CheckCircle2 size={20} color="#8B5CF6" />}
             iconBgColor="#EDE9FE"
             onClick={() => navigate('/app/services/amc')}
           />
@@ -192,7 +188,7 @@ export const ServicesDashboard: React.FC = () => {
             title="First-Time Fix Rate"
             value={kpis.firstTimeFixRate}
             trend={{ value: '+2.4% resolution', isPositive: true }}
-            icon={<FiPackage size={20} color="#6E56CF" />}
+            icon={<Package size={20} color="#6E56CF" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/services/performance')}
           />
@@ -202,7 +198,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Spare Parts Consumption"
             value="₹8.45 L"
             trend={{ value: '184 parts utilized', isPositive: true }}
-            icon={<TbTools size={20} color="#F59E0B" />}
+            icon={<Wrench size={20} color="#F59E0B" />}
             iconBgColor="#FEF3C7"
             onClick={() => navigate('/app/services/spare-parts')}
           />
@@ -259,7 +255,7 @@ export const ServicesDashboard: React.FC = () => {
                     <span>{tech.skill}</span>
                     <span>&bull;</span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: '#FEF3C7', padding: '1px 6px', borderRadius: 6 }}>
-                      <FaStar size={11} color="#F59E0B" />
+                      <Star size={11} color="#F59E0B" fill="#F59E0B" />
                       <span style={{ fontWeight: 700, color: '#B45309', fontSize: 11 }}>{tech.rating}</span>
                     </span>
                   </div>
@@ -415,7 +411,7 @@ export const ServicesDashboard: React.FC = () => {
                   key: 'tech',
                   render: (tc) => (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-                      <TbHelmet size={16} color="#6E56CF" /> {tc}
+                      <HardHat size={16} color="#6E56CF" /> {tc}
                     </span>
                   ),
                 },
