@@ -36,6 +36,11 @@ import {
   MessageSquare,
   LogOut,
   Sparkles,
+  Bell,
+  Headphones,
+  FileBox,
+  ClipboardList,
+  PhoneCall,
 } from 'lucide-react';
 import { getMenuGroupsForPackage } from '../config/menuConfig';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';
@@ -86,6 +91,11 @@ const renderIcon = (name?: string) => {
     case 'ThumbsUp': return <ThumbsUp {...props} />;
     case 'LifeBuoy': return <LifeBuoy {...props} />;
     case 'MessageSquare': return <MessageSquare {...props} />;
+    case 'Bell': return <Bell {...props} />;
+    case 'Headphones': return <Headphones {...props} />;
+    case 'FileBox': return <FileBox {...props} />;
+    case 'ClipboardList': return <ClipboardList {...props} />;
+    case 'PhoneCall': return <PhoneCall {...props} />;
     default: return <Package {...props} />;
   }
 };
@@ -98,9 +108,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
-  const menuGroups = getMenuGroupsForPackage(packageType);
+  const menuGroups = getMenuGroupsForPackage(packageType, user?.role);
   const pkgMeta = ERP_PACKAGES[packageType] || ERP_PACKAGES.COMPLETE;
 
   const buildAntMenuItem = (item: any): any => {
@@ -152,7 +162,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={260}
+      width={280}
       className="erp-dark-sidebar"
       style={{
         backgroundColor: '#19153B', // Midnight Deep Purple matching screenshot
@@ -186,13 +196,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Highlighted Primary "Business Overview" Pill Button */}
+        {/* Highlighted Primary "Business Overview" & "Notifications" Pill Buttons */}
         {!collapsed && (
-          <div style={{ padding: '0 16px 14px', flexShrink: 0 }}>
+          <div style={{ padding: '0 16px 14px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div
               onClick={() => navigate('/app/dashboard')}
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)',
+                background: location.pathname.includes('/app/dashboard')
+                  ? 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)'
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
                 backdropFilter: 'blur(10px)',
                 borderRadius: 14,
                 padding: '12px 16px',
@@ -205,10 +217,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 gap: 10,
                 boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                 border: '1px solid rgba(255,255,255,0.15)',
+                transition: 'all 0.2s ease',
               }}
             >
               <LayoutDashboard size={18} color="#FFFFFF" />
-              <span>Business Overview</span>
+              <span>Dashboard</span>
+            </div>
+
+            <div
+              onClick={() => navigate('/app/notifications')}
+              style={{
+                background: location.pathname.includes('/app/notifications')
+                  ? 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)'
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 14,
+                padding: '12px 16px',
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Package size={18} color="#FFFFFF" />
+                <span>Notifications</span>
+              </div>
+              <span
+                style={{
+                  backgroundColor: '#EF4444',
+                  color: '#FFFFFF',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  borderRadius: 10,
+                  padding: '1px 7px',
+                }}
+              >
+                3
+              </span>
             </div>
           </div>
         )}

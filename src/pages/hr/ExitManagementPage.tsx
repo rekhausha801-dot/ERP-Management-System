@@ -23,7 +23,7 @@ interface ExitItem {
 const INITIAL_EXITS: ExitItem[] = [
   { key: '1', exitId: 'EXT-301', empId: 'EMP-006', empName: 'Karthik Raja', department: 'Accounts', resignationDate: '2026-10-15', lastWorkingDay: '2026-11-30', noticePeriod: '45 Days', clearanceStatus: 'Fully Cleared', settlementStatus: 'Ready for Payout', fnfAmount: '₹1,42,800', status: 'In Notice' },
   { key: '2', exitId: 'EXT-302', empId: 'EMP-014', empName: 'Ramesh Selvan', department: 'Field Services', resignationDate: '2026-11-01', lastWorkingDay: '2026-12-15', noticePeriod: '45 Days', clearanceStatus: 'Pending IT/Assets', settlementStatus: 'Under Computation', fnfAmount: '₹84,500', status: 'In Notice' },
-  { key: '3', exitId: 'EXT-300', empId: 'EMP-009', empName: 'Priya Mani', department: 'Enterprise Sales', resignationDate: '2026-08-10', lastWorkingDay: '2026-09-25', noticePeriod: '45 Days', clearanceStatus: 'Fully Cleared', settlementStatus: 'Settled', fnfAmount: '₹1,95,000', status: 'Exited' },
+  { key: '3', exitId: 'EXT-300', empId: 'EMP-009', empName: 'Priya Mani', department: 'Service Dispatch', resignationDate: '2026-08-10', lastWorkingDay: '2026-09-25', noticePeriod: '45 Days', clearanceStatus: 'Fully Cleared', settlementStatus: 'Settled', fnfAmount: '₹1,95,000', status: 'Exited' },
 ];
 
 export const ExitManagementPage: React.FC = () => {
@@ -168,7 +168,7 @@ export const ExitManagementPage: React.FC = () => {
           <Form.Item label="Department" name="department" initialValue="Field Services">
             <Select options={[
               { value: 'Field Services', label: 'Field Services' },
-              { value: 'Enterprise Sales', label: 'Enterprise Sales' },
+              { value: 'Service Dispatch', label: 'Service Dispatch' },
               { value: 'Accounts', label: 'Accounts' },
               { value: 'Operations', label: 'Operations' },
             ]} />

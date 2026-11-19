@@ -9,11 +9,24 @@ interface ModuleAccessRouteProps {
 }
 
 export const ModuleAccessRoute: React.FC<ModuleAccessRouteProps> = ({ children }) => {
-  const { selectedCompany } = useAuth();
+  const { selectedCompany, user } = useAuth();
   const location = useLocation();
 
   const currentPkg: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || 'COMPLETE';
   const normalizedPath = location.pathname.replace(/\/$/, '');
+
+  // Restrict Office Staff users strictly to Office Staff Portal & Service Tickets
+  if (user?.role === 'office_staff') {
+    const allowedForStaff = [
+      '/app/portal/office-staff',
+      '/app/services/tickets',
+      '/app/services/requests',
+    ];
+    const isAllowed = allowedForStaff.some((p) => normalizedPath.startsWith(p));
+    if (!isAllowed) {
+      return <Navigate to="/app/portal/office-staff" replace />;
+    }
+  }
 
   // Recursive helper to check if a group owns the path
   const groupContainsPath = (group: any): boolean => {

@@ -10,6 +10,7 @@ export interface User {
     | 'sales_manager'
     | 'service_manager'
     | 'technician'
+    | 'office_staff'
     | 'employee';
   companyId?: string;
   status: 'active' | 'inactive';
@@ -32,19 +33,35 @@ export const MOCK_USERS: User[] = [
     status: 'active',
   },
   {
+    id: 'usr-staff',
+    name: 'Kavitha S. (Office Staff)',
+    email: 'staff@pqrsolutions.com',
+    role: 'office_staff',
+    companyId: 'comp-pqr',
+    status: 'active',
+  },
+  {
+    id: 'usr-pqr',
+    name: 'Murugan Selvam (Service Manager / Admin)',
+    email: 'support@pqrsolutions.com',
+    role: 'service_manager',
+    companyId: 'comp-pqr',
+    status: 'active',
+  },
+  {
+    id: 'usr-tech',
+    name: 'Dinesh V. (Field Technician)',
+    email: 'tech@pqrsolutions.com',
+    role: 'technician',
+    companyId: 'comp-pqr',
+    status: 'active',
+  },
+  {
     id: 'usr-xyz',
     name: 'Karthik Raja (Sales Manager)',
     email: 'sales@xyzagencies.com',
     role: 'sales_manager',
     companyId: 'comp-xyz',
-    status: 'active',
-  },
-  {
-    id: 'usr-pqr',
-    name: 'Murugan Selvam (Service Manager)',
-    email: 'support@pqrsolutions.com',
-    role: 'service_manager',
-    companyId: 'comp-pqr',
     status: 'active',
   },
 ];

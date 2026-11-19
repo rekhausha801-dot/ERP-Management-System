@@ -152,7 +152,10 @@ export const SalesDashboard: React.FC = () => {
                   <CartesianGrid vertical={false} stroke="rgba(110, 86, 207, 0.08)" strokeDasharray="3 3" />
                   <XAxis dataKey="month" stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} />
                   <YAxis stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
-                  <Tooltip contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }}
+                  />
                   <Area type="monotone" dataKey="revenue" stroke="#6E56CF" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -175,7 +178,10 @@ export const SalesDashboard: React.FC = () => {
                   <CartesianGrid horizontal={false} stroke="rgba(110, 86, 207, 0.08)" strokeDasharray="3 3" />
                   <XAxis type="number" stroke="#A5A1BE" fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
                   <YAxis type="category" dataKey="category" stroke="#181433" fontSize={11} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }}
+                  />
                   <Bar dataKey="sales" radius={[0, 6, 6, 0]}>
                     {SALES_BY_CATEGORY_DATA.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />

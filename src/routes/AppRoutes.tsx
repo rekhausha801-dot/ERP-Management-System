@@ -41,6 +41,7 @@ import {
 } from '../pages/sales/SalesPages';
 
 import { CompanyProfileSettingsPage as SettingsPage } from '../pages/settings/CompanySettingsPages';
+import { CompanyCalendarPage } from '../pages/CompanyCalendarPage';
 
 
 // Service Pages
@@ -56,6 +57,9 @@ import {
   ServiceFeedbackPage,
   ServiceReportsPage,
 } from '../pages/service/ServicePages';
+import { ServiceQuotationsPage } from '../pages/service/ServiceQuotationsPage';
+import { CustomerServiceRequestsPage } from '../pages/service/CustomerServiceRequestsPage';
+import { OfficeStaffPortalPage } from '../pages/service/OfficeStaffPortalPage';
 
 // Generic Active Module Viewer for dynamic features
 import { GenericModuleView } from '../pages/GenericModuleView';
@@ -83,8 +87,12 @@ import { ModuleAccessRoute } from './ModuleAccessRoute';
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // If role is office_staff and at root /app, direct to their dedicated portal
+  if (user?.role === 'office_staff' && window.location.pathname === '/app') {
+    return <Navigate to="/app/portal/office-staff" replace />;
+  }
   return <>{children}</>;
 };
 
@@ -146,7 +154,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="dashboard" element={<UnifiedDashboard />} />
         <Route path="dashboard-overview" element={<UnifiedDashboard />} />
         <Route path="notifications" element={<GenericModuleView title="Notifications" />} />
-        <Route path="calendar" element={<GenericModuleView title="Company Calendar" />} />
+        <Route path="calendar" element={<CompanyCalendarPage />} />
 
         {/* 02. CUSTOMER MANAGEMENT */}
         <Route path="customers" element={<CustomersPage />} />
@@ -201,14 +209,15 @@ export const AppRoutes: React.FC = () => {
 
         {/* 07. SERVICE MANAGEMENT (SERVICE & COMPLETE) */}
         <Route path="services/dashboard" element={<ModuleAccessRoute><ServicesDashboard /></ModuleAccessRoute>} />
-        <Route path="services/requests" element={<ModuleAccessRoute><ServiceTicketsPage /></ModuleAccessRoute>} />
+        <Route path="services/requests" element={<ModuleAccessRoute><CustomerServiceRequestsPage /></ModuleAccessRoute>} />
+        <Route path="services/customer-request" element={<ModuleAccessRoute><CustomerServiceRequestsPage /></ModuleAccessRoute>} />
         <Route path="services/tickets" element={<ModuleAccessRoute><ServiceTicketsPage /></ModuleAccessRoute>} />
         <Route path="services/ticket-categories" element={<ModuleAccessRoute><GenericModuleView title="Ticket Categories" /></ModuleAccessRoute>} />
         <Route path="services/ticket-assignments" element={<ModuleAccessRoute><GenericModuleView title="Ticket Assignments" /></ModuleAccessRoute>} />
         <Route path="services/ticket-status" element={<ModuleAccessRoute><GenericModuleView title="Ticket Status" /></ModuleAccessRoute>} />
         <Route path="services/ticket-priorities" element={<ModuleAccessRoute><GenericModuleView title="Ticket Priorities" /></ModuleAccessRoute>} />
         <Route path="services/enquiries" element={<ModuleAccessRoute><GenericModuleView title="Service Enquiries" /></ModuleAccessRoute>} />
-        <Route path="services/quotations" element={<ModuleAccessRoute><GenericModuleView title="Service Quotations" /></ModuleAccessRoute>} />
+        <Route path="services/quotations" element={<ModuleAccessRoute><ServiceQuotationsPage /></ModuleAccessRoute>} />
         <Route path="services/orders" element={<ModuleAccessRoute><GenericModuleView title="Service Orders" /></ModuleAccessRoute>} />
         <Route path="services/jobs" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
         <Route path="services/work-orders" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
@@ -289,6 +298,7 @@ export const AppRoutes: React.FC = () => {
 
         {/* 14. ENTERPRISE PORTALS */}
         <Route path="portal/customer" element={<CustomerPortal />} />
+        <Route path="portal/office-staff" element={<OfficeStaffPortalPage />} />
         <Route path="portal/supplier" element={<SupplierPortal />} />
         <Route path="portal/technician" element={<EmployeePortal />} />
 

@@ -34,8 +34,8 @@ const ATTENDANCE_TREND_DATA = [
 
 const DEPT_DISTRIBUTION = [
   { name: 'Field Services', value: 48, color: '#6E56CF' },
-  { name: 'Enterprise Sales', value: 38, color: '#3A2E78' },
-  { name: 'Warehouse & Inventory', value: 24, color: '#8874E8' },
+  { name: 'Service Contracts', value: 38, color: '#3A2E78' },
+  { name: 'Customer Support Desk', value: 24, color: '#8874E8' },
   { name: 'Finance & Accounts', value: 16, color: '#10B981' },
   { name: 'Operations & HR', value: 12, color: '#F59E0B' },
 ];
@@ -230,7 +230,7 @@ export const HrDashboardPage: React.FC = () => {
             <Table
               dataSource={[
                 { key: '1', emp: 'Dinesh V.', dept: 'Field Services', type: 'Annual Earned Leave', dates: 'Nov 18 - Nov 20 (3 Days)', reason: 'Family Function in native', status: 'Pending Manager' },
-                { key: '2', emp: 'Priya Narayanan', dept: 'Enterprise Sales', type: 'Casual Leave', dates: 'Nov 19 (1 Day)', reason: 'Personal work', status: 'Pending HR' },
+                { key: '2', emp: 'Priya Narayanan', dept: 'Service Contracts', type: 'Casual Leave', dates: 'Nov 19 (1 Day)', reason: 'Personal work', status: 'Pending HR' },
                 { key: '3', emp: 'Karthik Raja', dept: 'Warehouse Ops', type: 'Sick Leave', dates: 'Nov 17 - Nov 18 (2 Days)', reason: 'Medical appointment', status: 'Pending Manager' },
               ]}
               pagination={false}

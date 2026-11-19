@@ -19,11 +19,11 @@ interface PerformanceItem {
 }
 
 const INITIAL_PERFORMANCE: PerformanceItem[] = [
-  { key: '1', empId: 'EMP-002', name: 'Vikram Seth', department: 'Enterprise Sales', role: 'Sales Executive', targetMetric: '₹50,00,000 Pipeline', achievedMetric: '₹58,40,000 (116%)', score: 94, rating: 'Outstanding', reviewCycle: 'Q3 2026' },
-  { key: '2', empId: 'EMP-003', name: 'Murugan K.', department: 'Field Services', role: 'Field Engineer', targetMetric: '45 Service Tickets', achievedMetric: '49 Tickets Resolved (108%)', score: 91, rating: 'Outstanding', reviewCycle: 'Q3 2026' },
+  { key: '1', empId: 'EMP-002', name: 'Suresh Kumar', department: 'Service Contracts', role: 'AMC Service Specialist', targetMetric: '40 AMC Renewals', achievedMetric: '46 Renewals (115%)', score: 94, rating: 'Outstanding', reviewCycle: 'Q3 2026' },
+  { key: '2', empId: 'EMP-003', name: 'Murugan K.', department: 'Field Services', role: 'Field Service Engineer', targetMetric: '45 Service Tickets', achievedMetric: '49 Tickets Resolved (108%)', score: 91, rating: 'Outstanding', reviewCycle: 'Q3 2026' },
   { key: '3', empId: 'EMP-005', name: 'Dinesh V.', department: 'Technical Dispatch', role: 'Hydraulics Tech', targetMetric: '30 Maintenance Jobs', achievedMetric: '28 Jobs (93%)', score: 82, rating: 'Meets Expectations', reviewCycle: 'Q3 2026' },
-  { key: '4', empId: 'EMP-004', name: 'Ananya Sharma', department: 'Human Resources', role: 'HR Specialist', targetMetric: 'Hire 6 Engineers', achievedMetric: '6 Onboarded (100%)', score: 88, rating: 'Exceeds Expectations', reviewCycle: 'Q3 2026' },
-  { key: '5', empId: 'EMP-006', name: 'Karthik Raja', department: 'Accounts', role: 'Senior Accountant', targetMetric: '100% Tax Reconciliation', achievedMetric: '100% On-Time GST', score: 89, rating: 'Exceeds Expectations', reviewCycle: 'Q3 2026' },
+  { key: '4', empId: 'EMP-004', name: 'Ananya Sharma', department: 'Customer Support', role: 'Helpdesk Coordinator', targetMetric: 'Resolve 150 Tickets', achievedMetric: '158 Resolved (105%)', score: 88, rating: 'Exceeds Expectations', reviewCycle: 'Q3 2026' },
+  { key: '5', empId: 'EMP-006', name: 'Karthik Raja', department: 'Service Operations', role: 'Warranty & Parts Specialist', targetMetric: '100% SLA Compliance', achievedMetric: '99.4% SLA Met', score: 89, rating: 'Exceeds Expectations', reviewCycle: 'Q3 2026' },
 ];
 
 export const PerformanceManagementPage: React.FC = () => {
@@ -79,7 +79,7 @@ export const PerformanceManagementPage: React.FC = () => {
     <div style={{ padding: '4px 0' }}>
       <PageHeader
         title="Performance Management"
-        subtitle="Individual appraisal scores, sales quota achievements, technician completion ratings, and OKRs."
+        subtitle="Individual appraisal scores, service contract renewals, technician completion ratings, and OKRs."
         extra={
           <Space>
             <Button icon={<Download size={15} />} onClick={() => message.success('Performance matrix exported')}>
@@ -122,9 +122,9 @@ export const PerformanceManagementPage: React.FC = () => {
           onChange={setActiveTab}
           items={[
             { key: 'all', label: 'All Appraisals' },
-            { key: 'sales', label: 'Sales Target Quotas' },
+            { key: 'contracts', label: 'Service Contracts & AMCs' },
             { key: 'technicians', label: 'Technician Job Performance' },
-            { key: 'productivity', label: 'Department Productivity' },
+            { key: 'productivity', label: 'Service Desk Productivity' },
           ]}
         />
 
@@ -134,18 +134,18 @@ export const PerformanceManagementPage: React.FC = () => {
       {/* Record Review Modal */}
       <Modal title="Log Employee Performance Review" open={isModalOpen} onCancel={() => setIsModalOpen(false)} footer={null}>
         <Form form={form} layout="vertical" onFinish={handleAddReview}>
-          <Form.Item label="Employee Name" name="name" initialValue="Vikram Seth" rules={[{ required: true }]}>
+          <Form.Item label="Employee Name" name="name" initialValue="Suresh Kumar" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="Department" name="department" initialValue="Enterprise Sales" rules={[{ required: true }]}>
+          <Form.Item label="Department" name="department" initialValue="Field Services" rules={[{ required: true }]}>
             <Select options={[
-              { value: 'Enterprise Sales', label: 'Enterprise Sales' },
               { value: 'Field Services', label: 'Field Services' },
-              { value: 'Human Resources', label: 'Human Resources' },
-              { value: 'Accounts', label: 'Accounts' },
+              { value: 'Service Contracts', label: 'Service Contracts' },
+              { value: 'Technical Dispatch', label: 'Technical Dispatch' },
+              { value: 'Customer Support', label: 'Customer Support' },
             ]} />
           </Form.Item>
-          <Form.Item label="Assigned Target Metric" name="targetMetric" initialValue="Sales Target ₹50 Lakhs" rules={[{ required: true }]}>
+          <Form.Item label="Assigned Target Metric" name="targetMetric" initialValue="40 AMC Renewals" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
           <Form.Item label="Actual Performance Score (0-100)" name="score" initialValue={90} rules={[{ required: true }]}>
