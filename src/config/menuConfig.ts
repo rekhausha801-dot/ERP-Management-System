@@ -288,7 +288,7 @@ export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: st
   }
 
   return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType)).map((group) => {
-    if (packageType === 'SERVICE') {
+    if (packageType === 'SERVICE' && group.children) {
       return {
         ...group,
         children: group.children.filter((child) => child.key !== 'rep-sales'),

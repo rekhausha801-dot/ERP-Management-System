@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dropdown,
   Avatar,
@@ -46,18 +46,22 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
   const searchableItems = useMemo(() => {
     const list: { label: string; path: string; group: string }[] = [];
     SIDEBAR_MENU_GROUPS.forEach(grp => {
-      grp.children.forEach(c => {
-        if (c.path) {
-          list.push({ label: c.label, path: c.path, group: grp.label });
-        }
-        if (c.children) {
-          c.children.forEach(sub => {
-            if (sub.path) {
-              list.push({ label: sub.label, path: sub.path, group: `${grp.label} > ${c.label}` });
-            }
-          });
-        }
-      });
+      if (grp.children) {
+        grp.children.forEach(c => {
+          if (c.path) {
+            list.push({ label: c.label, path: c.path, group: grp.label });
+          }
+          if (c.children) {
+            c.children.forEach(sub => {
+              if (sub.path) {
+                list.push({ label: sub.label, path: sub.path, group: `${grp.label} > ${c.label}` });
+              }
+            });
+          }
+        });
+      } else if (grp.path) {
+        list.push({ label: grp.label, path: grp.path, group: grp.label });
+      }
     });
     return list;
   }, []);
@@ -66,9 +70,9 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
     if (!searchText.trim()) return [];
     const q = searchText.toLowerCase();
     return searchableItems
-      .filter(item => item.label.toLowerCase().includes(q) || item.group.toLowerCase().includes(q))
+      .filter((item: { label: string; path: string; group: string }) => item.label.toLowerCase().includes(q) || item.group.toLowerCase().includes(q))
       .slice(0, 8)
-      .map(item => ({
+      .map((item: { label: string; path: string; group: string }) => ({
         value: item.path,
         label: (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
@@ -359,61 +363,90 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
   return (
     <div
       style={{
-        padding: '16px 28px 14px',
+        padding: '12px 28px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#F3F0F9',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF8FF 100%)',
+        borderBottom: '1px solid #ECE6F8',
+        boxShadow: '0 4px 20px rgba(84, 33, 168, 0.04)',
         flexWrap: 'nowrap',
         width: '100%',
         boxSizing: 'border-box',
         gap: 16,
+        zIndex: 50,
       }}
     >
       {/* 1. Left Greeting Area with Elegant Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
         <div
           onClick={onToggleCollapse}
+          title={collapsed ? 'Expand Menu' : 'Collapse Menu'}
           style={{
             width: 38,
             height: 38,
             borderRadius: 12,
-            backgroundColor: '#FFFFFF',
+            background: 'linear-gradient(135deg, #F8F5FF 0%, #EDE7FA 100%)',
+            border: '1px solid #DCD2F5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(25, 21, 59, 0.05)',
-            color: '#6E56CF',
+            boxShadow: '0 2px 8px rgba(84, 33, 168, 0.08)',
+            color: '#5421A8',
             fontSize: 16,
             flexShrink: 0,
-            transition: 'all 0.2s ease',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = '#7544D6';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(84, 33, 168, 0.16)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = '#DCD2F5';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(84, 33, 168, 0.08)';
+          }}
         >
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         </div>
 
         <div style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 20,
-              fontWeight: 800,
-              color: '#181433',
-              letterSpacing: '-0.03em',
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Welcome, {user?.name ? user.name.split(' ')[0] : 'Janani'}!
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 19,
+                fontWeight: 900,
+                color: '#1E1035',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Welcome, {user?.name ? user.name.split(' ')[0] : 'Janani'}!
+            </h1>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #EDE7FA 0%, #E2D7F7 100%)',
+                color: '#5421A8',
+                padding: '2px 8px',
+                borderRadius: 10,
+                border: '1px solid #DDD1F5',
+                letterSpacing: '0.02em',
+              }}
+            >
+              Online
+            </span>
+          </div>
         </div>
       </div>
 
       {/* 2. Right Interactive Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         {/* Search Bar */}
         <div style={{ position: 'relative' }}>
           <AutoComplete
@@ -424,11 +457,11 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               navigate(path);
               setSearchText('');
             }}
-            popupMatchSelectWidth={320}
-            style={{ width: 180 }}
+            popupMatchSelectWidth={340}
+            style={{ width: 210 }}
           >
             <Input
-              prefix={<SearchOutlined style={{ color: '#A5A1BE', fontSize: 14, marginRight: 4 }} />}
+              prefix={<SearchOutlined style={{ color: '#7544D6', fontSize: 14, marginRight: 6 }} />}
               placeholder="Search anything..."
               allowClear
               onPressEnter={() => {
@@ -439,14 +472,24 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               }}
               style={{
                 width: '100%',
-                borderRadius: 30,
+                borderRadius: 20,
                 backgroundColor: '#FFFFFF',
-                boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-                height: 40,
-                border: 'none',
+                boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+                height: 38,
+                border: '1px solid #E2D9F3',
                 fontSize: 12,
                 fontWeight: 500,
                 paddingLeft: 14,
+                color: '#1E1035',
+                transition: 'all 0.2s ease',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#7544D6';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117, 68, 214, 0.12)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E2D9F3';
+                e.currentTarget.style.boxShadow = '0 2px 10px rgba(84, 33, 168, 0.05)';
               }}
             />
           </AutoComplete>
@@ -455,27 +498,44 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         {/* Company Switcher Pill */}
         <div
           style={{
-            height: 40,
-            borderRadius: 30,
+            height: 38,
+            borderRadius: 20,
             backgroundColor: '#FFFFFF',
-            boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-            padding: '0 10px',
+            border: '1px solid #E2D9F3',
+            boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+            padding: '0 12px',
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
+            gap: 6,
             flexShrink: 0,
+            transition: 'all 0.15s ease',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#7544D6')}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E2D9F3')}
         >
-          <Building2 size={14} color="#6E56CF" />
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: '#F1ECFA',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#5421A8',
+            }}
+          >
+            <Building2 size={13} />
+          </div>
           <Select
             value={selectedCompany?.id}
             onChange={(val) => selectCompany(val)}
             variant="borderless"
             style={{
               minWidth: 120,
-              maxWidth: 150,
+              maxWidth: 155,
               fontWeight: 700,
-              color: '#181433',
+              color: '#1E1035',
               fontSize: 12,
             }}
             popupMatchSelectWidth={false}
@@ -492,19 +552,23 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         <Tooltip title="Switch Active Package Subscription">
           <div
             style={{
-              height: 40,
-              borderRadius: 30,
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-              padding: '0 10px',
+              height: 38,
+              borderRadius: 20,
+              background: 'linear-gradient(135deg, #F8F5FF 0%, #F1ECFA 100%)',
+              border: '1px solid #DDD1F5',
+              boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+              padding: '0 12px',
               display: 'flex',
               alignItems: 'center',
-              gap: 4,
+              gap: 6,
               cursor: 'pointer',
               flexShrink: 0,
+              transition: 'all 0.15s ease',
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#7544D6')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#DDD1F5')}
           >
-            <Sparkles size={14} color="#6E56CF" />
+            <Sparkles size={13} color="#5421A8" />
             <Select
               value={currentPkg}
               size="middle"
@@ -513,9 +577,9 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
                 if (selectedCompany) updateCompanyPackage(selectedCompany.id, val as any);
               }}
               style={{
-                width: 90,
+                width: 95,
                 fontWeight: 800,
-                color: '#6E56CF',
+                color: '#5421A8',
                 fontSize: 12,
               }}
               popupMatchSelectWidth={false}
@@ -527,29 +591,37 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
           </div>
         </Tooltip>
 
-        {/* Sun / Theme Button */}
+        {/* Theme Button */}
         <div
+          title="Toggle Ambient Theme"
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#FFFFFF',
             cursor: 'pointer',
-            boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
-            transition: 'transform 0.2s ease',
+            boxShadow: '0 4px 14px rgba(84, 33, 168, 0.35)',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             flexShrink: 0,
+            border: '1px solid rgba(255, 255, 255, 0.25)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 18px rgba(84, 33, 168, 0.45)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(84, 33, 168, 0.35)';
+          }}
         >
           <Sun size={16} />
         </div>
 
-        {/* Notifications Button: Interactive Dropdown revealing all real notification records */}
+        {/* Notifications Button */}
         <Dropdown
           dropdownRender={() => notificationMenuContent}
           trigger={['click']}
@@ -559,25 +631,42 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
             <Badge
               count={unreadCount}
               offset={[-4, 4]}
-              styles={{ indicator: { backgroundColor: '#EF4444', fontWeight: 800, boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)' } }}
+              styles={{
+                indicator: {
+                  backgroundColor: '#EF4444',
+                  fontWeight: 800,
+                  fontSize: 10.5,
+                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                },
+              }}
             >
               <div
+                title="System Notifications"
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 19,
                   backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2D9F3',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#6E56CF',
-                  boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-                  transition: 'transform 0.2s ease',
+                  color: '#5421A8',
+                  boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   flexShrink: 0,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.borderColor = '#7544D6';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(84, 33, 168, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = '#E2D9F3';
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(84, 33, 168, 0.05)';
+                }}
               >
                 <BellOutlined style={{ fontSize: 16 }} />
               </div>
@@ -588,29 +677,31 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         {/* User Profile Avatar */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
           <div
+            title={`${user?.name || 'Janani'} (Profile & Settings)`}
             style={{
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               padding: 2,
               borderRadius: 22,
-              transition: 'transform 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               flexShrink: 0,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px) scale(1.05)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0) scale(1)')}
           >
             <Avatar
-              size={40}
+              size={38}
               style={{
-                background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
-                fontWeight: 800,
+                background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
+                fontWeight: 900,
                 fontSize: 15,
-                boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
+                boxShadow: '0 4px 14px rgba(84, 33, 168, 0.35)',
                 color: '#FFFFFF',
+                border: '2px solid #FFFFFF',
               }}
             >
-              {user?.name?.charAt(0) || 'J'}
+              {user?.name?.charAt(0) || 'R'}
             </Avatar>
           </div>
         </Dropdown>
