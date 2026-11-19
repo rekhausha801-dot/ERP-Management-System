@@ -339,13 +339,13 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
     },
     ...(isSuperAdmin
       ? [
-          {
-            key: 'superadmin',
-            icon: <SafetyCertificateOutlined />,
-            label: <span style={{ color: '#6E56CF', fontWeight: 700 }}>Super Admin HQ</span>,
-            onClick: () => navigate('/super-admin/dashboard'),
-          },
-        ]
+        {
+          key: 'superadmin',
+          icon: <SafetyCertificateOutlined />,
+          label: <span style={{ color: '#6E56CF', fontWeight: 700 }}>Super Admin HQ</span>,
+          onClick: () => navigate('/super-admin/dashboard'),
+        },
+      ]
       : []),
     { type: 'divider' as const },
     {
@@ -413,35 +413,19 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         </div>
 
         <div style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: 19,
-                fontWeight: 900,
-                color: '#1E1035',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Welcome, {user?.name ? user.name.split(' ')[0] : 'Janani'}!
-            </h1>
-            <span
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                background: 'linear-gradient(135deg, #EDE7FA 0%, #E2D7F7 100%)',
-                color: '#5421A8',
-                padding: '2px 8px',
-                borderRadius: 10,
-                border: '1px solid #DDD1F5',
-                letterSpacing: '0.02em',
-              }}
-            >
-              Online
-            </span>
-          </div>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 20,
+              fontWeight: 800,
+              color: '#181433',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Welcome, {user?.name ? user.name.replace(/\s*\(.*?\)\s*/g, '').split('@')[0].split(' ')[0] : 'Janani'}!
+          </h1>
         </div>
       </div>
 

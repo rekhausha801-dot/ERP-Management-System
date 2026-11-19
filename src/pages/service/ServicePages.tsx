@@ -119,7 +119,7 @@ export const ServiceTicketsPage: React.FC = () => {
       key: 'ticketNumber',
       width: 140,
       render: (t: string) => (
-        <span style={{ fontWeight: 700, color: '#059669', fontSize: 13, letterSpacing: '0.2px' }}>
+        <span style={{ fontWeight: 700, color: '#4C1D95', fontSize: 13, letterSpacing: '0.2px' }}>
           {t}
         </span>
       ),
@@ -192,8 +192,8 @@ export const ServiceTicketsPage: React.FC = () => {
       render: (t: string) => (
         <span
           style={{
-            backgroundColor: '#F0FDF4',
-            color: '#16A34A',
+            backgroundColor: '#F3E8FF',
+            color: '#4C1D95',
             fontWeight: 600,
             fontSize: 12,
             padding: '4px 14px',
@@ -225,8 +225,8 @@ export const ServiceTicketsPage: React.FC = () => {
         let bg = '#FEF3C7';
         let text = '#D97706';
         if (st === 'Resolved') {
-          bg = '#DCFCE7';
-          text = '#15803D';
+          bg = '#F3E8FF';
+          text = '#4C1D95';
         } else if (st === 'Assigned') {
           bg = '#F8FAFC';
           text = '#475569';
@@ -308,7 +308,7 @@ export const ServiceTicketsPage: React.FC = () => {
               Service Request Details
             </span>
             {selectedTicket && (
-              <span style={{ color: '#059669', fontWeight: 600, fontSize: 14 }}>
+              <span style={{ color: '#4C1D95', fontWeight: 600, fontSize: 14 }}>
                 ({selectedTicket.ticketNumber})
               </span>
             )}
@@ -335,8 +335,8 @@ export const ServiceTicketsPage: React.FC = () => {
                   icon={<CheckCircle size={15} />}
                   onClick={() => handleAccept(selectedTicket)}
                   style={{
-                    backgroundColor: '#10B981',
-                    borderColor: '#10B981',
+                    backgroundColor: '#4C1D95',
+                    borderColor: '#4C1D95',
                     borderRadius: 6,
                     fontWeight: 600,
                   }}
@@ -352,7 +352,7 @@ export const ServiceTicketsPage: React.FC = () => {
           <div style={{ paddingTop: 8 }}>
             <Descriptions bordered column={2} size="middle">
               <Descriptions.Item label="Ticket Number">
-                <span style={{ fontWeight: 700, color: '#059669' }}>{selectedTicket.ticketNumber}</span>
+                <span style={{ fontWeight: 700, color: '#4C1D95' }}>{selectedTicket.ticketNumber}</span>
               </Descriptions.Item>
               <Descriptions.Item label="Current Status / Stage">
                 <StatusBadge status={selectedTicket.stage} />
@@ -370,7 +370,7 @@ export const ServiceTicketsPage: React.FC = () => {
                 <StatusBadge status={selectedTicket.priority} />
               </Descriptions.Item>
               <Descriptions.Item label="Assigned Technician">
-                <Tag color="green" style={{ fontWeight: 600 }}>{selectedTicket.assignedTechnician}</Tag>
+                <Tag color="#4C1D95" style={{ backgroundColor: '#F3E8FF', borderColor: '#DDD6FE', color: '#4C1D95', fontWeight: 600 }}>{selectedTicket.assignedTechnician}</Tag>
               </Descriptions.Item>
 
               <Descriptions.Item label="Created Date & Time">
@@ -398,7 +398,7 @@ export const ServiceJobsPage: React.FC = () => {
   const [data] = useState<Job[]>(MOCK_JOBS);
   const [search, setSearch] = useState('');
   const columns = [
-    { title: 'Job #', dataIndex: 'jobNumber', key: 'jobNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#059669' }}>{t}</span> },
+    { title: 'Job #', dataIndex: 'jobNumber', key: 'jobNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#4C1D95' }}>{t}</span> },
     { title: 'Ticket Reference', dataIndex: 'ticketNumber', key: 'ticketNumber' },
     { title: 'Client & Site Location', dataIndex: 'clientName', key: 'clientName', render: (c: string, r: Job) => <div><div style={{ fontWeight: 600 }}>{c}</div><div style={{ fontSize: 12, color: '#6B7280' }}>{r.siteLocation}</div></div> },
     { title: 'Scheduled Timing', dataIndex: 'scheduledDate', key: 'scheduledDate' },
@@ -625,8 +625,8 @@ export const ServiceSchedulingPage: React.FC = () => {
           bg = '#FEF3C7';
           text = '#D97706';
         } else if (p === 'Low') {
-          bg = '#DCFCE7';
-          text = '#16A34A';
+          bg = '#F3E8FF';
+          text = '#4C1D95';
         }
         return (
           <span
@@ -651,9 +651,9 @@ export const ServiceSchedulingPage: React.FC = () => {
       key: 'status',
       align: 'center' as const,
       render: (st: string) => {
-        let bg = '#DCFCE7';
-        let text = '#15803D';
-        let dot = '#16A34A';
+        let bg = '#F3E8FF';
+        let text = '#4C1D95';
+        let dot = '#4C1D95';
         if (st === 'In Progress') {
           bg = '#DBEAFE';
           text = '#1D4ED8';
@@ -916,11 +916,11 @@ export const ServiceSchedulingPage: React.FC = () => {
                 width: 46,
                 height: 46,
                 borderRadius: 12,
-                backgroundColor: '#F0FDF4',
+                backgroundColor: '#F3E8FF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#16A34A',
+                color: '#4C1D95',
                 flexShrink: 0,
               }}
             >
@@ -1218,7 +1218,7 @@ export const ServiceSchedulingPage: React.FC = () => {
                       value: 'Low',
                       label: (
                         <span>
-                          <span style={{ color: '#10B981', marginRight: 6 }}>●</span> Low
+                          <span style={{ color: '#4C1D95', marginRight: 6 }}>●</span> Low
                         </span>
                       ),
                     },
@@ -1242,7 +1242,7 @@ export const ServiceSchedulingPage: React.FC = () => {
                     {
                       value: 'Scheduled',
                       label: (
-                        <span style={{ color: '#15803D', fontWeight: 600 }}>
+                        <span style={{ color: '#4C1D95', fontWeight: 600 }}>
                           ● Scheduled
                         </span>
                       ),
@@ -1451,7 +1451,7 @@ export const ServiceSchedulingPage: React.FC = () => {
                 transition: 'all 0.2s ease',
               }}
             >
-              <Download size={13} color="#10B981" />
+              <Download size={13} color="#4C1D95" />
               <span>Export</span>
             </button>
           </div>
@@ -1570,8 +1570,8 @@ export const ServiceSchedulingPage: React.FC = () => {
             icon={<CheckCircle size={15} />}
             onClick={() => handleAccept(selectedRecord)}
             style={{
-              backgroundColor: '#16A34A',
-              borderColor: '#16A34A',
+              backgroundColor: '#4C1D95',
+              borderColor: '#4C1D95',
               fontWeight: 600,
               borderRadius: 6,
             }}
@@ -1602,12 +1602,12 @@ export const ServiceSchedulingPage: React.FC = () => {
                 {selectedRecord.dateTime}
               </Descriptions.Item>
               <Descriptions.Item label="Priority">
-                <Tag color={selectedRecord.priority === 'High' ? 'red' : selectedRecord.priority === 'Medium' ? 'orange' : 'green'}>
+                <Tag color={selectedRecord.priority === 'High' ? 'red' : selectedRecord.priority === 'Medium' ? 'orange' : '#4C1D95'}>
                   {selectedRecord.priority}
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={selectedRecord.status === 'Scheduled' ? 'green' : selectedRecord.status === 'In Progress' ? 'blue' : 'red'}>
+                <Tag color={selectedRecord.status === 'Scheduled' ? '#4C1D95' : selectedRecord.status === 'In Progress' ? 'blue' : 'red'}>
                   {selectedRecord.status}
                 </Tag>
               </Descriptions.Item>
@@ -1657,7 +1657,7 @@ export const ServiceTechniciansPage: React.FC = () => {
 export const ServiceAmcPage: React.FC = () => {
   const [data] = useState<AMCContract[]>(MOCK_AMCS);
   const columns = [
-    { title: 'Contract #', dataIndex: 'contractNumber', key: 'contractNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#059669' }}>{t}</span> },
+    { title: 'Contract #', dataIndex: 'contractNumber', key: 'contractNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#4C1D95' }}>{t}</span> },
     { title: 'Customer', dataIndex: 'clientName', key: 'clientName' },
     { title: 'Contract Title', dataIndex: 'contractTitle', key: 'contractTitle' },
     { title: 'Valid Period', key: 'period', render: (_: any, r: AMCContract) => `${r.startDate} to ${r.endDate}` },
@@ -1677,7 +1677,7 @@ export const ServiceAmcPage: React.FC = () => {
 export const ServiceWarrantyPage: React.FC = () => {
   const [data] = useState<WarrantyClaim[]>(MOCK_WARRANTIES);
   const columns = [
-    { title: 'Claim #', dataIndex: 'claimNumber', key: 'claimNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#059669' }}>{t}</span> },
+    { title: 'Claim #', dataIndex: 'claimNumber', key: 'claimNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#4C1D95' }}>{t}</span> },
     { title: 'Product & Serial', key: 'product', render: (_: any, r: WarrantyClaim) => <div><div style={{ fontWeight: 600 }}>{r.productName}</div><div style={{ fontSize: 12, color: '#6B7280' }}>SN: {r.productSerial}</div></div> },
     { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
     { title: 'Defect Category', dataIndex: 'defectCategory', key: 'defectCategory' },
@@ -1696,7 +1696,7 @@ export const ServiceWarrantyPage: React.FC = () => {
 export const ServiceSparesPage: React.FC = () => {
   const [data] = useState<SparePart[]>(MOCK_SPARES);
   const columns = [
-    { title: 'Part #', dataIndex: 'partNumber', key: 'partNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#059669' }}>{t}</span> },
+    { title: 'Part #', dataIndex: 'partNumber', key: 'partNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#4C1D95' }}>{t}</span> },
     { title: 'Part Name', dataIndex: 'name', key: 'name' },
     { title: 'Compatibility', dataIndex: 'compatibleWith', key: 'compatibleWith' },
     { title: 'Warehouse Bin', dataIndex: 'locationBin', key: 'locationBin' },
@@ -1716,12 +1716,12 @@ export const ServiceSparesPage: React.FC = () => {
 export const ServiceBillingPage: React.FC = () => {
   const [data] = useState<ServiceBilling[]>(MOCK_SERVICE_BILLING);
   const columns = [
-    { title: 'Service Bill #', dataIndex: 'billNumber', key: 'billNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#059669' }}>{t}</span> },
+    { title: 'Service Bill #', dataIndex: 'billNumber', key: 'billNumber', render: (t: string) => <span style={{ fontWeight: 600, color: '#4C1D95' }}>{t}</span> },
     { title: 'Ticket Reference', dataIndex: 'ticketNumber', key: 'ticketNumber' },
     { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
     { title: 'Labor Charge', dataIndex: 'laborCharge', key: 'laborCharge', render: (v: number) => `₹${v.toLocaleString()}` },
     { title: 'Parts Charge', dataIndex: 'partsCharge', key: 'partsCharge', render: (v: number) => `₹${v.toLocaleString()}` },
-    { title: 'Total Bill (inc. Tax)', dataIndex: 'totalBill', key: 'totalBill', render: (v: number) => <span style={{ fontWeight: 700, color: '#059669' }}>₹${v.toLocaleString()}</span> },
+    { title: 'Total Bill (inc. Tax)', dataIndex: 'totalBill', key: 'totalBill', render: (v: number) => <span style={{ fontWeight: 700, color: '#4C1D95' }}>₹${v.toLocaleString()}</span> },
     { title: 'Payment Status', dataIndex: 'paymentStatus', key: 'paymentStatus', render: (st: string) => <StatusBadge status={st} /> },
   ];
   return (

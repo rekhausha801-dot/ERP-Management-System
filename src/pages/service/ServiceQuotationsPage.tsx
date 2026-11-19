@@ -289,8 +289,8 @@ export const ServiceQuotationsPage: React.FC = () => {
           bg = '#E0F2FE';
           text = '#0284C7';
         } else if (st === 'Approved') {
-          bg = '#DCFCE7';
-          text = '#16A34A';
+          bg = '#F3E8FF';
+          text = '#4C1D95';
         } else if (st === 'Draft') {
           bg = '#F3F4F6';
           text = '#4B5563';
@@ -385,7 +385,7 @@ export const ServiceQuotationsPage: React.FC = () => {
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <Button
-              icon={<FileSpreadsheet size={15} color="#10B981" />}
+              icon={<FileSpreadsheet size={15} color="#4C1D95" />}
               onClick={() => message.success('Exporting Service Quotations to Excel...')}
               style={{
                 borderRadius: 10,
@@ -572,18 +572,18 @@ export const ServiceQuotationsPage: React.FC = () => {
               width: 34,
               height: 34,
               borderRadius: 17,
-              backgroundColor: '#BBF7D0',
+              backgroundColor: '#F3E8FF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#16A34A',
+              color: '#4C1D95',
               flexShrink: 0,
             }}
           >
             <CheckCircle size={16} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#15803D', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Approved</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#4C1D95', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Approved</div>
             <div style={{ fontSize: 16, fontWeight: 800, color: '#1E293B', lineHeight: 1.2 }}>{approvedCount}</div>
           </div>
         </Card>
@@ -736,8 +736,8 @@ export const ServiceQuotationsPage: React.FC = () => {
                   icon={<CheckCircle size={15} />}
                   onClick={() => handleAccept(selectedQuote)}
                   style={{
-                    backgroundColor: '#10B981',
-                    borderColor: '#10B981',
+                    backgroundColor: '#4C1D95',
+                    borderColor: '#4C1D95',
                     borderRadius: 6,
                     fontWeight: 600,
                   }}
@@ -780,7 +780,7 @@ export const ServiceQuotationsPage: React.FC = () => {
               </Descriptions.Item>
 
               <Descriptions.Item label="Total Amount" span={2}>
-                <span style={{ fontSize: 18, fontWeight: 800, color: '#10B981' }}>
+                <span style={{ fontSize: 18, fontWeight: 800, color: '#4C1D95' }}>
                   {selectedQuote.totalAmount}
                 </span>
               </Descriptions.Item>
@@ -789,14 +789,21 @@ export const ServiceQuotationsPage: React.FC = () => {
                 <Tag
                   color={
                     selectedQuote.status === 'Approved'
-                      ? 'green'
+                      ? '#4C1D95'
                       : selectedQuote.status === 'Sent'
-                      ? 'blue'
-                      : selectedQuote.status === 'Rejected'
-                      ? 'red'
-                      : 'default'
+                        ? 'blue'
+                        : selectedQuote.status === 'Rejected'
+                          ? 'red'
+                          : 'default'
                   }
-                  style={{ fontWeight: 600, padding: '2px 12px', borderRadius: 12 }}
+                  style={{
+                    fontWeight: 600,
+                    padding: '2px 12px',
+                    borderRadius: 12,
+                    backgroundColor: selectedQuote.status === 'Approved' ? '#F3E8FF' : undefined,
+                    borderColor: selectedQuote.status === 'Approved' ? '#DDD6FE' : undefined,
+                    color: selectedQuote.status === 'Approved' ? '#4C1D95' : undefined,
+                  }}
                 >
                   {selectedQuote.status}
                 </Tag>

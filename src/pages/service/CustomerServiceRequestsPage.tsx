@@ -165,7 +165,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
         );
       case 'Approved':
         return (
-          <Tag color="green" style={{ fontWeight: 700 }}>
+          <Tag color="#4C1D95" style={{ fontWeight: 700, backgroundColor: '#F3E8FF', borderColor: '#DDD6FE', color: '#4C1D95' }}>
             <CheckCircle size={12} style={{ display: 'inline', marginRight: 4 }} />
             Approved
           </Tag>
@@ -359,7 +359,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
         <Col xs={12} sm={6}>
           <Card bordered={false} style={{ borderRadius: 14 }}>
             <div style={{ fontSize: 13, color: '#8C89A0', marginBottom: 4 }}>Approved & Dispatched</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#10B981', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: '#4C1D95', display: 'flex', alignItems: 'center', gap: 8 }}>
               <CheckCircle size={20} />
               {requests.filter((r) => r.status === 'Approved').length}
             </div>
@@ -429,7 +429,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
           <div style={{ paddingTop: 12 }}>
             {pendingRequests.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <CheckCircle size={48} color="#10B981" style={{ marginBottom: 12 }} />
+                <CheckCircle size={48} color="#4C1D95" style={{ marginBottom: 12 }} />
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#181433' }}>
                   All Service Requests Cleared!
                 </div>
@@ -726,8 +726,8 @@ export const CustomerServiceRequestsPage: React.FC = () => {
                   icon={<CheckCircle size={15} />}
                   onClick={() => setActionType('Approve')}
                   style={{
-                    backgroundColor: actionType === 'Approve' ? '#10B981' : undefined,
-                    borderColor: actionType === 'Approve' ? '#10B981' : undefined,
+                    backgroundColor: actionType === 'Approve' ? '#4C1D95' : undefined,
+                    borderColor: actionType === 'Approve' ? '#4C1D95' : undefined,
                     borderRadius: 8,
                     fontWeight: 600,
                   }}
@@ -804,8 +804,8 @@ export const CustomerServiceRequestsPage: React.FC = () => {
                     type="primary"
                     htmlType="submit"
                     style={{
-                      backgroundColor: actionType === 'Approve' ? '#10B981' : actionType === 'Reject' ? '#EF4444' : '#6E56CF',
-                      borderColor: actionType === 'Approve' ? '#10B981' : actionType === 'Reject' ? '#EF4444' : '#6E56CF',
+                      backgroundColor: actionType === 'Approve' ? '#4C1D95' : actionType === 'Reject' ? '#EF4444' : '#6E56CF',
+                      borderColor: actionType === 'Approve' ? '#4C1D95' : actionType === 'Reject' ? '#EF4444' : '#6E56CF',
                       borderRadius: 8,
                       fontWeight: 700,
                       padding: '0 20px',
@@ -827,7 +827,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
             </div>
             <Timeline
               items={selectedRequest.timeline.map((item) => ({
-                color: item.status === 'Approved' ? 'green' : item.status === 'Rejected' ? 'red' : 'blue',
+                color: item.status === 'Approved' ? '#4C1D95' : item.status === 'Rejected' ? 'red' : 'blue',
                 children: (
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: '#181433' }}>
