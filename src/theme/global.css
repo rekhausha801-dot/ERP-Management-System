@@ -20,8 +20,8 @@ body,
   overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
-  background-color: #F3F0F9;
-  color: #181433;
+  background-color: #FFFFFF !important;
+  color: #1E1B4B;
   font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -43,11 +43,81 @@ body,
   height: 100vh;
   max-height: 100vh;
   display: flex;
-  background: #F3F0F9;
+  background-color: #FFFFFF;
   overflow: hidden;
 }
 
-/* Custom Soft Scrollbars */
+/* Modern Soft-Rounded Buttons with Subtle Shadow */
+.ant-btn:not(.ant-btn-link):not(.ant-btn-text) {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn:not(.ant-btn-link):not(.ant-btn-text):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.ant-btn-link,
+.ant-btn-text {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.ant-btn-link:hover,
+.ant-btn-text:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  background: transparent !important;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 6px 20px rgba(110, 86, 207, 0.35) !important;
+}
+
+.ant-btn-primary:hover {
+  box-shadow: 0 8px 25px rgba(110, 86, 207, 0.45) !important;
+}
+
+/* Clean, Modern Input Boxes with Subtle Gray Border */
+.ant-input,
+.ant-input-affix-wrapper {
+  border-color: #E2E8F0 !important;
+  border-width: 1px !important;
+  border-radius: 8px !important;
+  background-color: #FFFFFF !important;
+  color: #1E293B !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-input:hover,
+.ant-input-affix-wrapper:hover {
+  border-color: #CBD5E1 !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: #6D28D9 !important;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1) !important;
+}
+
+.ant-select-selector {
+  border-color: #E2E8F0 !important;
+  border-radius: 8px !important;
+}
+
+.ant-select:hover .ant-select-selector {
+  border-color: #CBD5E1 !important;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: #6D28D9 !important;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1) !important;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -61,6 +131,84 @@ body,
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(110, 86, 207, 0.6);
+}
+
+/* Ant Design Table Wrapper Shadow & Modern Card Styling */
+.ant-table-wrapper {
+  background: #ffffff;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  margin-bottom: 8px !important;
+}
+
+.ant-table-wrapper .ant-table {
+  background: transparent !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.ant-table-wrapper .ant-table-container {
+  overflow: hidden !important;
+}
+
+.ant-table-wrapper .ant-table-body {
+  overflow: hidden !important;
+}
+
+.ant-table-wrapper .ant-table-pagination {
+  margin: 12px 0 0 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Global Ant Design Card Modern Box Shadow Styling */
+.ant-card {
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-card:hover {
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Ensure nested tables inside Cards don't double up shadows */
+.ant-card .ant-table-wrapper {
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  /* Allow natural layout without forcing artificial table scroll */
+}
+
+.ant-table-cell {
+  /* Natural table cell wrapping */
+}
+
+/* Hide horizontal scrollbar in ant-table */
+.ant-table-container::-webkit-scrollbar,
+.ant-table-body::-webkit-scrollbar,
+.ant-table-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.ant-table-container,
+.ant-table-body,
+.ant-table-content {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Ensure smooth scrolling across the app */
@@ -119,6 +267,17 @@ body,
 .erp-dark-sidebar .ant-menu-submenu-arrow {
   right: 12px !important;
   color: #A78BFA !important;
+}
+
+.erp-dark-sidebar .ant-menu-submenu-title .ant-menu-title-content {
+  padding-right: 8px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.erp-dark-sidebar .ant-menu-submenu-arrow {
+  right: 12px !important;
 }
 
 .erp-dark-sidebar .ant-menu-dark .ant-menu-item:hover,

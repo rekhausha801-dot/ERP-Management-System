@@ -126,7 +126,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Customer Management',
     iconName: 'Users',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'cm-all', label: 'All Customers', path: '/app/customers', iconName: 'Users' },
       { key: 'cm-groups', label: 'Customer Groups', path: '/app/customers/groups', iconName: 'Boxes' },
@@ -141,7 +141,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Invoice & Billing',
     iconName: 'Receipt',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'inv-all', label: 'All Invoices', path: '/app/finance/invoices', iconName: 'Receipt' },
       { key: 'inv-create', label: 'Create Invoice', path: '/app/finance/create-invoice', iconName: 'FileText' },
@@ -156,7 +156,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Creditors & Debtors',
     iconName: 'CreditCard',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'cd-creditors', label: 'Creditors', path: '/app/finance/creditors', iconName: 'Users' },
       { key: 'cd-debtors', label: 'Debtors', path: '/app/finance/debtors', iconName: 'UserCheck' },
@@ -257,8 +257,43 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
 ];
 
 /**
- * Filter menu groups allowed for current user/package
+ * Filter whole collapsible menu groups allowed for the current ERP package and user role
  */
 export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: string): MenuGroupConfig[] {
-  return SIDEBAR_MENU_GROUPS;
+  // If user is restricted Office Staff, show ONLY Office Staff Service Desk features
+  if (userRole === 'office_staff') {
+    return [
+      {
+        key: 'grp-office-staff',
+        label: 'Office Staff Service Desk',
+        iconName: 'PhoneCall',
+        section: 'services',
+        allowedPackages: ['COMPLETE', 'SERVICE'],
+        children: [
+          {
+            key: 'portal-office-staff-desk',
+            label: 'Call Intake & Status Portal',
+            path: '/app/portal/office-staff',
+            iconName: 'PhoneCall',
+          },
+          {
+            key: 'portal-office-staff-tickets',
+            label: 'Live Service Tickets',
+            path: '/app/services/tickets',
+            iconName: 'Ticket',
+          },
+        ],
+      },
+    ];
+  }
+
+  return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType)).map((group) => {
+    if (packageType === 'SERVICE') {
+      return {
+        ...group,
+        children: group.children.filter((child) => child.key !== 'rep-sales'),
+      };
+    }
+    return group;
+  });
 }

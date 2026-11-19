@@ -32,45 +32,46 @@ export const KpiCard: React.FC<KpiCardProps> = ({
     <Card
       bordered
       style={{
-        borderRadius: 8,
-        boxShadow: '0 1px 3px rgba(81, 37, 140, 0.05)',
+        borderRadius: 16,
+        boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
         height: '100%',
+        border: '1px solid rgba(226, 232, 240, 0.8)',
       }}
-      styles={{ body: { padding: '20px 24px' } }}
+      styles={{ body: { padding: '14px 16px' } }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <Text style={{ fontSize: 13, color: '#6B7280', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <Text style={{ fontSize: 11, color: '#6B7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {title}
           </Text>
-          <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            {prefix && <span style={{ fontSize: 18, color: '#4B5563', fontWeight: 600 }}>{prefix}</span>}
-            <Title level={2} style={{ margin: 0, color: '#1E152A', fontWeight: 700 }}>
+          <div style={{ marginTop: 4, display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            {prefix && <span style={{ fontSize: 16, color: '#4B5563', fontWeight: 600 }}>{prefix}</span>}
+            <Title level={2} style={{ margin: 0, color: '#1E152A', fontWeight: 800, fontSize: 20, lineHeight: 1.2 }}>
               {value}
             </Title>
-            {suffix && <span style={{ fontSize: 14, color: '#6B7280' }}>{suffix}</span>}
+            {suffix && <span style={{ fontSize: 12, color: '#6B7280' }}>{suffix}</span>}
           </div>
           {trend && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
               {trend.isPositive ? (
-                <ArrowUpRight size={16} color="#10B981" />
+                <ArrowUpRight size={13} color="#10B981" />
               ) : (
-                <ArrowDownRight size={16} color="#EF4444" />
+                <ArrowDownRight size={13} color="#EF4444" />
               )}
               <span
                 style={{
-                  fontSize: 12,
-                  fontWeight: 600,
+                  fontSize: 10,
+                  fontWeight: 700,
                   color: trend.isPositive ? '#10B981' : '#EF4444',
                 }}
               >
                 {trend.value}
               </span>
-              <span style={{ fontSize: 12, color: '#9CA3AF' }}>vs last month</span>
+              <span style={{ fontSize: 10, color: '#9CA3AF' }}>vs last month</span>
             </div>
           )}
           {subtitle && (
-            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 6 }}>
+            <div style={{ fontSize: 10, color: '#6B7280', marginTop: 2 }}>
               {subtitle}
             </div>
           )}
@@ -78,14 +79,14 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         {icon && (
           <div
             style={{
-              width: 46,
-              height: 46,
+              width: 36,
+              height: 36,
               borderRadius: 10,
               backgroundColor: iconBgColor,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#51258C',
+              flexShrink: 0,
             }}
           >
             {icon}

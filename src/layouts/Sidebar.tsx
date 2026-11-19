@@ -32,6 +32,11 @@ import {
   History,
   LogOut,
   Sparkles,
+  Bell,
+  Headphones,
+  FileBox,
+  ClipboardList,
+  PhoneCall,
 } from 'lucide-react';
 import { getMenuGroupsForPackage } from '../config/menuConfig';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Button, Input, Tag, Space, Typography, Modal, Form, Select, DatePicker, message, Tooltip, Row, Col } from 'antd';
-import { Plus, Search, Filter, Download, FileSpreadsheet, FileText, ArrowLeft, CheckCircle, Clock, AlertTriangle, Eye, Edit, Trash2 } from 'lucide-react';
+import { Card, Table, Button, Input, Tag, Space, Typography, Modal, Form, Select, DatePicker, message, Tooltip, Row, Col, Descriptions } from 'antd';
+import { Plus, Search, Filter, Download, FileSpreadsheet, FileText, ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, Eye, Edit, Trash2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageHeader } from '../components';
 
@@ -73,13 +73,33 @@ export const GenericModuleView: React.FC<{
   const location = useLocation();
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [form] = Form.useForm();
 
   const autoTitle = title || location.pathname.split('/').pop()?.replace(/-/g, ' ').toUpperCase() || 'Module View';
-  const records = getMockRecordsForModule(autoTitle);
+  const [dataRecords, setDataRecords] = useState<any[]>(() => getMockRecordsForModule(autoTitle));
+
+  const handleAcceptRecord = (rec: any) => {
+    setDataRecords(prev => prev.map(r => r.key === rec.key ? { ...r, status: 'Active / Approved' } : r));
+    if (selectedRecord && selectedRecord.key === rec.key) {
+      setSelectedRecord({ ...selectedRecord, status: 'Active / Approved' });
+    }
+    message.success(`Record ${rec.code || rec.name} has been APPROVED / ACCEPTED.`);
+    setViewModalOpen(false);
+  };
+
+  const handleRejectRecord = (rec: any) => {
+    setDataRecords(prev => prev.map(r => r.key === rec.key ? { ...r, status: 'Rejected' } : r));
+    if (selectedRecord && selectedRecord.key === rec.key) {
+      setSelectedRecord({ ...selectedRecord, status: 'Rejected' });
+    }
+    message.error(`Record ${rec.code || rec.name} has been REJECTED.`);
+    setViewModalOpen(false);
+  };
 
   // Dynamic columns generated from records
-  const sample = records[0] || {};
+  const sample = dataRecords[0] || {};
   const columns = Object.keys(sample)
     .filter((k) => k !== 'key')
     .map((key) => {
@@ -114,19 +134,26 @@ export const GenericModuleView: React.FC<{
     title: 'Actions',
     key: 'actions',
     dataIndex: 'actions',
-    render: () => (
-      <Button
-        type="link"
-        size="small"
-        style={{ padding: 0, fontWeight: 500, color: '#1677ff' }}
-        onClick={() => message.info(`Viewing details for ${autoTitle}`)}
+    render: (_: any, record: any) => (
+      <span
+        style={{
+          cursor: 'pointer',
+          fontWeight: 700,
+          color: '#2563EB',
+          fontSize: 13,
+          display: 'inline-block',
+        }}
+        onClick={() => {
+          setSelectedRecord(record);
+          setViewModalOpen(true);
+        }}
       >
         View
-      </Button>
+      </span>
     ),
   }];
 
-  const filteredData = records.filter((r) =>
+  const filteredData = dataRecords.filter((r) =>
     Object.values(r).some((val) => String(val).toLowerCase().includes(search.toLowerCase()))
   );
 
@@ -161,7 +188,8 @@ export const GenericModuleView: React.FC<{
         style={{
           borderRadius: 16,
           backgroundColor: '#FFFFFF',
-          boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)',
+          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
+          border: '1px solid rgba(226, 232, 240, 0.8)',
           marginBottom: 16,
         }}
         styles={{ body: { padding: '14px 20px' } }}
@@ -173,9 +201,24 @@ export const GenericModuleView: React.FC<{
               placeholder={`Search ${autoTitle}...`}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ width: 280, borderRadius: 24, backgroundColor: '#FAF8FC' }}
+              style={{
+                width: 280,
+                borderRadius: 24,
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                border: '1px solid rgba(226, 232, 240, 0.8)',
+              }}
             />
-            <Button icon={<Filter size={14} />}>Advanced Filters</Button>
+            <Button
+              icon={<Filter size={14} />}
+              style={{
+                borderRadius: 10,
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                border: '1px solid rgba(226, 232, 240, 0.8)',
+              }}
+            >
+              Advanced Filters
+            </Button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -186,23 +229,13 @@ export const GenericModuleView: React.FC<{
       </Card>
 
       {/* Main Data Table */}
-      <Card
+      <Table
+        dataSource={filteredData}
+        columns={allColumns}
+        pagination={{ pageSize: 8, showSizeChanger: true }}
         bordered={false}
-        style={{
-          borderRadius: 20,
-          backgroundColor: '#FFFFFF',
-          boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)',
-        }}
-        styles={{ body: { padding: '16px 20px 24px' } }}
-      >
-        <Table
-          dataSource={filteredData}
-          columns={allColumns}
-          pagination={{ pageSize: 8, showSizeChanger: true }}
-          bordered={false}
-          size="middle"
-        />
-      </Card>
+        size="middle"
+      />
 
       {/* Add New Record Modal */}
       <Modal
@@ -241,6 +274,97 @@ export const GenericModuleView: React.FC<{
             </Col>
           </Row>
         </Form>
+      </Modal>
+
+      {/* View Details Modal with Accept and Reject Options */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#181433' }}>
+              {autoTitle} – Record Details
+            </span>
+            {selectedRecord && selectedRecord.code && (
+              <span style={{ color: '#6E56CF', fontWeight: 600, fontSize: 13 }}>
+                ({selectedRecord.code})
+              </span>
+            )}
+          </div>
+        }
+        open={viewModalOpen}
+        onCancel={() => setViewModalOpen(false)}
+        width={680}
+        footer={
+          selectedRecord ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
+              <Button onClick={() => setViewModalOpen(false)}>Close</Button>
+              <Space>
+                <Button
+                  danger
+                  icon={<XCircle size={15} />}
+                  onClick={() => handleRejectRecord(selectedRecord)}
+                  style={{ borderRadius: 6, fontWeight: 600 }}
+                >
+                  Reject
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<CheckCircle size={15} />}
+                  onClick={() => handleAcceptRecord(selectedRecord)}
+                  style={{
+                    backgroundColor: '#10B981',
+                    borderColor: '#10B981',
+                    borderRadius: 6,
+                    fontWeight: 600,
+                  }}
+                >
+                  Accept
+                </Button>
+              </Space>
+            </div>
+          ) : null
+        }
+      >
+        {selectedRecord && (
+          <div style={{ paddingTop: 8 }}>
+            <Descriptions bordered column={2} size="middle">
+              {Object.entries(selectedRecord)
+                .filter(([k]) => k !== 'key')
+                .map(([key, val]: [string, any]) => {
+                  const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+                  return (
+                    <Descriptions.Item
+                      key={key}
+                      label={label}
+                      span={key === 'name' || key === 'description' || key === 'issueDescription' || key === 'serviceName' ? 2 : 1}
+                    >
+                      {key === 'status' ? (
+                        <Tag
+                          color={
+                            String(val).includes('Active') || String(val).includes('Approved') || String(val).includes('Completed')
+                              ? 'green'
+                              : String(val).includes('Pending') || String(val).includes('Processing')
+                              ? 'orange'
+                              : String(val).includes('Rejected')
+                              ? 'red'
+                              : 'blue'
+                          }
+                          style={{ borderRadius: 8, fontWeight: 600 }}
+                        >
+                          {String(val)}
+                        </Tag>
+                      ) : key === 'amount' || key === 'baseAmount' || key === 'finalAmount' ? (
+                        <span style={{ fontWeight: 700, color: '#181433', fontSize: 14 }}>{String(val)}</span>
+                      ) : key === 'code' ? (
+                        <span style={{ fontWeight: 700, color: '#6E56CF' }}>{String(val)}</span>
+                      ) : (
+                        <span>{String(val)}</span>
+                      )}
+                    </Descriptions.Item>
+                  );
+                })}
+            </Descriptions>
+          </div>
+        )}
       </Modal>
     </div>
   );

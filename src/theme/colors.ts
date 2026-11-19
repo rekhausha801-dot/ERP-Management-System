@@ -10,22 +10,23 @@ export const colors = {
   // Outer Screen Backdrop
   outerBackdrop: '#1E1938',
 
-  // Inner Dashboard Canvas
-  canvasBg: '#F3F0F9',
+  // Inner Dashboard Canvas - Clean Pure White Background
+  canvasBg: '#FFFFFF',
+  canvasGradient: 'none',
   cardBg: '#FFFFFF',
-  cardBorder: 'transparent',
-  cardShadow: '0 8px 24px rgba(25, 21, 59, 0.04)',
+  cardBorder: 'rgba(226, 232, 240, 0.8)',
+  cardShadow: '0 8px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
 
   // Primary Violet Accent
-  primary: '#6E56CF',
-  primaryHover: '#5B43C2',
-  primaryLight: '#EFEBFF',
-  primaryGradient: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
+  primary: '#6D28D9',
+  primaryHover: '#5B21B6',
+  primaryLight: '#EDE9FE',
+  primaryGradient: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
 
   // Text
-  primaryText: '#181433',
-  secondaryText: '#7E7A9B',
-  mutedText: '#A5A1BE',
+  primaryText: '#1E1B4B',
+  secondaryText: '#64748B',
+  mutedText: '#94A3B8',
 
   // Accents
   success: '#10B981',
