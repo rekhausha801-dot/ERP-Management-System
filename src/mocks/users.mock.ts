@@ -27,17 +27,9 @@ export const MOCK_USERS: User[] = [
   {
     id: 'usr-abc',
     name: 'Janani (Admin)',
-    email: 'janani@abctraders.com',
+    email: 'admin@abctraders.com',
     role: 'company_admin',
     companyId: 'comp-abc',
-    status: 'active',
-  },
-  {
-    id: 'usr-staff',
-    name: 'Kavitha S. (Office Staff)',
-    email: 'staff@pqrsolutions.com',
-    role: 'office_staff',
-    companyId: 'comp-pqr',
     status: 'active',
   },
   {
