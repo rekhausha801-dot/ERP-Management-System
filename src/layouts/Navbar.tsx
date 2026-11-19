@@ -17,7 +17,16 @@ import {
   SettingOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
-import { Sun, Building2, Sparkles, ChevronDown } from 'lucide-react';
+import {
+  Sun,
+  Building2,
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Info,
+  ExternalLink,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';
@@ -37,18 +46,22 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
   const searchableItems = useMemo(() => {
     const list: { label: string; path: string; group: string }[] = [];
     SIDEBAR_MENU_GROUPS.forEach(grp => {
-      grp.children.forEach(c => {
-        if (c.path) {
-          list.push({ label: c.label, path: c.path, group: grp.label });
-        }
-        if (c.children) {
-          c.children.forEach(sub => {
-            if (sub.path) {
-              list.push({ label: sub.label, path: sub.path, group: `${grp.label} > ${c.label}` });
-            }
-          });
-        }
-      });
+      if (grp.children) {
+        grp.children.forEach(c => {
+          if (c.path) {
+            list.push({ label: c.label, path: c.path, group: grp.label });
+          }
+          if (c.children) {
+            c.children.forEach(sub => {
+              if (sub.path) {
+                list.push({ label: sub.label, path: sub.path, group: `${grp.label} > ${c.label}` });
+              }
+            });
+          }
+        });
+      } else if (grp.path) {
+        list.push({ label: grp.label, path: grp.path, group: grp.label });
+      }
     });
     return list;
   }, []);
@@ -57,9 +70,9 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
     if (!searchText.trim()) return [];
     const q = searchText.toLowerCase();
     return searchableItems
-      .filter(item => item.label.toLowerCase().includes(q) || item.group.toLowerCase().includes(q))
+      .filter((item: { label: string; path: string; group: string }) => item.label.toLowerCase().includes(q) || item.group.toLowerCase().includes(q))
       .slice(0, 8)
-      .map(item => ({
+      .map((item: { label: string; path: string; group: string }) => ({
         value: item.path,
         label: (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
@@ -72,6 +85,223 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
 
   const currentPkg: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || 'COMPLETE';
   const pkgMeta = ERP_PACKAGES[currentPkg] || ERP_PACKAGES.COMPLETE;
+
+  // Real Enterprise Notifications matching the ERP context
+  const [notifications, setNotifications] = useState([
+    {
+      id: 'REC-9718',
+      title: 'Sales Order Approved',
+      desc: 'Order SO-1047 from Kumar & Co (₹48,750) has been approved and moved to delivery dispatch.',
+      time: '10 mins ago',
+      type: 'success',
+      read: false,
+    },
+    {
+      id: 'REC-5868',
+      title: 'Invoice Payment Overdue',
+      desc: 'Invoice INV-2026-88 for ₹3,20,000 exceeded 30 days. Priority follow-up required.',
+      time: '45 mins ago',
+      type: 'warning',
+      read: false,
+    },
+    {
+      id: 'REC-1727',
+      title: 'Preventive Service Scheduled',
+      desc: 'Annual Maintenance visit assigned to Field Tech Ramesh for tomorrow 10:00 AM.',
+      time: '2 hours ago',
+      type: 'info',
+      read: false,
+    },
+    {
+      id: 'REC-7753',
+      title: 'Low Stock Alert',
+      desc: 'Item "15KW Variable Frequency Drive" is below reorder threshold (8 units remaining).',
+      time: '5 hours ago',
+      type: 'urgent',
+      read: true,
+    },
+  ]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  // Notification Dropdown Panel
+  const notificationMenuContent = (
+    <div
+      style={{
+        width: 360,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 18,
+        boxShadow: '0 16px 40px rgba(25, 21, 59, 0.15)',
+        border: '1px solid rgba(226, 232, 240, 0.9)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: '16px 20px',
+          background: 'linear-gradient(135deg, #1F1646 0%, #2D1B69 100%)',
+          color: '#FFFFFF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <BellOutlined style={{ fontSize: 16, color: '#C4B5FD' }} />
+          <span style={{ fontSize: 15, fontWeight: 800 }}>Notifications</span>
+          {unreadCount > 0 && (
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                backgroundColor: '#EF4444',
+                color: '#FFFFFF',
+                padding: '1px 7px',
+                borderRadius: 10,
+              }}
+            >
+              {unreadCount} new
+            </span>
+          )}
+        </div>
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllRead}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#A5B4FC',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* Notification List Items */}
+      <div style={{ maxHeight: 340, overflowY: 'auto', padding: '6px 0' }}>
+        {notifications.map((item) => {
+          const icon =
+            item.type === 'success' ? (
+              <CheckCircle2 size={18} color="#10B981" />
+            ) : item.type === 'warning' ? (
+              <AlertTriangle size={18} color="#F59E0B" />
+            ) : item.type === 'urgent' ? (
+              <AlertTriangle size={18} color="#EF4444" />
+            ) : (
+              <Info size={18} color="#6366F1" />
+            );
+
+          const iconBg =
+            item.type === 'success'
+              ? '#ECFDF5'
+              : item.type === 'warning'
+              ? '#FFFBEB'
+              : item.type === 'urgent'
+              ? '#FEF2F2'
+              : '#EEF2FF';
+
+          return (
+            <div
+              key={item.id}
+              onClick={() => {
+                setNotifications((prev) =>
+                  prev.map((n) => (n.id === item.id ? { ...n, read: true } : n))
+                );
+              }}
+              style={{
+                padding: '12px 18px',
+                display: 'flex',
+                gap: 12,
+                cursor: 'pointer',
+                backgroundColor: item.read ? '#FFFFFF' : 'rgba(99, 102, 241, 0.04)',
+                borderBottom: '1px solid #F1F5F9',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = item.read ? '#FFFFFF' : 'rgba(99, 102, 241, 0.04)')
+              }
+            >
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 12,
+                  backgroundColor: iconBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  marginTop: 2,
+                }}
+              >
+                {icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: item.read ? 600 : 800,
+                      color: '#0F172A',
+                    }}
+                  >
+                    {item.title}
+                  </span>
+                  <span style={{ fontSize: 10.5, color: '#94A3B8', fontWeight: 500 }}>{item.time}</span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: '#64748B',
+                    marginTop: 3,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {item.desc}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div
+        style={{
+          padding: '10px 18px',
+          backgroundColor: '#F8FAFC',
+          borderTop: '1px solid #E2E8F0',
+          textAlign: 'center',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#6E56CF',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+          onClick={() => navigate('/app/calendar')}
+        >
+          View System Calendar & Schedule <ExternalLink size={12} />
+        </span>
+      </div>
+    </div>
+  );
 
   const userMenuItems = [
     {
@@ -133,38 +363,51 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
   return (
     <div
       style={{
-        padding: '16px 28px 14px',
+        padding: '12px 28px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#F3F0F9',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF8FF 100%)',
+        borderBottom: '1px solid #ECE6F8',
+        boxShadow: '0 4px 20px rgba(84, 33, 168, 0.04)',
         flexWrap: 'nowrap',
         width: '100%',
         boxSizing: 'border-box',
         gap: 16,
+        zIndex: 50,
       }}
     >
       {/* 1. Left Greeting Area with Elegant Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
         <div
           onClick={onToggleCollapse}
+          title={collapsed ? 'Expand Menu' : 'Collapse Menu'}
           style={{
             width: 38,
             height: 38,
             borderRadius: 12,
-            backgroundColor: '#FFFFFF',
+            background: 'linear-gradient(135deg, #F8F5FF 0%, #EDE7FA 100%)',
+            border: '1px solid #DCD2F5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(25, 21, 59, 0.05)',
-            color: '#6E56CF',
+            boxShadow: '0 2px 8px rgba(84, 33, 168, 0.08)',
+            color: '#5421A8',
             fontSize: 16,
             flexShrink: 0,
-            transition: 'all 0.2s ease',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = '#7544D6';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(84, 33, 168, 0.16)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = '#DCD2F5';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(84, 33, 168, 0.08)';
+          }}
         >
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         </div>
@@ -186,9 +429,9 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         </div>
       </div>
 
-      {/* 2. Right Interactive Controls: Matching the Reference Image Clean Pill Aesthetic */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        {/* Search Bar: White Pill with instant global navigation */}
+      {/* 2. Right Interactive Controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        {/* Search Bar */}
         <div style={{ position: 'relative' }}>
           <AutoComplete
             options={searchOptions}
@@ -198,11 +441,11 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               navigate(path);
               setSearchText('');
             }}
-            popupMatchSelectWidth={320}
-            style={{ width: 180 }}
+            popupMatchSelectWidth={340}
+            style={{ width: 210 }}
           >
             <Input
-              prefix={<SearchOutlined style={{ color: '#A5A1BE', fontSize: 14, marginRight: 4 }} />}
+              prefix={<SearchOutlined style={{ color: '#7544D6', fontSize: 14, marginRight: 6 }} />}
               placeholder="Search anything..."
               allowClear
               onPressEnter={() => {
@@ -213,14 +456,24 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               }}
               style={{
                 width: '100%',
-                borderRadius: 30,
+                borderRadius: 20,
                 backgroundColor: '#FFFFFF',
-                boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-                height: 40,
-                border: 'none',
+                boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+                height: 38,
+                border: '1px solid #E2D9F3',
                 fontSize: 12,
                 fontWeight: 500,
                 paddingLeft: 14,
+                color: '#1E1035',
+                transition: 'all 0.2s ease',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#7544D6';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(117, 68, 214, 0.12)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E2D9F3';
+                e.currentTarget.style.boxShadow = '0 2px 10px rgba(84, 33, 168, 0.05)';
               }}
             />
           </AutoComplete>
@@ -229,27 +482,44 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         {/* Company Switcher Pill */}
         <div
           style={{
-            height: 40,
-            borderRadius: 30,
+            height: 38,
+            borderRadius: 20,
             backgroundColor: '#FFFFFF',
-            boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-            padding: '0 10px',
+            border: '1px solid #E2D9F3',
+            boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+            padding: '0 12px',
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
+            gap: 6,
             flexShrink: 0,
+            transition: 'all 0.15s ease',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#7544D6')}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E2D9F3')}
         >
-          <Building2 size={14} color="#6E56CF" />
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: '#F1ECFA',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#5421A8',
+            }}
+          >
+            <Building2 size={13} />
+          </div>
           <Select
             value={selectedCompany?.id}
             onChange={(val) => selectCompany(val)}
             variant="borderless"
             style={{
               minWidth: 120,
-              maxWidth: 150,
+              maxWidth: 155,
               fontWeight: 700,
-              color: '#181433',
+              color: '#1E1035',
               fontSize: 12,
             }}
             popupMatchSelectWidth={false}
@@ -266,19 +536,23 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         <Tooltip title="Switch Active Package Subscription">
           <div
             style={{
-              height: 40,
-              borderRadius: 30,
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-              padding: '0 10px',
+              height: 38,
+              borderRadius: 20,
+              background: 'linear-gradient(135deg, #F8F5FF 0%, #F1ECFA 100%)',
+              border: '1px solid #DDD1F5',
+              boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+              padding: '0 12px',
               display: 'flex',
               alignItems: 'center',
-              gap: 4,
+              gap: 6,
               cursor: 'pointer',
               flexShrink: 0,
+              transition: 'all 0.15s ease',
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#7544D6')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#DDD1F5')}
           >
-            <Sparkles size={14} color="#6E56CF" />
+            <Sparkles size={13} color="#5421A8" />
             <Select
               value={currentPkg}
               size="middle"
@@ -287,9 +561,9 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
                 if (selectedCompany) updateCompanyPackage(selectedCompany.id, val as any);
               }}
               style={{
-                width: 90,
+                width: 95,
                 fontWeight: 800,
-                color: '#6E56CF',
+                color: '#5421A8',
                 fontSize: 12,
               }}
               popupMatchSelectWidth={false}
@@ -301,54 +575,117 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
           </div>
         </Tooltip>
 
-        {/* Sun / Theme Button: Glowing Soft Purple Circle */}
+        {/* Theme Button */}
         <div
+          title="Toggle Ambient Theme"
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#FFFFFF',
             cursor: 'pointer',
-            boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
-            transition: 'transform 0.2s ease',
+            boxShadow: '0 4px 14px rgba(84, 33, 168, 0.35)',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             flexShrink: 0,
+            border: '1px solid rgba(255, 255, 255, 0.25)',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 18px rgba(84, 33, 168, 0.45)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(84, 33, 168, 0.35)';
+          }}
         >
           <Sun size={16} />
         </div>
 
-        {/* User Profile Avatar with Soft Violet Ring Shadow */}
+        {/* Notifications Button */}
+        <Dropdown
+          dropdownRender={() => notificationMenuContent}
+          trigger={['click']}
+          placement="bottomRight"
+        >
+          <div style={{ display: 'inline-block' }}>
+            <Badge
+              count={unreadCount}
+              offset={[-4, 4]}
+              styles={{
+                indicator: {
+                  backgroundColor: '#EF4444',
+                  fontWeight: 800,
+                  fontSize: 10.5,
+                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                },
+              }}
+            >
+              <div
+                title="System Notifications"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 19,
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2D9F3',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#5421A8',
+                  boxShadow: '0 2px 10px rgba(84, 33, 168, 0.05)',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.borderColor = '#7544D6';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(84, 33, 168, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = '#E2D9F3';
+                  e.currentTarget.style.boxShadow = '0 2px 10px rgba(84, 33, 168, 0.05)';
+                }}
+              >
+                <BellOutlined style={{ fontSize: 16 }} />
+              </div>
+            </Badge>
+          </div>
+        </Dropdown>
+
+        {/* User Profile Avatar */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
           <div
+            title={`${user?.name || 'Janani'} (Profile & Settings)`}
             style={{
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               padding: 2,
               borderRadius: 22,
-              transition: 'transform 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               flexShrink: 0,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px) scale(1.05)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0) scale(1)')}
           >
             <Avatar
-              size={40}
+              size={38}
               style={{
-                background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
-                fontWeight: 800,
+                background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
+                fontWeight: 900,
                 fontSize: 15,
-                boxShadow: '0 6px 18px rgba(110, 86, 207, 0.35)',
+                boxShadow: '0 4px 14px rgba(84, 33, 168, 0.35)',
                 color: '#FFFFFF',
+                border: '2px solid #FFFFFF',
               }}
             >
-              {user?.name?.charAt(0) || 'J'}
+              {user?.name?.charAt(0) || 'R'}
             </Avatar>
           </div>
         </Dropdown>

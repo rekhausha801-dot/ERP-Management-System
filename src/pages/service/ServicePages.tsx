@@ -29,7 +29,6 @@ import {
   Download,
   Star,
 } from 'lucide-react';
-import { TbStarFilled } from 'react-icons/tb';
 import { PageHeader, StatusBadge, GenericCrudToolbar } from '../../components';
 import {
   MOCK_SERVICE_TICKETS,
@@ -1619,7 +1618,7 @@ export const ServiceTechniciansPage: React.FC = () => {
       key: 'rating',
       render: (r: number) => (
         <span style={{ fontWeight: 700, color: '#1E293B', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <TbStarFilled size={14} color="#F59E0B" /> {r}
+          <Star size={14} fill="#F59E0B" color="#F59E0B" /> {r}
         </span>
       ),
     },
