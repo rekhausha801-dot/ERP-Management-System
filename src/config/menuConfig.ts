@@ -153,7 +153,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Product Management',
     iconName: 'Package',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'prod-list', label: 'Products', path: '/app/sales/products', iconName: 'Package' },
       { key: 'prod-price-lists', label: 'Price Lists', path: '/app/sales/price-lists', iconName: 'CreditCard' },
@@ -169,7 +169,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Inventory Management',
     iconName: 'Boxes',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'inv-overview', label: 'Inventory Overview', path: '/app/sales/inventory', iconName: 'Boxes' },
       { key: 'inv-stock', label: 'Stock Management', path: '/app/sales/stock-management', iconName: 'Boxes' },
@@ -186,7 +186,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     label: 'Purchase Management',
     iconName: 'ShoppingCart',
     section: 'sales',
-    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    allowedPackages: ['COMPLETE', 'SALES'],
     children: [
       { key: 'pur-overview', label: 'Purchase Overview', path: '/app/sales/purchases', iconName: 'ShoppingCart' },
       { key: 'pur-requisitions', label: 'Purchase Requisitions', path: '/app/sales/purchase-requisitions', iconName: 'FileText' },
@@ -267,6 +267,7 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'portal-customer', label: 'Customer Self-Service Portal', path: '/app/portal/customer', iconName: 'Users' },
+      { key: 'portal-office-staff', label: 'Office Staff Service Desk', path: '/app/portal/office-staff', iconName: 'PhoneCall' },
       { key: 'portal-supplier', label: 'Supplier Collaboration Portal', path: '/app/portal/supplier', iconName: 'Truck' },
       { key: 'portal-technician', label: 'Technician Mobile Workspace', path: '/app/portal/technician', iconName: 'HardHat' },
     ],
@@ -321,8 +322,43 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
 ];
 
 /**
- * Filter whole collapsible menu groups allowed for the current ERP package
+ * Filter whole collapsible menu groups allowed for the current ERP package and user role
  */
-export function getMenuGroupsForPackage(packageType: ErpPackageId): MenuGroupConfig[] {
-  return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType));
+export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: string): MenuGroupConfig[] {
+  // If user is restricted Office Staff, show ONLY Office Staff Service Desk features
+  if (userRole === 'office_staff') {
+    return [
+      {
+        key: 'grp-office-staff',
+        label: 'Office Staff Service Desk',
+        iconName: 'PhoneCall',
+        section: 'services',
+        allowedPackages: ['COMPLETE', 'SERVICE'],
+        children: [
+          {
+            key: 'portal-office-staff-desk',
+            label: 'Call Intake & Status Portal',
+            path: '/app/portal/office-staff',
+            iconName: 'PhoneCall',
+          },
+          {
+            key: 'portal-office-staff-tickets',
+            label: 'Live Service Tickets',
+            path: '/app/services/tickets',
+            iconName: 'Ticket',
+          },
+        ],
+      },
+    ];
+  }
+
+  return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType)).map((group) => {
+    if (packageType === 'SERVICE') {
+      return {
+        ...group,
+        children: group.children.filter((child) => child.key !== 'rep-sales'),
+      };
+    }
+    return group;
+  });
 }

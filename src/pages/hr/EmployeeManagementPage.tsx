@@ -21,7 +21,7 @@ interface EmployeeItem {
 
 const INITIAL_EMPLOYEES: EmployeeItem[] = [
   { key: '1', id: 'EMP-001', name: 'Janani Ramesh', email: 'janani@abctraders.com', phone: '+91 98401 23456', department: 'Executive Management', designation: 'General Manager', branch: 'Chennai HQ', status: 'Active', joiningDate: '2023-01-10', salary: '₹1,20,000' },
-  { key: '2', id: 'EMP-002', name: 'Vikram Seth', email: 'vikram@abctraders.com', phone: '+91 98401 88990', department: 'Enterprise Sales', designation: 'Senior Account Executive', branch: 'Chennai HQ', status: 'Active', joiningDate: '2023-04-15', salary: '₹85,000' },
+  { key: '2', id: 'EMP-002', name: 'Suresh Kumar', email: 'suresh@abctraders.com', phone: '+91 98401 88990', department: 'Service Contracts', designation: 'Senior Service Manager', branch: 'Chennai HQ', status: 'Active', joiningDate: '2023-04-15', salary: '₹85,000' },
   { key: '3', id: 'EMP-003', name: 'Murugan K.', email: 'murugan@abctraders.com', phone: '+91 98402 11223', department: 'Field Services', designation: 'Lead Field Engineer', branch: 'Coimbatore Hub', status: 'Active', joiningDate: '2022-08-10', salary: '₹75,000' },
   { key: '4', id: 'EMP-004', name: 'Ananya Sharma', email: 'ananya@abctraders.com', phone: '+91 98403 44556', department: 'Human Resources', designation: 'HR Specialist', branch: 'Chennai HQ', status: 'Active', joiningDate: '2023-11-01', salary: '₹60,000' },
   { key: '5', id: 'EMP-005', name: 'Dinesh V.', email: 'dinesh@abctraders.com', phone: '+91 98404 77889', department: 'Technical Dispatch', designation: 'Hydraulics Specialist', branch: 'Madurai Depot', status: 'On Leave', joiningDate: '2024-01-20', salary: '₹55,000' },
@@ -194,7 +194,7 @@ export const EmployeeManagementPage: React.FC = () => {
         </Col>
       </Row>
 
-      <Card bordered={false} style={{ borderRadius: 14, boxShadow: '0 4px 18px rgba(0,0,0,0.04)' }}>
+      <Card bordered={false} style={{ borderRadius: 14, boxShadow: '0 4px 18px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
         {/* Horizontal Navigation Tabs */}
         <Tabs
           activeKey={activeTab}
@@ -228,7 +228,7 @@ export const EmployeeManagementPage: React.FC = () => {
                   options={[
                     { value: 'all', label: 'All Departments' },
                     { value: 'Executive Management', label: 'Executive Management' },
-                    { value: 'Enterprise Sales', label: 'Enterprise Sales' },
+                    { value: 'Service Contracts', label: 'Service Contracts' },
                     { value: 'Field Services', label: 'Field Services' },
                     { value: 'Human Resources', label: 'Human Resources' },
                     { value: 'Technical Dispatch', label: 'Technical Dispatch' },
@@ -250,14 +250,18 @@ export const EmployeeManagementPage: React.FC = () => {
               <Text type="secondary" style={{ fontSize: 13 }}>Showing {filtered.length} of {employees.length} personnel</Text>
             </div>
 
-            <Table dataSource={filtered} columns={columns} pagination={{ pageSize: 8 }} />
+            <Table
+              dataSource={filtered}
+              columns={columns}
+              pagination={{ pageSize: 8, showSizeChanger: true }}
+            />
           </>
         ) : activeTab === 'departments' ? (
           <div style={{ padding: '16px 0' }}>
             <Row gutter={[16, 16]}>
               {[
                 { name: 'Executive Management', head: 'Janani Ramesh', staffCount: 4, budget: '₹18.5L / mo' },
-                { name: 'Enterprise Sales', head: 'Vikram Seth', staffCount: 12, budget: '₹14.2L / mo' },
+                { name: 'Service Contracts & Operations', head: 'Suresh Kumar', staffCount: 12, budget: '₹14.2L / mo' },
                 { name: 'Field Services & Engineering', head: 'Murugan K.', staffCount: 16, budget: '₹16.8L / mo' },
                 { name: 'Human Resources & Admin', head: 'Ananya Sharma', staffCount: 5, budget: '₹5.5L / mo' },
               ].map((dept, i) => (
@@ -328,10 +332,10 @@ export const EmployeeManagementPage: React.FC = () => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Department" name="department" initialValue="Enterprise Sales" rules={[{ required: true }]}>
+              <Form.Item label="Department" name="department" initialValue="Field Services" rules={[{ required: true }]}>
                 <Select options={[
-                  { value: 'Enterprise Sales', label: 'Enterprise Sales' },
                   { value: 'Field Services', label: 'Field Services' },
+                  { value: 'Service Contracts', label: 'Service Contracts' },
                   { value: 'Executive Management', label: 'Executive Management' },
                   { value: 'Accounts & Finance', label: 'Accounts & Finance' },
                   { value: 'Human Resources', label: 'Human Resources' },

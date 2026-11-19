@@ -16,28 +16,51 @@ export const MainLayout: React.FC = () => {
   const packageType = (selectedCompany?.packageType as any) || 'COMPLETE';
 
   return (
-    <Layout style={{ height: '100vh', maxHeight: '100vh', overflow: 'hidden', backgroundColor: '#F3F0F9', display: 'flex', flexDirection: 'row' }}>
+    <Layout
+      style={{
+        height: '100vh',
+        maxHeight: '100vh',
+        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
+        display: 'flex',
+        flexDirection: 'row',
+      }}
+    >
       <Sidebar
         collapsed={collapsed}
         packageType={packageType}
         companyName={selectedCompany?.name || 'Company ERP'}
         companyCode={selectedCompany?.code || 'ERP'}
       />
-      <Layout style={{ height: '100vh', maxHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minWidth: 0, backgroundColor: '#F3F0F9' }}>
+      <Layout
+        style={{
+          height: '100vh',
+          maxHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          flex: 1,
+          minWidth: 0,
+          backgroundColor: '#FFFFFF',
+        }}
+      >
         <Navbar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
         />
         <Content
           style={{
-            padding: '0 24px 20px',
+            padding: '20px 24px 0',
             overflowY: 'auto',
             overflowX: 'hidden',
             flex: 1,
             minHeight: 0,
+            backgroundColor: '#FFFFFF',
           }}
         >
-          <Outlet />
+          <div style={{ maxWidth: '100%', minWidth: 0, overflowX: 'hidden' }}>
+            <Outlet />
+          </div>
         </Content>
         <Footer companyName={selectedCompany?.name} />
       </Layout>

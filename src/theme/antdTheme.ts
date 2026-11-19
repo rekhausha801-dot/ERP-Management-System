@@ -19,7 +19,7 @@ export const antdTheme: ThemeConfig = {
   components: {
     Button: {
       controlHeight: 40,
-      borderRadius: 12,
+      borderRadius: 10,
       colorPrimary: colors.primary,
       colorPrimaryHover: colors.primaryHover,
       fontWeight: 600,
@@ -27,7 +27,7 @@ export const antdTheme: ThemeConfig = {
     Card: {
       borderRadiusLG: 20,
       colorBorderSecondary: 'transparent',
-      boxShadowTertiary: '0 8px 24px rgba(25, 21, 59, 0.03)',
+      boxShadowTertiary: '0 8px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
     },
     Menu: {
       darkItemBg: 'transparent',
@@ -45,11 +45,20 @@ export const antdTheme: ThemeConfig = {
       borderRadius: 16,
     },
     Input: {
-      controlHeight: 42,
-      borderRadius: 24,
+      controlHeight: 40,
+      borderRadius: 8,
       colorBgContainer: '#FFFFFF',
-      colorBorder: 'transparent',
-      hoverBorderColor: colors.primary,
+      colorBorder: '#E2E8F0',
+      hoverBorderColor: '#CBD5E1',
+      activeBorderColor: '#6D28D9',
+    },
+    Select: {
+      controlHeight: 40,
+      borderRadius: 8,
+      colorBgContainer: '#FFFFFF',
+      colorBorder: '#E2E8F0',
+      colorPrimaryHover: '#CBD5E1',
+      colorPrimary: '#6D28D9',
     },
   },
 };

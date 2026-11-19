@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dropdown,
   Avatar,
@@ -6,6 +6,7 @@ import {
   Input,
   Select,
   Tooltip,
+  AutoComplete,
 } from 'antd';
 import {
   MenuFoldOutlined,
@@ -21,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';
 import type { ErpPackageId } from '../config/erpPackageConfig';
+import { SIDEBAR_MENU_GROUPS } from '../config/menuConfig';
 
 interface NavbarProps {
   collapsed: boolean;
@@ -30,6 +32,43 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) => {
   const { user, selectedCompany, companies, selectCompany, updateCompanyPackage, logout, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
+
+  const searchableItems = useMemo(() => {
+    const list: { label: string; path: string; group: string }[] = [];
+    SIDEBAR_MENU_GROUPS.forEach(grp => {
+      grp.children.forEach(c => {
+        if (c.path) {
+          list.push({ label: c.label, path: c.path, group: grp.label });
+        }
+        if (c.children) {
+          c.children.forEach(sub => {
+            if (sub.path) {
+              list.push({ label: sub.label, path: sub.path, group: `${grp.label} > ${c.label}` });
+            }
+          });
+        }
+      });
+    });
+    return list;
+  }, []);
+
+  const searchOptions = useMemo(() => {
+    if (!searchText.trim()) return [];
+    const q = searchText.toLowerCase();
+    return searchableItems
+      .filter(item => item.label.toLowerCase().includes(q) || item.group.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map(item => ({
+        value: item.path,
+        label: (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
+            <span style={{ fontWeight: 600, color: '#181433' }}>{item.label}</span>
+            <span style={{ fontSize: 11, color: '#8F8BA8' }}>{item.group}</span>
+          </div>
+        ),
+      }));
+  }, [searchText, searchableItems]);
 
   const currentPkg: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || 'COMPLETE';
   const pkgMeta = ERP_PACKAGES[currentPkg] || ERP_PACKAGES.COMPLETE;
@@ -149,23 +188,42 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
 
       {/* 2. Right Interactive Controls: Matching the Reference Image Clean Pill Aesthetic */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        {/* Search Bar: White Pill with subtle inset feel */}
+        {/* Search Bar: White Pill with instant global navigation */}
         <div style={{ position: 'relative' }}>
-          <Input
-            prefix={<SearchOutlined style={{ color: '#A5A1BE', fontSize: 14, marginRight: 4 }} />}
-            placeholder="Search anything..."
-            style={{
-              width: 160,
-              borderRadius: 30,
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-              height: 40,
-              border: 'none',
-              fontSize: 12,
-              fontWeight: 500,
-              paddingLeft: 14,
+          <AutoComplete
+            options={searchOptions}
+            value={searchText}
+            onChange={(val) => setSearchText(val)}
+            onSelect={(path: string) => {
+              navigate(path);
+              setSearchText('');
             }}
-          />
+            popupMatchSelectWidth={320}
+            style={{ width: 180 }}
+          >
+            <Input
+              prefix={<SearchOutlined style={{ color: '#A5A1BE', fontSize: 14, marginRight: 4 }} />}
+              placeholder="Search anything..."
+              allowClear
+              onPressEnter={() => {
+                if (searchOptions.length > 0) {
+                  navigate(searchOptions[0].value);
+                  setSearchText('');
+                }
+              }}
+              style={{
+                width: '100%',
+                borderRadius: 30,
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
+                height: 40,
+                border: 'none',
+                fontSize: 12,
+                fontWeight: 500,
+                paddingLeft: 14,
+              }}
+            />
+          </AutoComplete>
         </div>
 
         {/* Company Switcher Pill */}
@@ -264,36 +322,6 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         >
           <Sun size={16} />
         </div>
-
-        {/* Notifications Button: Clean White Circle with Red Badge */}
-        <Tooltip title="Notifications">
-          <Badge
-            count={3}
-            offset={[-4, 4]}
-            styles={{ indicator: { backgroundColor: '#EF4444', fontWeight: 800, boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)' } }}
-          >
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#6E56CF',
-                boxShadow: '0 4px 16px rgba(25, 21, 59, 0.04)',
-                transition: 'transform 0.2s ease',
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <BellOutlined style={{ fontSize: 16 }} />
-            </div>
-          </Badge>
-        </Tooltip>
 
         {/* User Profile Avatar with Soft Violet Ring Shadow */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>

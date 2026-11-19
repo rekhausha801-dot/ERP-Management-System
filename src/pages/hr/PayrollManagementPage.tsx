@@ -22,7 +22,7 @@ interface PayrollItem {
 
 const INITIAL_PAYROLL: PayrollItem[] = [
   { key: '1', empId: 'EMP-001', name: 'Janani Ramesh', department: 'Executive Management', basicSalary: 70000, hra: 30000, allowances: 20000, pfDeduction: 8400, taxDeduction: 12000, netPayable: 99600, status: 'Disbursed', month: 'October 2026' },
-  { key: '2', empId: 'EMP-002', name: 'Vikram Seth', department: 'Enterprise Sales', basicSalary: 50000, hra: 20000, allowances: 15000, pfDeduction: 6000, taxDeduction: 7500, netPayable: 71500, status: 'Disbursed', month: 'October 2026' },
+  { key: '2', empId: 'EMP-002', name: 'Suresh Kumar', department: 'Service Contracts', basicSalary: 50000, hra: 20000, allowances: 15000, pfDeduction: 6000, taxDeduction: 7500, netPayable: 71500, status: 'Disbursed', month: 'October 2026' },
   { key: '3', empId: 'EMP-003', name: 'Murugan K.', department: 'Field Services', basicSalary: 45000, hra: 18000, allowances: 12000, pfDeduction: 5400, taxDeduction: 5000, netPayable: 64600, status: 'Disbursed', month: 'October 2026' },
   { key: '4', empId: 'EMP-004', name: 'Ananya Sharma', department: 'Human Resources', basicSalary: 35000, hra: 15000, allowances: 10000, pfDeduction: 4200, taxDeduction: 3500, netPayable: 52300, status: 'Pending Approval', month: 'November 2026' },
   { key: '5', empId: 'EMP-005', name: 'Dinesh V.', department: 'Technical Dispatch', basicSalary: 32000, hra: 13000, allowances: 10000, pfDeduction: 3840, taxDeduction: 2800, netPayable: 48360, status: 'Pending Approval', month: 'November 2026' },
