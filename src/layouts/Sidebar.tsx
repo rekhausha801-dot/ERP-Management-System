@@ -1,39 +1,35 @@
 import React from 'react';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
-  Package,
-  Boxes,
-  ShoppingCart,
-  Truck,
-  ShoppingBag,
-  FileSpreadsheet,
-  Undo2,
-  Inbox,
-  Wrench,
-  HardHat,
   Calendar,
+  Clock,
+  ShoppingCart,
   FileCheck,
-  History,
-  Receipt,
-  CreditCard,
-  BarChart3,
+  Users,
+  Undo2,
+  Boxes,
+  Layers,
+  Truck,
   SlidersHorizontal,
+  ShieldAlert,
+  Building2,
+  Package,
+  Award,
+  Receipt,
   TrendingUp,
+  ShoppingBag,
+  FileText,
   Target,
   UserCheck,
-  HelpCircle,
+  CreditCard,
+  CheckCircle,
+  FileSpreadsheet,
   Briefcase,
-  Ticket,
   MapPin,
-  ShieldAlert,
-  Cpu,
-  FileText,
-  ThumbsUp,
-  LifeBuoy,
   MessageSquare,
+  History,
   LogOut,
   Sparkles,
   Bell,
@@ -57,45 +53,36 @@ interface SidebarProps {
 }
 
 const renderIcon = (name?: string) => {
-  const props = { size: 17, style: { marginRight: 10 } };
+  const props = { size: 16, style: { marginRight: 8 } };
   switch (name) {
     case 'LayoutDashboard': return <LayoutDashboard {...props} />;
-    case 'Users': return <Users {...props} />;
-    case 'Package': return <Package {...props} />;
-    case 'Boxes': return <Boxes {...props} />;
-    case 'ShoppingCart': return <ShoppingCart {...props} />;
-    case 'Truck': return <Truck {...props} />;
-    case 'ShoppingBag': return <ShoppingBag {...props} />;
-    case 'FileSpreadsheet': return <FileSpreadsheet {...props} />;
-    case 'Undo2': return <Undo2 {...props} />;
-    case 'Inbox': return <Inbox {...props} />;
-    case 'Wrench': return <Wrench {...props} />;
-    case 'HardHat': return <HardHat {...props} />;
     case 'Calendar': return <Calendar {...props} />;
+    case 'Clock': return <Clock {...props} />;
+    case 'ShoppingCart': return <ShoppingCart {...props} />;
     case 'FileCheck': return <FileCheck {...props} />;
-    case 'History': return <History {...props} />;
-    case 'Receipt': return <Receipt {...props} />;
-    case 'CreditCard': return <CreditCard {...props} />;
-    case 'BarChart3': return <BarChart3 {...props} />;
+    case 'Users': return <Users {...props} />;
+    case 'Undo2': return <Undo2 {...props} />;
+    case 'Boxes': return <Boxes {...props} />;
+    case 'Layers': return <Layers {...props} />;
+    case 'Truck': return <Truck {...props} />;
     case 'SlidersHorizontal': return <SlidersHorizontal {...props} />;
+    case 'ShieldAlert': return <ShieldAlert {...props} />;
+    case 'Building2': return <Building2 {...props} />;
+    case 'Package': return <Package {...props} />;
+    case 'Award': return <Award {...props} />;
+    case 'Receipt': return <Receipt {...props} />;
     case 'TrendingUp': return <TrendingUp {...props} />;
+    case 'ShoppingBag': return <ShoppingBag {...props} />;
+    case 'FileText': return <FileText {...props} />;
     case 'Target': return <Target {...props} />;
     case 'UserCheck': return <UserCheck {...props} />;
-    case 'HelpCircle': return <HelpCircle {...props} />;
+    case 'CreditCard': return <CreditCard {...props} />;
+    case 'CheckCircle': return <CheckCircle {...props} />;
+    case 'FileSpreadsheet': return <FileSpreadsheet {...props} />;
     case 'Briefcase': return <Briefcase {...props} />;
-    case 'Ticket': return <Ticket {...props} />;
     case 'MapPin': return <MapPin {...props} />;
-    case 'ShieldAlert': return <ShieldAlert {...props} />;
-    case 'Cpu': return <Cpu {...props} />;
-    case 'FileText': return <FileText {...props} />;
-    case 'ThumbsUp': return <ThumbsUp {...props} />;
-    case 'LifeBuoy': return <LifeBuoy {...props} />;
     case 'MessageSquare': return <MessageSquare {...props} />;
-    case 'Bell': return <Bell {...props} />;
-    case 'Headphones': return <Headphones {...props} />;
-    case 'FileBox': return <FileBox {...props} />;
-    case 'ClipboardList': return <ClipboardList {...props} />;
-    case 'PhoneCall': return <PhoneCall {...props} />;
+    case 'History': return <History {...props} />;
     default: return <Package {...props} />;
   }
 };
@@ -118,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       return {
         key: item.key,
         icon: item.iconName ? renderIcon(item.iconName) : undefined,
-        label: <span style={{ fontWeight: 600 }}>{item.label}</span>,
+        label: item.label,
         children: item.children.map(buildAntMenuItem),
       };
     }
@@ -129,304 +116,296 @@ export const Sidebar: React.FC<SidebarProps> = ({
     };
   };
 
-  const antMenuItems = menuGroups.map((group) => ({
-    key: group.key,
-    icon: renderIcon(group.iconName),
-    label: <span style={{ fontWeight: 600 }}>{group.label}</span>,
-    children: group.children.map(buildAntMenuItem),
-  }));
+  const antMenuItems = menuGroups.map((group) => {
+    if (group.path || !group.children || group.children.length === 0) {
+      return {
+        key: group.path || group.key,
+        icon: renderIcon(group.iconName),
+        label: group.label,
+      };
+    }
+    return {
+      key: group.key,
+      icon: renderIcon(group.iconName),
+      label: group.label,
+      children: group.children.map(buildAntMenuItem),
+    };
+  });
 
-  // Recursive search to find active open key
-  const findActiveKeys = (): string[] => {
+  // Find active open group key based on location.pathname
+  const findActiveGroupKey = (): string => {
     for (const group of menuGroups) {
-      for (const child of group.children) {
-        if (child.path === location.pathname) {
-          return [group.key];
-        }
-        if (child.children) {
-          for (const sub of child.children) {
-            if (sub.path === location.pathname) {
-              return [group.key, child.key];
+      if (group.path === location.pathname) {
+        return group.key;
+      }
+      if (group.children) {
+        for (const child of group.children) {
+          if (child.path === location.pathname) {
+            return group.key;
+          }
+          if (child.children) {
+            for (const sub of child.children) {
+              if (sub.path === location.pathname) {
+                return group.key;
+              }
             }
           }
         }
       }
     }
-    return [menuGroups[0]?.key];
+    return menuGroups[0]?.key;
   };
 
-  const defaultOpenKeys = findActiveKeys();
+  const [openKeys, setOpenKeys] = React.useState<string[]>([findActiveGroupKey()]);
+
+  React.useEffect(() => {
+    const activeKey = findActiveGroupKey();
+    if (activeKey && !openKeys.includes(activeKey)) {
+      setOpenKeys((prev) => [...prev, activeKey]);
+    }
+  }, [location.pathname]);
+
+  const onOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+  };
 
   return (
     <Sider
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={280}
+      width={250}
       className="erp-dark-sidebar"
       style={{
-        backgroundColor: '#19153B', // Midnight Deep Purple matching screenshot
+        backgroundColor: '#211044',
+        background: 'linear-gradient(180deg, #211044 0%, #2A1454 45%, #1D0E3D 80%, #301761 100%)',
         height: '100vh',
         maxHeight: '100vh',
-        zIndex: 10,
+        zIndex: 100,
         position: 'sticky',
         top: 0,
         left: 0,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        boxShadow: '4px 0 24px rgba(33, 16, 68, 0.45)',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: '100vh', overflow: 'hidden' }}>
-        {/* Brand Title (ERP Enterprise Platform) */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          maxHeight: '100vh',
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        {/* Soft Purple Glow Atmosphere */}
         <div
           style={{
-            padding: collapsed ? '24px 12px' : '28px 24px 20px',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 180,
+            background: 'radial-gradient(ellipse at bottom, rgba(117, 68, 214, 0.3) 0%, rgba(84, 33, 168, 0.15) 50%, transparent 80%)',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
+
+        {/* Ambient Wave SVG at Bottom */}
+        <svg
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: 80,
+            opacity: 0.35,
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+          viewBox="0 0 260 80"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,45 Q65,15 130,40 T260,20 L260,80 L0,80 Z"
+            fill="url(#sidebarWaveGradDark)"
+          />
+          <defs>
+            <linearGradient id="sidebarWaveGradDark" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#7544D6" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#5421A8" stopOpacity="0.3" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        {/* Brand Header */}
+        <div
+          style={{
+            padding: collapsed ? '22px 8px' : '22px 20px 18px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
+            alignItems: 'center',
+            gap: 12,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             flexShrink: 0,
+            position: 'relative',
+            zIndex: 2,
           }}
         >
-          <div style={{ fontSize: 22, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-            ERP
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: 16,
+              flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(84, 33, 168, 0.4)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            {companyCode?.slice(0, 2) || 'SE'}
           </div>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#8F8BA8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            ENTERPRISE MANAGEMENT
-          </div>
-        </div>
-
-        {/* Highlighted Primary "Business Overview" & "Notifications" Pill Buttons */}
-        {!collapsed && (
-          <div style={{ padding: '0 16px 14px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div
-              onClick={() => navigate('/app/dashboard')}
-              style={{
-                background: location.pathname.includes('/app/dashboard')
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)'
-                  : 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: 14,
-                padding: '12px 16px',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: 13,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <LayoutDashboard size={18} color="#FFFFFF" />
-              <span>Dashboard</span>
-            </div>
-
-            <div
-              onClick={() => navigate('/app/notifications')}
-              style={{
-                background: location.pathname.includes('/app/notifications')
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)'
-                  : 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: 14,
-                padding: '12px 16px',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: 13,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Package size={18} color="#FFFFFF" />
-                <span>Notifications</span>
-              </div>
-              <span
+          {!collapsed && (
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <div
                 style={{
-                  backgroundColor: '#EF4444',
+                  fontSize: 16,
+                  fontWeight: 900,
                   color: '#FFFFFF',
-                  fontSize: 11,
-                  fontWeight: 800,
-                  borderRadius: 10,
-                  padding: '1px 7px',
+                  letterSpacing: '-0.2px',
+                  lineHeight: 1.2,
                 }}
               >
-                3
-              </span>
+                Sales ERP
+              </div>
+              <div
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: '#C4B5FD',
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  marginTop: 2,
+                }}
+              >
+                Enterprise System
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Collapsible Dark Navigation Menu with Card Inside Scrollable Area */}
+        {/* Navigation Menu List */}
         <div
           style={{
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
             overflowX: 'hidden',
-            padding: '4px 10px',
-            display: 'flex',
-            flexDirection: 'column',
+            padding: '8px 8px',
+            position: 'relative',
+            zIndex: 2,
           }}
         >
-          <div style={{ flex: '1 0 auto' }}>
-            <Menu
-              theme="dark"
-              mode="inline"
-              selectedKeys={[location.pathname]}
-              defaultOpenKeys={defaultOpenKeys}
-              items={antMenuItems}
-              onClick={({ key }) => navigate(key)}
-              style={{
-                backgroundColor: 'transparent',
-                fontSize: 13,
-                border: 'none',
-              }}
-            />
-          </div>
-
-          {/* Bottom Banner Card: Placed at the very end of scroll so it reveals on scroll down */}
-          {!collapsed && (
-            <div style={{ padding: '16px 4px 8px', marginTop: 12, flexShrink: 0 }}>
-
-              <div
-                style={{
-                  position: 'relative',
-                  borderRadius: 18,
-                  background: 'linear-gradient(145deg, rgba(124, 102, 220, 0.25) 0%, rgba(88, 62, 199, 0.12) 100%)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  padding: '16px 14px',
-                  color: '#FFFFFF',
-                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Subtle Ambient Glowing Orb */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -20,
-                    right: -20,
-                    width: 70,
-                    height: 70,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(110, 86, 207, 0.6) 0%, rgba(110, 86, 207, 0) 70%)',
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 8,
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Sparkles size={13} color="#C4B5FD" />
-                    </div>
-                    <span style={{ fontSize: 10, fontWeight: 800, color: '#C4B5FD', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                      {pkgMeta.name} EDITION
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      padding: '2px 7px',
-                      borderRadius: 10,
-                      backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                      color: '#34D399',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                    }}
-                  >
-                    ACTIVE
-                  </div>
-                </div>
-
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.3 }}>
-                  Enterprise Operations
-                </div>
-                <div style={{ fontSize: 11, color: '#9B96B5', marginTop: 3, lineHeight: 1.4 }}>
-                  Multi-Tenant Sales & Service SLA Priority
-                </div>
-
-                {/* Action Button */}
-                <div
-                  onClick={() => navigate('/app/settings/subscription')}
-                  style={{
-                    marginTop: 12,
-                    background: 'linear-gradient(135deg, #7C66DC 0%, #583EC7 100%)',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    borderRadius: 10,
-                    fontSize: 11,
-                    height: 30,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 6,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(110, 86, 207, 0.35)',
-                    transition: 'all 0.2s ease',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(110, 86, 207, 0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(110, 86, 207, 0.35)';
-                  }}
-                >
-                  <span>Manage Plan</span>
-                  <span style={{ fontSize: 12 }}>&rarr;</span>
-                </div>
-              </div>
-            </div>
-          )}
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            openKeys={collapsed ? undefined : openKeys}
+            onOpenChange={onOpenChange}
+            items={antMenuItems}
+            onClick={({ key }) => {
+              if (key && key.startsWith('/')) {
+                navigate(key);
+              }
+            }}
+            style={{
+              backgroundColor: 'transparent',
+              fontSize: 12.5,
+              fontWeight: 500,
+              border: 'none',
+            }}
+          />
         </div>
 
-        {/* Log Out Button (Fixed at Bottom Footer) */}
+        {/* Bottom User / Logout Footer */}
         <div
-          onClick={() => {
-            logout();
-            navigate('/login');
-          }}
           style={{
-            padding: '14px 24px',
+            padding: collapsed ? '12px 8px' : '14px 18px',
             borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            color: '#8F8BA8',
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'color 0.2s',
+            justifyContent: collapsed ? 'center' : 'space-between',
+            background: 'rgba(20, 8, 44, 0.65)',
+            backdropFilter: 'blur(10px)',
             flexShrink: 0,
+            position: 'relative',
+            zIndex: 2,
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#8F8BA8')}
         >
-          <LogOut size={16} />
-          {!collapsed && <span>Log Out</span>}
+          {!collapsed && (
+            <div style={{ overflow: 'hidden', minWidth: 0, paddingRight: 8 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {user?.name || companyName || 'Admin User'}
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: '#C4B5FD',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                }}
+              >
+                {user?.role || 'Enterprise Admin'}
+              </div>
+            </div>
+          )}
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            title="Log Out"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#A78BFA',
+              padding: 6,
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#EF4444';
+              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#A78BFA';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
     </Sider>
