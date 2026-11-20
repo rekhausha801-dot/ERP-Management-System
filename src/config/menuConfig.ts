@@ -267,13 +267,5 @@ export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: st
     return ADMIN_FULL_SIDEBAR_GROUPS.filter((group) => group.allowedPackages.includes('SERVICE'));
   }
 
-  return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType)).map((group) => {
-    if (packageType === 'SERVICE' && group.children) {
-      return {
-        ...group,
-        children: group.children.filter((child) => child.key !== 'rep-sales'),
-      };
-    }
-    return group;
-  });
+  return SIDEBAR_MENU_GROUPS.filter((group) => group.allowedPackages.includes(packageType));
 }

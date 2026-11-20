@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Typography } from 'antd';
-import { ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 const { Text, Title } = Typography;
 
@@ -14,8 +14,15 @@ export interface KPICardProps {
     isPositive: boolean;
   };
   subtitle?: string;
+  badge?: {
+    text: string;
+    color?: string;
+  };
   icon?: React.ReactNode;
   iconBgColor?: string;
+  bgGradient?: string;
+  shadowColor?: string;
+  loading?: boolean;
   onClick?: () => void;
 }
 
@@ -26,142 +33,227 @@ export const KPICard: React.FC<KPICardProps> = ({
   suffix,
   trend,
   subtitle,
+  badge,
   icon,
-  iconBgColor = 'rgba(110, 86, 207, 0.08)',
+  iconBgColor = 'rgba(255, 255, 255, 0.22)',
+  bgGradient = 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+  shadowColor = 'rgba(30, 64, 175, 0.35)',
+  loading = false,
   onClick,
 }) => {
-  // Determine soft pastel gradient palette based on card theme or positive/warning
-  const isAlert = trend && !trend.isPositive;
-  const isAmber = iconBgColor?.includes('FEF') || iconBgColor?.includes('FDE') || iconBgColor?.includes('FEE');
-  
-  let bgGradient = 'linear-gradient(135deg, #FCFAFF 0%, #F5F0FF 100%)';
-  let borderColor = 'rgba(124, 58, 237, 0.16)';
-  let accentColor = '#4C1D95';
-  let pillBg = '#F3E8FF';
-  let arrowColor = '#7C3AED';
-
-  if (isAlert) {
-    bgGradient = 'linear-gradient(135deg, #FFFDF8 0%, #FFF5EB 100%)';
-    borderColor = 'rgba(245, 158, 11, 0.22)';
-    accentColor = '#D97706';
-    pillBg = '#FFE8CC';
-    arrowColor = '#EA580C';
-  } else if (isAmber) {
-    bgGradient = 'linear-gradient(135deg, #FFFDF8 0%, #FFF9EB 100%)';
-    borderColor = 'rgba(217, 119, 6, 0.2)';
-    accentColor = '#B45309';
-    pillBg = '#FEF3C7';
-    arrowColor = '#D97706';
-  } else if (iconBgColor?.includes('DBE') || iconBgColor?.includes('EFF')) {
-    bgGradient = 'linear-gradient(135deg, #F9FBFF 0%, #EFF6FF 100%)';
-    borderColor = 'rgba(59, 130, 246, 0.2)';
-    accentColor = '#1E3A8A';
-    pillBg = '#DBEAFE';
-    arrowColor = '#2563EB';
-  }
+  const [isHovered, setIsHovered] = React.useState(false);
 
   return (
-    <div
+    <Card
+      bordered={false}
+      loading={loading}
       onClick={onClick}
       style={{
-        background: bgGradient,
-        border: `1px solid ${borderColor}`,
         borderRadius: 20,
-        padding: '14px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 6px 20px rgba(76, 29, 149, 0.05)',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        background: bgGradient,
+        boxShadow: isHovered
+          ? `0 16px 36px -4px ${shadowColor}, 0 4px 12px rgba(0, 0, 0, 0.1)`
+          : `0 10px 25px -5px ${shadowColor}, 0 2px 6px rgba(0, 0, 0, 0.05)`,
+        border: '1px solid rgba(255, 255, 255, 0.22)',
         height: '100%',
-        boxSizing: 'border-box',
+        cursor: onClick ? 'pointer' : 'default',
+        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden',
       }}
-      onMouseEnter={(e) => {
-        if (onClick) {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 10px 24px rgba(76, 29, 149, 0.09)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (onClick) {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(76, 29, 149, 0.05)';
-        }
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      styles={{
+        body: {
+          padding: '22px 24px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          position: 'relative',
+          zIndex: 2,
+        },
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
-        {icon && (
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              backgroundColor: pillBg,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: accentColor,
-              flexShrink: 0,
-            }}
-          >
-            {icon}
-          </div>
-        )}
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: '#181433',
-              marginBottom: 2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {title}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
-            {prefix && <span style={{ fontSize: 13, fontWeight: 700, color: accentColor }}>{prefix}</span>}
-            <span
+      {/* Decorative Translucent Glowing Background Circles */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -30,
+          right: -30,
+          width: 110,
+          height: 110,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: -40,
+          left: -20,
+          width: 90,
+          height: 90,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div>
+        {/* Top Header: Translucent Icon & Trend Tag */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          {icon && (
+            <div
               style={{
-                fontSize: 20,
-                fontWeight: 900,
-                color: accentColor,
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
+                width: 46,
+                height: 46,
+                borderRadius: 14,
+                backgroundColor: iconBgColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.35)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
+              {icon}
+            </div>
+          )}
+          {trend ? (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '5px 12px',
+                borderRadius: 20,
+                backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                border: '1px solid rgba(255, 255, 255, 0.35)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              {trend.isPositive ? (
+                <ArrowUpRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+              ) : (
+                <ArrowDownRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+              )}
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.01em',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                {trend.value}
+              </span>
+            </div>
+          ) : badge ? (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                padding: '5px 12px',
+                borderRadius: 20,
+                backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                color: '#FFFFFF',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              {badge.text}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Main Value & Title */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            {prefix && (
+              <span
+                style={{
+                  fontSize: 22,
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                {prefix}
+              </span>
+            )}
+            <Title
+              level={2}
+              style={{
+                margin: 0,
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: 31,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.15,
+                textShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
               }}
             >
               {value}
-            </span>
-            {suffix && <span style={{ fontSize: 11, color: '#7E7A9B' }}>{suffix}</span>}
+            </Title>
+            {suffix && (
+              <span
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontWeight: 600,
+                }}
+              >
+                {suffix}
+              </span>
+            )}
           </div>
-          {trend && (
-            <div style={{ fontSize: 10, fontWeight: 600, color: trend.isPositive ? '#4C1D95' : '#EF4444', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {trend.value}
-            </div>
-          )}
+          <Text
+            style={{
+              fontSize: 15,
+              color: 'rgba(255, 255, 255, 0.95)',
+              fontWeight: 600,
+              display: 'block',
+              marginTop: 6,
+              letterSpacing: '-0.01em',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            {title}
+          </Text>
         </div>
       </div>
 
-      <div
-        style={{
-          width: 26,
-          height: 26,
-          borderRadius: '50%',
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: arrowColor,
-          flexShrink: 0,
-          marginLeft: 8,
-          border: `1px solid ${borderColor}`,
-        }}
-      >
-        <ChevronRight size={15} />
-      </div>
-    </div>
+      {/* Subtitle / Operational Breakdown */}
+      {subtitle && (
+        <div
+          style={{
+            fontSize: 12.5,
+            color: 'rgba(255, 255, 255, 0.82)',
+            marginTop: 14,
+            borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+            paddingTop: 10,
+            fontWeight: 500,
+            lineHeight: 1.4,
+          }}
+        >
+          {subtitle}
+        </div>
+      )}
+    </Card>
   );
 };
