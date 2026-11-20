@@ -1,13 +1,13 @@
 :root {
-  --erp-sidebar-bg: #19153B;
-  --erp-canvas-bg: #FFFFFF;
+  --erp-sidebar-bg: #211044;
+  --erp-canvas-bg: #F7F5FC;
   --erp-card-bg: #FFFFFF;
-  --erp-primary: #6D28D9;
-  --erp-primary-hover: #5B21B6;
-  --erp-primary-gradient: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
-  --erp-primary-text: #1E1B4B;
-  --erp-secondary-text: #64748B;
-  --erp-border: #F1F5F9;
+  --erp-primary: #5421A8;
+  --erp-primary-hover: #7544D6;
+  --erp-primary-gradient: linear-gradient(135deg, #7544D6 0%, #5421A8 100%);
+  --erp-primary-text: #181433;
+  --erp-secondary-text: #7E7A9B;
+  --erp-border: #EAE6F4;
 }
 
 html,
@@ -211,23 +211,55 @@ body,
 }
 
 
-/* Ant Design Dark Menu Overrides for Ultra-Premium Violet Sidebar */
+/* Responsive grid for Enterprise 10 KPI Cards: 4 on Desktop (25%), 2 on Tablet (50%), 1 on Mobile (100%) */
+@media (min-width: 1200px) {
+  .erp-kpi-col-4 {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .erp-kpi-col-4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+@media (max-width: 767px) {
+  .erp-kpi-col-4 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Ant Design Dark Menu Overrides for Vibrant Royal Violet Sidebar */
 .erp-dark-sidebar .ant-menu-dark {
   background: transparent !important;
 }
 
 .erp-dark-sidebar .ant-menu-dark .ant-menu-sub {
-  background: transparent !important;
+  background: rgba(18, 7, 40, 0.45) !important;
+  border-radius: 12px !important;
+  padding: 4px 0 !important;
+  margin: 3px 0 6px 0 !important;
 }
 
 .erp-dark-sidebar .ant-menu-dark .ant-menu-item,
 .erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-title {
-  margin: 4px 0 !important;
-  border-radius: 12px !important;
-  color: #9B96B5 !important;
+  margin: 3px 0 !important;
+  border-radius: 10px !important;
+  color: #DDD6FE !important;
   font-weight: 500 !important;
-  padding-right: 36px !important;
+  font-size: 12.5px !important;
   transition: all 0.2s ease !important;
+  padding-right: 32px !important;
+  overflow: visible !important;
+  height: 38px !important;
+  line-height: 38px !important;
+}
+
+.erp-dark-sidebar .ant-menu-submenu-arrow {
+  right: 12px !important;
+  color: #A78BFA !important;
 }
 
 .erp-dark-sidebar .ant-menu-submenu-title .ant-menu-title-content {
@@ -247,24 +279,44 @@ body,
   color: #FFFFFF !important;
 }
 
-/* Active Selected Item - Glossy Pill with Soft Purple Glow matching reference */
+/* Active Selected Item - Purple Gradient Pill (#7544D6 to #5421A8) */
 .erp-dark-sidebar .ant-menu-dark .ant-menu-item-selected {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.10) 100%) !important;
+  background: linear-gradient(135deg, #7544D6 0%, #5421A8 100%) !important;
   color: #FFFFFF !important;
   font-weight: 700 !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 14px rgba(84, 33, 168, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
 }
 
 .erp-dark-sidebar .ant-menu-dark .ant-menu-submenu-open > .ant-menu-submenu-title {
   color: #FFFFFF !important;
   font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Submenu Child Indentation & Visual Hierarchy */
 .erp-dark-sidebar .ant-menu-sub .ant-menu-item {
-  padding-left: 42px !important;
-  height: 38px !important;
-  line-height: 38px !important;
-  font-size: 12.5px !important;
+  padding-left: 36px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  font-size: 12px !important;
+  color: #C4B5FD !important;
+  margin: 2px 4px !important;
 }
+
+.erp-dark-sidebar .ant-menu-sub .ant-menu-item:hover {
+  color: #FFFFFF !important;
+  background: rgba(117, 68, 214, 0.25) !important;
+}
+
+.erp-dark-sidebar .ant-menu-sub .ant-menu-item-selected {
+  background: linear-gradient(135deg, #7544D6 0%, #5421A8 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
