@@ -272,7 +272,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            {companyCode?.slice(0, 2) || 'SE'}
+            {companyCode?.slice(0, 2) || (packageType === 'SERVICE' ? 'SV' : packageType === 'SALES' ? 'SL' : 'SE')}
           </div>
           {!collapsed && (
             <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -285,7 +285,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   lineHeight: 1.2,
                 }}
               >
-                Sales ERP
+                {pkgMeta?.name || (packageType === 'SERVICE' ? 'Service ERP' : packageType === 'SALES' ? 'Sales ERP' : 'Complete ERP')}
               </div>
               <div
                 style={{
@@ -297,7 +297,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   marginTop: 2,
                 }}
               >
-                Enterprise System
+                {pkgMeta?.tagline || 'Enterprise System'}
               </div>
             </div>
           )}
