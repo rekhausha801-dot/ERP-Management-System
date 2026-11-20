@@ -46,6 +46,7 @@ import {
   Sparkles,
   RefreshCw,
   SlidersHorizontal,
+  Download,
 } from 'lucide-react';
 import {
   INITIAL_QUOTATIONS,
@@ -510,31 +511,49 @@ export const SalesQuotationsPage: React.FC = () => {
             growth: '+18.5%',
             isDark: true,
             icon: <FileSpreadsheet size={20} color="#5421A8" />,
-            pillExtra: 'Value: ₹26.9L',
+            pillExtra: `₹${(data.reduce((acc, q) => acc + q.grandTotal, 0) / 100000).toFixed(1)}L Total`,
           },
           {
-            title: 'Approved / Won',
+            title: 'Draft Quotations',
+            value: data.filter((q) => q.status === 'Draft').length.toString(),
+            growth: 'In Prep',
+            isDark: false,
+            icon: <FileText size={20} color="#7544D6" />,
+            pillExtra: 'Unsent',
+          },
+          {
+            title: 'Sent Quotations',
+            value: data.filter((q) => q.status === 'Sent').length.toString(),
+            growth: 'Active Review',
+            isDark: true,
+            icon: <Send size={20} color="#3B82F6" />,
+            pillExtra: 'Awaiting Client',
+          },
+          {
+            title: 'Accepted Quotations',
             value: data.filter((q) => q.status === 'Approved' || q.status === 'Converted to Order').length.toString(),
-            growth: '+12.4%',
+            growth: 'Won Deals',
             isDark: false,
             icon: <CheckCircle size={20} color="#10B981" />,
-            pillExtra: 'Conversion 67%',
+            pillExtra: '67% Won',
           },
           {
-            title: 'Pending Client Review',
-            value: data.filter((q) => q.status === 'Sent' || q.status === 'Draft').length.toString(),
-            growth: '+2.1%',
+            title: 'Rejected Quotations',
+            value: data.filter((q) => q.status === 'Rejected').length.toString(),
+            growth: 'Price/Lead Time',
+            isPositive: false,
             isDark: true,
-            icon: <Clock size={20} color="#F59E0B" />,
-            pillExtra: 'Active Pipeline',
+            icon: <Trash2 size={20} color="#EF4444" />,
+            pillExtra: 'Lost',
           },
           {
-            title: 'Avg Quote Value',
-            value: `₹${(Math.round(data.reduce((acc, q) => acc + q.grandTotal, 0) / (data.length || 1)) / 100000).toFixed(2)}L`,
-            growth: '+8.3%',
+            title: 'Expired Quotations',
+            value: data.filter((q) => q.status === 'Expired').length.toString(),
+            growth: 'Needs Follow-up',
+            isPositive: false,
             isDark: false,
-            icon: <TrendingUp size={20} color="#7544D6" />,
-            pillExtra: 'Commercial Margin',
+            icon: <Clock size={20} color="#F59E0B" />,
+            pillExtra: 'Validity Passed',
           },
         ]}
       />
@@ -1713,7 +1732,7 @@ export const SalesTargetsPage: React.FC = () => {
       <SalesKpiCardsRow
         cards={[
           {
-            title: 'Aggregate Sales Quota',
+            title: 'Overall Sales Target',
             value: `₹${(data.reduce((acc, t) => acc + t.targetRevenue, 0) / 10000000).toFixed(2)} Cr`,
             growth: '+14.5%',
             isDark: true,
@@ -1721,7 +1740,7 @@ export const SalesTargetsPage: React.FC = () => {
             pillExtra: 'Combined Goals',
           },
           {
-            title: 'Total Revenue Achieved',
+            title: 'Achieved Revenue',
             value: `₹${(data.reduce((acc, t) => acc + t.achievedRevenue, 0) / 10000000).toFixed(2)} Cr`,
             growth: '+12.1%',
             isDark: false,
@@ -1729,20 +1748,36 @@ export const SalesTargetsPage: React.FC = () => {
             pillExtra: 'Run-rate 83%',
           },
           {
-            title: 'Deals Closed / Target',
-            value: `${data.reduce((acc, t) => acc + t.achievedDeals, 0)} / ${data.reduce((acc, t) => acc + t.targetDeals, 0)}`,
-            growth: 'Deals Pace',
+            title: 'Remaining Target',
+            value: `₹${((data.reduce((acc, t) => acc + t.targetRevenue, 0) - data.reduce((acc, t) => acc + t.achievedRevenue, 0)) / 10000000).toFixed(2)} Cr`,
+            growth: 'Target Gap',
             isDark: true,
-            icon: <Award size={20} color="#F59E0B" />,
-            pillExtra: 'Qualified Won',
+            icon: <Clock size={20} color="#F59E0B" />,
+            pillExtra: 'Q4 Focus',
           },
           {
-            title: 'Commission Eligible',
-            value: `${data.filter((t) => t.commissionEligible).length} Reps`,
-            growth: '100% Reps',
+            title: 'Target Achievement',
+            value: `${Math.round((data.reduce((acc, t) => acc + t.achievedRevenue, 0) / (data.reduce((acc, t) => acc + t.targetRevenue, 0) || 1)) * 100)}%`,
+            growth: 'On Track',
             isDark: false,
-            icon: <DollarSign size={20} color="#7544D6" />,
-            pillExtra: 'Incentive Ready',
+            icon: <Award size={20} color="#10B981" />,
+            pillExtra: 'Team Pacing',
+          },
+          {
+            title: 'Total Salespersons',
+            value: `${data.length} Executives`,
+            growth: 'Full Quota',
+            isDark: true,
+            icon: <Users size={20} color="#3B82F6" />,
+            pillExtra: 'Active Team',
+          },
+          {
+            title: 'Top Performer',
+            value: data.slice().sort((a, b) => (b.achievedRevenue / b.targetRevenue) - (a.achievedRevenue / a.targetRevenue))[0]?.employeeName || 'Priya Sharma',
+            growth: '118% Quota',
+            isDark: false,
+            icon: <Sparkles size={20} color="#7544D6" />,
+            pillExtra: 'Leader',
           },
         ]}
       />
@@ -2064,20 +2099,34 @@ export const SalesTeamPage: React.FC = () => {
 };
 
 // ============================================================================
-// 8. SALES RETURNS & RMA
+// 8. SALES RETURNS & RMA (Redesigned with Premium ERP Style & Action Controls)
 // ============================================================================
 export const SalesReturnsPage: React.FC = () => {
   const [data, setData] = useState<DetailedSalesReturn[]>(INITIAL_DETAILED_RETURNS);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [reasonFilter, setReasonFilter] = useState('ALL');
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewRecord, setViewRecord] = useState<DetailedSalesReturn | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const filtered = data.filter(
-    (d) =>
+  const filtered = data.filter((d) => {
+    const matchSearch =
+      !search ||
       d.returnNumber.toLowerCase().includes(search.toLowerCase()) ||
       d.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      d.orderNumber.toLowerCase().includes(search.toLowerCase())
-  );
+      d.orderNumber.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === 'ALL' || d.status === statusFilter;
+    const matchReason = reasonFilter === 'ALL' || d.reason === reasonFilter;
+    return matchSearch && matchStatus && matchReason;
+  });
+
+  // Dynamic KPI Metrics
+  const totalReturns = data.length;
+  const pendingReview = data.filter((r) => r.status === 'Requested' || r.status === 'Inspecting').length;
+  const approvedReturns = data.filter((r) => r.status === 'Approved' || r.status === 'Refunded').length;
+  const totalClaimAmount = data.reduce((acc, r) => acc + r.claimAmount, 0);
 
   const handleCreate = (values: any) => {
     const newReturn: DetailedSalesReturn = {
@@ -2111,27 +2160,80 @@ export const SalesReturnsPage: React.FC = () => {
     message.success(`Return approved. Credit note ${creditNoteNum} generated for ₹${record.claimAmount.toLocaleString()}`);
   };
 
+  const handleMarkInspected = (record: DetailedSalesReturn) => {
+    setData((prev) =>
+      prev.map((r) =>
+        r.id === record.id
+          ? { ...r, status: 'Inspecting' }
+          : r
+      )
+    );
+    message.info(`Return ${record.returnNumber} moved to Lab Inspection.`);
+  };
+
+  const handleReject = (record: DetailedSalesReturn) => {
+    setData((prev) =>
+      prev.map((r) =>
+        r.id === record.id
+          ? { ...r, status: 'Rejected' }
+          : r
+      )
+    );
+    message.warning(`Return ${record.returnNumber} has been rejected.`);
+  };
+
   const columns = [
     {
       title: 'Return #',
       dataIndex: 'returnNumber',
       key: 'returnNumber',
-      render: (t: string) => <span style={{ fontWeight: 800, color: '#5421A8' }}>{t}</span>,
+      render: (t: string, r: DetailedSalesReturn) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
+          <span
+            onClick={() => {
+              setViewRecord(r);
+              setViewModalOpen(true);
+            }}
+            style={{ fontWeight: 800, color: '#441A87', cursor: 'pointer', fontSize: 13 }}
+          >
+            {t}
+          </span>
+          <span style={{ fontSize: 11, color: '#94A3B8' }}>(Filed {r.returnDate})</span>
+        </div>
+      ),
     },
     {
       title: 'Against Order',
       dataIndex: 'orderNumber',
       key: 'orderNumber',
-      render: (t: string) => <Tag color="geekblue">{t}</Tag>,
+      width: 130,
+      render: (t: string) => (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            borderRadius: 6,
+            background: '#EFF6FF',
+            color: '#1D4ED8',
+            fontSize: 11.5,
+            fontWeight: 700,
+            border: '1px solid #BFDBFE',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {t}
+        </span>
+      ),
     },
     {
       title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
-      render: (t: string, r: DetailedSalesReturn) => (
-        <div>
-          <div style={{ fontWeight: 700 }}>{t}</div>
-          <div style={{ fontSize: 11, color: '#6B7280' }}>Date: {r.returnDate}</div>
+      render: (t: string) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+          <span style={{ fontWeight: 700, color: '#0F172A', fontSize: 13 }}>{t}</span>
+          <span style={{ fontSize: 11, color: '#64748B' }}>• Commercial Client</span>
         </div>
       ),
     },
@@ -2139,30 +2241,89 @@ export const SalesReturnsPage: React.FC = () => {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
-      render: (r: string) => <Tag color="orange">{r}</Tag>,
+      width: 155,
+      render: (r: string) => {
+        let bg = '#FFFBEB';
+        let color = '#B45309';
+        let border = '#FDE68A';
+        if (r === 'Defective') {
+          bg = '#FEF2F2';
+          color = '#B91C1C';
+          border = '#FECACA';
+        } else if (r === 'Damaged in Transit') {
+          bg = '#FFF1F2';
+          color = '#BE123C';
+          border = '#FDA4AF';
+        } else if (r === 'Wrong Item') {
+          bg = '#F3E8FF';
+          color = '#7E22CE';
+          border = '#E9D5FF';
+        }
+        return (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '3px 10px',
+              borderRadius: 20,
+              background: bg,
+              color: color,
+              fontSize: 11.5,
+              fontWeight: 700,
+              border: `1px solid ${border}`,
+            }}
+          >
+            {r}
+          </span>
+        );
+      },
     },
     {
-      title: 'Quantity Returned',
+      title: 'Quantity',
       dataIndex: 'returnedQuantity',
       key: 'returnedQuantity',
-      render: (q: number) => <span>{q} Units</span>,
+      width: 95,
+      render: (q: number) => <span style={{ fontWeight: 600, color: '#334155' }}>{q} Units</span>,
     },
     {
       title: 'Claim Amount',
       dataIndex: 'claimAmount',
       key: 'claimAmount',
-      render: (v: number) => <span style={{ fontWeight: 700, color: '#DC2626' }}>₹{v.toLocaleString()}</span>,
+      width: 130,
+      align: 'right' as const,
+      render: (v: number) => (
+        <span style={{ fontWeight: 800, color: '#DC2626', fontSize: 13.5, fontVariantNumeric: 'tabular-nums' }}>
+          ₹{v.toLocaleString('en-IN')}
+        </span>
+      ),
     },
     {
       title: 'Refund / Credit Note',
       key: 'refund',
+      width: 165,
       render: (_: any, r: DetailedSalesReturn) => (
         <div>
-          <div>{r.refundMethod}</div>
-          {r.creditNoteNumber && (
-            <Tag color="cyan" style={{ fontSize: 10.5, fontWeight: 700, marginTop: 2 }}>
-              {r.creditNoteNumber}
-            </Tag>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{r.refundMethod}</div>
+          {r.creditNoteNumber ? (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '1px 7px',
+                borderRadius: 4,
+                background: '#ECFDF5',
+                color: '#047857',
+                fontSize: 10.5,
+                fontWeight: 700,
+                border: '1px solid #A7F3D0',
+                marginTop: 2,
+              }}
+            >
+              CN: {r.creditNoteNumber}
+            </span>
+          ) : (
+            <span style={{ fontSize: 10.5, color: '#94A3B8' }}>Awaiting Approval</span>
           )}
         </div>
       ),
@@ -2171,99 +2332,660 @@ export const SalesReturnsPage: React.FC = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 125,
+      align: 'center' as const,
       render: (st: string) => {
-        const color = st === 'Refunded' || st === 'Approved' ? 'green' : st === 'Inspecting' ? 'gold' : 'blue';
-        return <Tag color={color}>{st}</Tag>;
+        let bg = '#F1F5F9';
+        let color = '#475569';
+        let border = '#E2E8F0';
+        let dot = '#94A3B8';
+
+        if (st === 'Approved' || st === 'Refunded') {
+          bg = '#F0FDF4';
+          color = '#15803D';
+          border = '#BBF7D0';
+          dot = '#16A34A';
+        } else if (st === 'Inspecting') {
+          bg = '#FFFBEB';
+          color = '#B45309';
+          border = '#FDE68A';
+          dot = '#D97706';
+        } else if (st === 'Requested') {
+          bg = '#EFF6FF';
+          color = '#1D4ED8';
+          border = '#BFDBFE';
+          dot = '#2563EB';
+        } else if (st === 'Rejected') {
+          bg = '#FEF2F2';
+          color = '#B91C1C';
+          border = '#FECACA';
+          dot = '#DC2626';
+        }
+
+        return (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '3px 10px',
+              borderRadius: 20,
+              background: bg,
+              color: color,
+              fontSize: 11.5,
+              fontWeight: 700,
+              border: `1px solid ${border}`,
+            }}
+          >
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: dot }} /> {st}
+          </span>
+        );
       },
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, r: DetailedSalesReturn) => (
-        <Space size={4}>
-          {r.status === 'Requested' && (
+      width: 155,
+      align: 'right' as const,
+      render: (_: any, r: DetailedSalesReturn) => {
+        return (
+          <Space size={6} style={{ justifyContent: 'flex-end', width: '100%' }}>
             <Button
               size="small"
-              type="primary"
-              style={{ background: '#5421A8', borderColor: '#5421A8', fontSize: 11 }}
-              onClick={() => handleApprove(r)}
+              onClick={() => {
+                setViewRecord(r);
+                setViewModalOpen(true);
+              }}
+              style={{
+                borderRadius: 6,
+                borderColor: '#E2E8F0',
+                color: '#334155',
+                fontSize: 11.5,
+                fontWeight: 600,
+                height: 28,
+                padding: '0 8px',
+              }}
             >
-              Approve RMA
+              View
             </Button>
-          )}
-        </Space>
-      ),
+            {r.status === 'Requested' && (
+              <Button
+                size="small"
+                type="primary"
+                onClick={() => handleApprove(r)}
+                style={{
+                  backgroundColor: '#441A87',
+                  borderColor: '#441A87',
+                  borderRadius: 6,
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  height: 28,
+                  padding: '0 8px',
+                }}
+              >
+                Approve
+              </Button>
+            )}
+            {r.status === 'Inspecting' && (
+              <Button
+                size="small"
+                type="primary"
+                onClick={() => handleApprove(r)}
+                style={{
+                  backgroundColor: '#059669',
+                  borderColor: '#059669',
+                  borderRadius: 6,
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  height: 28,
+                  padding: '0 8px',
+                }}
+              >
+                Pass QA
+              </Button>
+            )}
+            {r.status === 'Approved' && (
+              <Button
+                size="small"
+                onClick={() => message.info(`Downloading Credit Note ${r.creditNoteNumber || 'Slip'}...`)}
+                style={{
+                  borderRadius: 6,
+                  borderColor: '#CBD5E1',
+                  color: '#441A87',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  height: 28,
+                  padding: '0 8px',
+                }}
+              >
+                Print CN
+              </Button>
+            )}
+          </Space>
+        );
+      },
     },
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <SalesModuleHeader
-        title="Sales Returns & RMA"
-        subtitle="Manage client return authorisations, defective inspections, returned quantities, and automated credit note integration."
-        icon={<Undo2 size={20} />}
-        searchPlaceholder="Search return #, customer, order..."
-        searchValue={search}
-        onSearchChange={setSearch}
-        primaryActionLabel="Initiate Return"
-        onPrimaryAction={() => {
-          form.resetFields();
-          setModalOpen(true);
+    <div style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. TOP HEADER BANNER (Single Row Layout matching user guidelines) */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 16,
+          padding: '12px 20px',
+          backgroundColor: '#FAF5FF',
+          borderRadius: 16,
+          border: '1px solid #E9D5FF',
+          flexWrap: 'nowrap',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
-      />
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              backgroundColor: '#EDE7F6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#441A87',
+              boxShadow: '0 2px 8px rgba(68, 26, 135, 0.12)',
+              flexShrink: 0,
+            }}
+          >
+            <Undo2 size={22} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+              Sales Returns & RMA Management
+            </h1>
+            <p style={{ margin: 0, fontSize: 12, color: '#6B7280', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Manage client return authorisations, defective inspections, returned quantities, and automated credit note integration.
+            </p>
+          </div>
+        </div>
 
-      <SalesKpiCardsRow
-        cards={[
-          {
-            title: 'Total Return Claims',
-            value: data.length.toString(),
-            growth: '-2.4%',
-            isPositive: false,
-            isDark: true,
-            icon: <Undo2 size={20} color="#5421A8" />,
-            pillExtra: 'Claims Filed',
-          },
-          {
-            title: 'Settled Credit Notes',
-            value: data.filter((r) => r.creditNoteNumber).length.toString(),
-            growth: '+14.0%',
-            isDark: false,
-            icon: <CheckCircle size={20} color="#10B981" />,
-            pillExtra: 'Adjusted in Ledger',
-          },
-          {
-            title: 'In Inspection Lab',
-            value: data.filter((r) => r.status === 'Requested' || r.status === 'Inspecting').length.toString(),
-            growth: 'Active QA',
-            isDark: true,
-            icon: <Clock size={20} color="#F59E0B" />,
-            pillExtra: 'Warranty Review',
-          },
-          {
-            title: 'Total Claim Value',
-            value: `₹${(data.reduce((acc, r) => acc + r.claimAmount, 0) / 1000).toFixed(1)}k`,
-            growth: '<0.5% Revenue',
-            isDark: false,
-            icon: <DollarSign size={20} color="#DC2626" />,
-            pillExtra: 'Defect Control',
-          },
-        ]}
-      />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <Button
+            type="primary"
+            onClick={() => {
+              form.resetFields();
+              setModalOpen(true);
+            }}
+            icon={<Plus size={15} />}
+            style={{
+              backgroundColor: '#441A87',
+              borderColor: '#441A87',
+              borderRadius: 10,
+              fontWeight: 700,
+              height: 38,
+              padding: '0 16px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Initiate Return
+          </Button>
+        </div>
+      </div>
 
+      {/* 2. FOUR ESSENTIAL HERO CARDS (Each with vibrant gradient theme matching Delivery & Quotations ERP style) */}
+      <Row gutter={[16, 16]}>
+        {/* Card 1: Total Returns (Deep Royal Purple Gradient) */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #441A87 0%, #311068 100%)',
+              borderRadius: 22,
+              padding: '18px 20px',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(68, 26, 135, 0.28)',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  backgroundColor: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#441A87',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  flexShrink: 0,
+                }}
+              >
+                <Undo2 size={24} strokeWidth={2.4} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: '#D8B4FE', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Total Returns
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, marginTop: 1 }}>
+                  {totalReturns}
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#4ADE80', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
+                  Active RMA Registry
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#E9D5FF',
+                flexShrink: 0,
+              }}
+            >
+              <Package size={20} />
+            </div>
+          </div>
+        </Col>
+
+        {/* Card 2: Pending Approval / In Inspection (Clean Ice-Blue Gradient) */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+              borderRadius: 22,
+              padding: '18px 20px',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(2, 132, 199, 0.28)',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  backgroundColor: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0284C7',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  flexShrink: 0,
+                }}
+              >
+                <Clock size={24} strokeWidth={2.4} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: '#BAE6FD', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Pending Review
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, marginTop: 1 }}>
+                  {pendingReview}
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#E0F2FE', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
+                  QA Lab Inspection
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#BAE6FD',
+                flexShrink: 0,
+              }}
+            >
+              <HelpCircle size={20} />
+            </div>
+          </div>
+        </Col>
+
+        {/* Card 3: Approved & Settled (Vibrant Emerald Green Gradient) */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+              borderRadius: 22,
+              padding: '18px 20px',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(5, 150, 105, 0.28)',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  backgroundColor: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#059669',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  flexShrink: 0,
+                }}
+              >
+                <CheckCircle size={24} strokeWidth={2.6} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: '#A7F3D0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Approved Returns
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, marginTop: 1 }}>
+                  {approvedReturns}
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#D1FAE5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
+                  CN Issued / Replaced
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#A7F3D0',
+                flexShrink: 0,
+              }}
+            >
+              <CheckCircle size={20} />
+            </div>
+          </div>
+        </Col>
+
+        {/* Card 4: Total Refund Value (High-Notice Crimson Red Gradient) */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+              borderRadius: 22,
+              padding: '18px 20px',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(220, 38, 38, 0.28)',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  backgroundColor: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#DC2626',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  flexShrink: 0,
+                }}
+              >
+                <DollarSign size={24} strokeWidth={2.4} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: '#FECDD3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Total Refund Claim
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, marginTop: 1 }}>
+                  ₹{(totalClaimAmount / 1000).toFixed(1)}k
+                </div>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#FEE2E2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
+                  Settled & Outstanding
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FECDD3',
+                flexShrink: 0,
+              }}
+            >
+              <DollarSign size={20} />
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+      {/* 3. CLEAN MINIMALIST SAAS DATA TABLE WITH INTEGRATED TOOLBAR */}
       <div
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 16,
-          padding: '18px 20px',
-          border: '1px solid #ECE8F6',
-          boxShadow: '0 4px 18px rgba(84, 33, 168, 0.05)',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+          overflow: 'hidden',
         }}
       >
-        <Table dataSource={filtered} columns={columns} rowKey="id" />
+        {/* Sleek Minimalist Toolbar */}
+        <div
+          style={{
+            padding: '14px 20px',
+            borderBottom: '1px solid #F1F5F9',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+            backgroundColor: '#FAFAFA',
+          }}
+        >
+          {/* Left: Title & Count Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>
+              All Sales Returns
+            </span>
+            <span
+              style={{
+                backgroundColor: '#EDE7F6',
+                color: '#441A87',
+                padding: '1px 8px',
+                borderRadius: 12,
+                fontSize: 11,
+                fontWeight: 700,
+              }}
+            >
+              {filtered.length}
+            </span>
+          </div>
+
+          {/* Right: Clean Filters in Single Row */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Input
+              prefix={<Search size={14} color="#94A3B8" />}
+              placeholder="Filter by return #, order, client..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: 230, borderRadius: 8, height: 34, fontSize: 12 }}
+              allowClear
+            />
+            <Select
+              size="small"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 130, height: 34 }}
+              options={[
+                { value: 'ALL', label: 'All Statuses' },
+                { value: 'Requested', label: 'Requested' },
+                { value: 'Inspecting', label: 'Inspecting' },
+                { value: 'Approved', label: 'Approved' },
+                { value: 'Refunded', label: 'Refunded' },
+                { value: 'Rejected', label: 'Rejected' },
+              ]}
+            />
+            <Select
+              size="small"
+              value={reasonFilter}
+              onChange={setReasonFilter}
+              style={{ width: 140, height: 34 }}
+              options={[
+                { value: 'ALL', label: 'All Reasons' },
+                { value: 'Defective', label: 'Defective' },
+                { value: 'Wrong Item', label: 'Wrong Item' },
+                { value: 'Damaged in Transit', label: 'Damaged in Transit' },
+              ]}
+            />
+            <Button
+              size="small"
+              icon={<Download size={13} />}
+              onClick={() => message.success('Exporting returns log to CSV...')}
+              style={{ borderRadius: 8, height: 34, fontWeight: 600, fontSize: 12, borderColor: '#CBD5E1' }}
+            >
+              Export
+            </Button>
+          </div>
+        </div>
+
+        {/* Minimalist SaaS Table */}
+        <Table
+          dataSource={filtered}
+          columns={columns}
+          rowKey="id"
+          pagination={{
+            pageSize: 8,
+            showTotal: (total, range) => (
+              <span style={{ fontSize: 12, color: '#64748B' }}>
+                Showing {range[0]}-{range[1]} of {total} returns records
+              </span>
+            ),
+          }}
+          size="middle"
+        />
       </div>
 
+      {/* Details View Modal */}
       <Modal
-        title="Initiate Sales Return / RMA Workflow"
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#441A87', fontWeight: 800 }}>
+            <Undo2 size={18} />
+            <span>RMA Return Details - {viewRecord?.returnNumber}</span>
+          </div>
+        }
+        open={viewModalOpen}
+        onCancel={() => setViewModalOpen(false)}
+        footer={[
+          <Button key="close" onClick={() => setViewModalOpen(false)}>
+            Close
+          </Button>,
+          viewRecord?.status === 'Requested' && (
+            <Button
+              key="approve"
+              type="primary"
+              style={{ backgroundColor: '#441A87', borderColor: '#441A87' }}
+              onClick={() => {
+                if (viewRecord) handleApprove(viewRecord);
+                setViewModalOpen(false);
+              }}
+            >
+              Approve Return
+            </Button>
+          ),
+        ]}
+        width={580}
+      >
+        {viewRecord && (
+          <div style={{ padding: '8px 0', fontSize: 13 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, background: '#FAF5FF', padding: 14, borderRadius: 10, border: '1px solid #E9D5FF' }}>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Return Reference:</span>
+                <div style={{ fontWeight: 800, color: '#441A87' }}>{viewRecord.returnNumber}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Linked Sales Order:</span>
+                <div style={{ fontWeight: 700, color: '#0F172A' }}>{viewRecord.orderNumber}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Customer Name:</span>
+                <div style={{ fontWeight: 700, color: '#0F172A' }}>{viewRecord.customerName}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Return Date:</span>
+                <div style={{ fontWeight: 600, color: '#334155' }}>{viewRecord.returnDate}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, margin: '14px 0' }}>
+              <div style={{ padding: 12, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Reason:</span>
+                <div style={{ fontWeight: 700, color: '#B45309' }}>{viewRecord.reason}</div>
+              </div>
+              <div style={{ padding: 12, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Quantity:</span>
+                <div style={{ fontWeight: 700, color: '#334155' }}>{viewRecord.returnedQuantity} Units</div>
+              </div>
+              <div style={{ padding: 12, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: 11, color: '#64748B' }}>Claim Value:</span>
+                <div style={{ fontWeight: 800, color: '#DC2626' }}>₹{viewRecord.claimAmount.toLocaleString('en-IN')}</div>
+              </div>
+            </div>
+
+            <div style={{ padding: 12, background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+              <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Inspection Notes:</span>
+              <div style={{ marginTop: 4, color: '#334155', lineHeight: 1.4 }}>
+                {viewRecord.inspectionNotes || 'Standard physical condition check performed.'}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Create Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#441A87', fontWeight: 800 }}>
+            <Undo2 size={18} />
+            <span>Initiate Sales Return / RMA Workflow</span>
+          </div>
+        }
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
@@ -2272,21 +2994,22 @@ export const SalesReturnsPage: React.FC = () => {
         <Form form={form} layout="vertical" onFinish={handleCreate} style={{ marginTop: 14 }}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Customer Name" name="customerName" rules={[{ required: true }]}>
-                <Input placeholder="Client company name" />
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Customer Name</span>} name="customerName" rules={[{ required: true }]}>
+                <Input placeholder="Client company name" style={{ height: 38, borderRadius: 8 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Original Order Number" name="orderNumber" rules={[{ required: true }]}>
-                <Input placeholder="e.g. SO-2026-401" />
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Original Order Number</span>} name="orderNumber" rules={[{ required: true }]}>
+                <Input placeholder="e.g. SO-2026-401" style={{ height: 38, borderRadius: 8 }} />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Reason for Return" name="reason" initialValue="Defective">
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Reason for Return</span>} name="reason" initialValue="Defective">
                 <Select
+                  style={{ height: 38 }}
                   options={[
                     { label: 'Defective Equipment', value: 'Defective' },
                     { label: 'Wrong Item Shipped', value: 'Wrong Item' },
@@ -2298,8 +3021,9 @@ export const SalesReturnsPage: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Refund / Settlement" name="refundMethod" initialValue="Credit Note">
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Refund / Settlement</span>} name="refundMethod" initialValue="Credit Note">
                 <Select
+                  style={{ height: 38 }}
                   options={[
                     { label: 'Credit Note', value: 'Credit Note' },
                     { label: 'Direct Bank Refund', value: 'Bank Refund' },
@@ -2312,24 +3036,24 @@ export const SalesReturnsPage: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Returned Quantity" name="returnedQuantity" initialValue={1}>
-                <InputNumber min={1} style={{ width: '100%' }} />
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Returned Quantity</span>} name="returnedQuantity" initialValue={1}>
+                <InputNumber min={1} style={{ width: '100%', height: 38, borderRadius: 8 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Claim Amount (INR)" name="claimAmount" rules={[{ required: true }]}>
-                <InputNumber min={100} style={{ width: '100%' }} placeholder="42000" />
+              <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Claim Amount (INR)</span>} name="claimAmount" rules={[{ required: true }]}>
+                <InputNumber min={100} style={{ width: '100%', height: 38, borderRadius: 8 }} placeholder="42000" />
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item label="Inspection Lab / Defect Notes" name="inspectionNotes">
-            <Input.TextArea rows={2} placeholder="Observed physical damage, error code..." />
+          <Form.Item label={<span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>Inspection Lab / Defect Notes</span>} name="inspectionNotes">
+            <Input.TextArea rows={2} style={{ borderRadius: 8 }} placeholder="Observed physical damage, error code..." />
           </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
-            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ background: '#5421A8', borderColor: '#5421A8' }}>
+            <Button onClick={() => setModalOpen(false)} style={{ borderRadius: 8, height: 36 }}>Cancel</Button>
+            <Button type="primary" htmlType="submit" style={{ background: '#441A87', borderColor: '#441A87', borderRadius: 8, height: 36, fontWeight: 700 }}>
               Submit RMA Request
             </Button>
           </div>

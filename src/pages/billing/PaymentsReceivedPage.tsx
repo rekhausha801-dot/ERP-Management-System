@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Table, Button, Input, Select, Tag, Space, Modal, Form, DatePicker, InputNumber, Typography, message, Tabs } from 'antd';
-import { CreditCard, CheckCircle2, Clock, AlertCircle, Plus, Search, Printer, Download, Eye, Layers, DollarSign } from 'lucide-react';
+import { Table, Button, Input, Select, Tag, Space, Modal, Form, DatePicker, InputNumber, Typography, message, Row, Col } from 'antd';
+import { CreditCard, CheckCircle2, Clock, AlertCircle, Plus, Search, Printer, Download, Eye, Layers, DollarSign, XCircle, TrendingUp, IndianRupee, ArrowDownLeft } from 'lucide-react';
 import dayjs from 'dayjs';
-import { KpiCard } from '../../components/KpiCard';
 
 const { Text, Title } = Typography;
+
+const ROYAL_PURPLE = '#441A87';
+const PURPLE_LIGHT_BG = '#FAF5FF';
+const PURPLE_BORDER = '#EDE9FE';
 
 export interface PaymentReceivedRecord {
   id: string;
@@ -169,11 +172,19 @@ export const PaymentsReceivedPage: React.FC = () => {
     {
       title: 'Receipt # & Date',
       key: 'rcpDate',
-      width: 150,
+      width: 170,
       render: (_: any, r: PaymentReceivedRecord) => (
-        <div>
-          <div style={{ fontWeight: 800, color: '#1E3A8A' }}>{r.receiptNumber}</div>
-          <div style={{ fontSize: 11, color: '#64748B' }}>{r.paymentDate}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
+          <span
+            onClick={() => {
+              setSelectedRecord(r);
+              setDetailModalOpen(true);
+            }}
+            style={{ fontWeight: 800, color: ROYAL_PURPLE, cursor: 'pointer', fontSize: 13 }}
+          >
+            {r.receiptNumber}
+          </span>
+          <span style={{ fontSize: 11, color: '#94A3B8' }}>({r.paymentDate})</span>
         </div>
       ),
     },
@@ -181,9 +192,9 @@ export const PaymentsReceivedPage: React.FC = () => {
       title: 'Customer Name & Code',
       key: 'cust',
       render: (_: any, r: PaymentReceivedRecord) => (
-        <div>
-          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: 13 }}>{r.customerName}</div>
-          <div style={{ fontSize: 11, color: '#64748B' }}>{r.customerCode}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+          <span style={{ fontWeight: 700, color: '#0F172A', fontSize: 13 }}>{r.customerName}</span>
+          <span style={{ fontSize: 11, color: '#64748B' }}>• {r.customerCode}</span>
         </div>
       ),
     },
@@ -191,27 +202,50 @@ export const PaymentsReceivedPage: React.FC = () => {
       title: 'Invoice Ref',
       dataIndex: 'invoiceNumber',
       key: 'invoiceNumber',
-      width: 130,
-      render: (v: string) => <Tag color={v === 'Advance Deposit' ? 'gold' : 'blue'}>{v}</Tag>,
+      width: 140,
+      render: (v: string) => (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            borderRadius: 6,
+            background: v === 'Advance Deposit' ? '#FEF3C7' : '#EFF6FF',
+            color: v === 'Advance Deposit' ? '#92400E' : '#1D4ED8',
+            fontSize: 11.5,
+            fontWeight: 700,
+            border: v === 'Advance Deposit' ? '1px solid #FDE68A' : '1px solid #BFDBFE',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {v}
+        </span>
+      ),
     },
     {
       title: 'Amount Received (₹)',
       dataIndex: 'amountReceived',
       key: 'amountReceived',
+      width: 150,
       align: 'right' as const,
       render: (v: number) => (
-        <span style={{ fontWeight: 800, color: '#10B981', fontSize: 13.5 }}>
-          ₹{v.toLocaleString('en-IN')}
-        </span>
+        <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+          <span style={{ fontWeight: 800, color: '#059669', fontSize: 13.5, fontVariantNumeric: 'tabular-nums' }}>
+            ₹{v.toLocaleString('en-IN')}
+          </span>
+        </div>
       ),
     },
     {
       title: 'Payment Mode & Ref',
       key: 'modeRef',
+      width: 220,
       render: (_: any, r: PaymentReceivedRecord) => (
-        <div style={{ fontSize: 12 }}>
-          <div style={{ fontWeight: 600, color: '#1E293B' }}>{r.paymentMode}</div>
-          <div style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>{r.referenceTransactionId}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', fontSize: 12 }}>
+          <span style={{ fontWeight: 600, color: '#1E293B' }}>{r.paymentMode}</span>
+          <span style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>
+            ({r.referenceTransactionId})
+          </span>
         </div>
       ),
     },
@@ -219,207 +253,595 @@ export const PaymentsReceivedPage: React.FC = () => {
       title: 'Bank Account',
       dataIndex: 'bankAccount',
       key: 'bankAccount',
-      render: (v: string) => <span style={{ fontSize: 11.5, color: '#475569' }}>{v}</span>,
+      width: 200,
+      render: (v: string) => <span style={{ fontSize: 11.5, color: '#475569', whiteSpace: 'nowrap' }}>{v}</span>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: 130,
+      width: 140,
+      align: 'center' as const,
       render: (status: string) => {
-        const color =
-          status === 'Completed'
-            ? 'success'
-            : status === 'Partially Allocated'
-            ? 'gold'
-            : status === 'Unallocated'
-            ? 'purple'
-            : 'default';
-        return <Tag color={color}>{status}</Tag>;
+        if (status === 'Completed') {
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, background: '#F0FDF4', color: '#166534', fontSize: 11.5, fontWeight: 700, border: '1px solid #BBF7D0', whiteSpace: 'nowrap' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16A34A' }} /> Completed
+            </span>
+          );
+        }
+        if (status === 'Partially Allocated') {
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, background: '#FFFBEB', color: '#B45309', fontSize: 11.5, fontWeight: 700, border: '1px solid #FDE68A', whiteSpace: 'nowrap' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#D97706' }} /> Partially Allocated
+            </span>
+          );
+        }
+        return (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 20, background: '#FAF5FF', color: ROYAL_PURPLE, fontSize: 11.5, fontWeight: 700, border: '1px solid #E9D5FF', whiteSpace: 'nowrap' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#7C3AED' }} /> Unallocated
+          </span>
+        );
       },
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      align: 'center' as const,
+      width: 110,
+      align: 'right' as const,
       render: (_: any, r: PaymentReceivedRecord) => (
-        <Space size="small">
+        <Space size={6} style={{ justifyContent: 'flex-end', width: '100%' }}>
           <Button
-            type="text"
-            icon={<Eye size={15} color="#4F46E5" />}
-            title="View Receipt Voucher"
+            size="small"
             onClick={() => {
               setSelectedRecord(r);
               setDetailModalOpen(true);
             }}
-          />
+            style={{
+              borderRadius: 6,
+              borderColor: '#E2E8F0',
+              color: '#334155',
+              fontSize: 11.5,
+              fontWeight: 600,
+              height: 28,
+              padding: '0 8px',
+            }}
+          >
+            View
+          </Button>
           <Button
-            type="text"
-            icon={<Printer size={15} color="#0D9488" />}
-            title="Print Official Receipt"
+            size="small"
             onClick={() => message.success(`Printing Receipt Voucher ${r.receiptNumber}...`)}
-          />
+            style={{
+              borderRadius: 6,
+              borderColor: '#E2E8F0',
+              color: '#334155',
+              fontSize: 11.5,
+              fontWeight: 600,
+              height: 28,
+              padding: '0 8px',
+            }}
+          >
+            Print
+          </Button>
         </Space>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: '0 0 40px' }}>
-      {/* Title & Actions */}
+    <div style={{ padding: '0 4px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. PAGE HEADER BANNER (Single Row Layout matching Purple ERP Theme) */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 20,
-          flexWrap: 'wrap',
-          gap: 12,
+          gap: 16,
+          padding: '12px 20px',
+          backgroundColor: PURPLE_LIGHT_BG,
+          borderRadius: 16,
+          border: `1px solid ${PURPLE_BORDER}`,
+          flexWrap: 'nowrap',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
-        <div>
-          <Title level={3} style={{ margin: 0, color: '#1E3A8A', fontWeight: 800 }}>
-            Payments Received (Collections)
-          </Title>
-          <Text style={{ color: '#64748B', fontSize: 13 }}>
-            Track customer incoming collections, bank remittances, advance deposits, and invoice-wise settlement allocations.
-          </Text>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              backgroundColor: '#EDE7F6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: ROYAL_PURPLE,
+              boxShadow: '0 2px 8px rgba(68, 26, 135, 0.12)',
+              flexShrink: 0,
+            }}
+          >
+            <CreditCard size={22} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+              Payments Received (Collections)
+            </h1>
+            <p style={{ margin: 0, fontSize: 12, color: '#6B7280', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Track customer incoming collections, bank remittances, advance deposits, and invoice-wise settlement allocations.
+            </p>
+          </div>
         </div>
 
-        <Space wrap>
-          <Button icon={<Printer size={14} />} onClick={() => window.print()}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <Button
+            icon={<Printer size={14} />}
+            onClick={() => window.print()}
+            style={{ borderRadius: 10, height: 38, fontWeight: 600, borderColor: '#CBD5E1' }}
+          >
             Print Receipts Log
           </Button>
-          <Button icon={<Download size={14} />} onClick={() => message.success('Exporting collections log...')}>
+          <Button
+            icon={<Download size={14} />}
+            onClick={() => message.success('Exporting collections log to Excel...')}
+            style={{ borderRadius: 10, height: 38, fontWeight: 600, borderColor: '#CBD5E1' }}
+          >
             Export Excel
           </Button>
           <Button
             type="primary"
-            icon={<Plus size={14} />}
-            style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #4F46E5 100%)', border: 'none' }}
+            icon={<Plus size={15} />}
+            style={{
+              backgroundColor: ROYAL_PURPLE,
+              borderColor: ROYAL_PURPLE,
+              borderRadius: 10,
+              fontWeight: 700,
+              height: 38,
+              padding: '0 16px',
+              whiteSpace: 'nowrap',
+            }}
             onClick={() => setCreateModalOpen(true)}
           >
             Record Payment Receipt
           </Button>
-        </Space>
+        </div>
       </div>
 
-      {/* Exactly 4 Meaningful Summary Cards */}
+      {/* 2. COLORFUL LIGHT-THEMED KPI CARDS (Each with its distinct soft tinted background & accent colors) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Row 1: 4 Cards */}
+        <Row gutter={[12, 12]}>
+          {/* Card 1: Total Receipts (Soft Lavender/Purple Theme) */}
+          <Col xs={24} sm={12} md={6}>
+            <div
+              onClick={() => setActiveTab('all')}
+              style={{
+                background: 'linear-gradient(180deg, #FAF5FF 0%, #F5EEFD 100%)',
+                borderRadius: 16,
+                padding: '16px 18px',
+                border: activeTab === 'all' ? `1.5px solid ${ROYAL_PURPLE}` : '1px solid #E9D5FF',
+                boxShadow: '0 2px 10px rgba(68, 26, 135, 0.05)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#581C87', whiteSpace: 'nowrap' }}>
+                  Total Receipts
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #DDD6FE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: ROYAL_PURPLE,
+                    boxShadow: '0 1px 3px rgba(68, 26, 135, 0.08)',
+                  }}
+                >
+                  <CreditCard size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: ROYAL_PURPLE, lineHeight: 1 }}>
+                    {summaryMetrics.totalReceipts < 10 ? `0${summaryMetrics.totalReceipts}` : summaryMetrics.totalReceipts}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#7C3AED' }}>
+                    ₹{(summaryMetrics.totalCollected / 100000).toFixed(2)}L
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#7E22CE', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  All Receipts
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Card 2: Today's Collections (Soft Sky Blue Theme) */}
+          <Col xs={24} sm={12} md={6}>
+            <div
+              style={{
+                background: 'linear-gradient(180deg, #F0F9FF 0%, #E0F2FE 100%)',
+                borderRadius: 16,
+                padding: '16px 18px',
+                border: '1px solid #BAE6FD',
+                boxShadow: '0 2px 10px rgba(2, 132, 199, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0369A1', whiteSpace: 'nowrap' }}>
+                  Today's Collections
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #BAE6FD',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0284C7',
+                    boxShadow: '0 1px 3px rgba(2, 132, 199, 0.08)',
+                  }}
+                >
+                  <TrendingUp size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: '#0284C7', lineHeight: 1 }}>
+                    ₹1.85L
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#0284C7', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  Awaiting Clearance
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Card 3: This Month Collections (Soft Mint Green Theme) */}
+          <Col xs={24} sm={12} md={6}>
+            <div
+              style={{
+                background: 'linear-gradient(180deg, #F0FDF4 0%, #DCFCE7 100%)',
+                borderRadius: 16,
+                padding: '16px 18px',
+                border: '1px solid #BBF7D0',
+                boxShadow: '0 2px 10px rgba(5, 150, 105, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#15803D', whiteSpace: 'nowrap' }}>
+                  This Month Collections
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #BBF7D0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#059669',
+                    boxShadow: '0 1px 3px rgba(5, 150, 105, 0.08)',
+                  }}
+                >
+                  <IndianRupee size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: '#059669', lineHeight: 1 }}>
+                    ₹{(summaryMetrics.totalCollected / 100000).toFixed(2)}L
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#16A34A', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  Fully Settled
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Card 4: Pending Collections (Soft Coral/Rose Theme) */}
+          <Col xs={24} sm={12} md={6}>
+            <div
+              style={{
+                background: 'linear-gradient(180deg, #FEF2F2 0%, #FEE2E2 100%)',
+                borderRadius: 16,
+                padding: '16px 18px',
+                border: '1px solid #FECACA',
+                boxShadow: '0 2px 10px rgba(220, 38, 38, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', whiteSpace: 'nowrap' }}>
+                  Pending Collections
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #FECACA',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#DC2626',
+                    boxShadow: '0 1px 3px rgba(220, 38, 38, 0.08)',
+                  }}
+                >
+                  <Clock size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: '#DC2626', lineHeight: 1 }}>
+                    ₹8.45L
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#EF4444', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  Past Due
+                </div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+
+        {/* Row 2: 2 Cards (Equal Width md={12}) */}
+        <Row gutter={[12, 12]}>
+          {/* Card 5: Unallocated Payments (Soft Amber Theme) */}
+          <Col xs={24} sm={12} md={12}>
+            <div
+              onClick={() => setActiveTab('Unallocated')}
+              style={{
+                background: 'linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%)',
+                borderRadius: 16,
+                padding: '16px 20px',
+                border: activeTab === 'Unallocated' ? '1.5px solid #D97706' : '1px solid #FDE68A',
+                boxShadow: '0 2px 10px rgba(217, 119, 6, 0.05)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#92400E', whiteSpace: 'nowrap' }}>
+                  Unallocated Payments
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #FDE68A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#D97706',
+                    boxShadow: '0 1px 3px rgba(217, 119, 6, 0.08)',
+                  }}
+                >
+                  <AlertCircle size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: '#D97706', lineHeight: 1 }}>
+                    ₹{(summaryMetrics.unallocatedAmount / 1000).toFixed(0)}k
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#B45309', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  Split Collection
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Card 6: Pending Receivables (Soft Indigo Theme) */}
+          <Col xs={24} sm={12} md={12}>
+            <div
+              style={{
+                background: 'linear-gradient(180deg, #EEF2FF 0%, #E0E7FF 100%)',
+                borderRadius: 16,
+                padding: '16px 20px',
+                border: '1px solid #C7D2FE',
+                boxShadow: '0 2px 10px rgba(79, 70, 229, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: 114,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', whiteSpace: 'nowrap' }}>
+                  Pending Receivables
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #C7D2FE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#4F46E5',
+                    boxShadow: '0 1px 3px rgba(79, 70, 229, 0.08)',
+                  }}
+                >
+                  <IndianRupee size={16} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: '#4F46E5', lineHeight: 1 }}>
+                    ₹4.25L
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: '#4338CA', marginTop: 4, whiteSpace: 'nowrap' }}>
+                  Pending Receivables
+                </div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </div>
+
+      {/* 3. TABLE CONTAINER WITH CLEAN PILL TABS & INTEGRATED FILTER TOOLBAR */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
-        <KpiCard
-          title="Total Collections Received"
-          value={`₹${summaryMetrics.totalCollected.toLocaleString('en-IN')}`}
-          subtitle="Direct bank remittances & UPI"
-          trend={{ value: '18.2% vs previous period', isPositive: true }}
-          icon={<CreditCard size={20} color="#1E3A8A" />}
-          iconBgColor="#EEF2FF"
-        />
-        <KpiCard
-          title="Fully Allocated Receipts"
-          value={summaryMetrics.completedCount}
-          subtitle="Matched against sales invoices"
-          trend={{ value: '100% reconciled', isPositive: true }}
-          icon={<CheckCircle2 size={20} color="#10B981" />}
-          iconBgColor="#ECFDF5"
-        />
-        <KpiCard
-          title="Unallocated Advances"
-          value={`₹${summaryMetrics.unallocatedAmount.toLocaleString('en-IN')}`}
-          subtitle="Held on account for future billing"
-          trend={{ value: 'Ready for invoice assignment', isPositive: true }}
-          icon={<Clock size={20} color="#EA580C" />}
-          iconBgColor="#FFF7ED"
-        />
-        <KpiCard
-          title="Total Payment Transactions"
-          value={summaryMetrics.totalReceipts}
-          subtitle="Signed payment vouchers logged"
-          trend={{ value: 'Audit trails synchronized', isPositive: true }}
-          icon={<DollarSign size={20} color="#0D9488" />}
-          iconBgColor="#F0FDFA"
-        />
-      </div>
-
-      {/* Tabs */}
-      <Card
-        bordered
-        style={{
-          borderRadius: 14,
-          marginBottom: 16,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 16,
           border: '1px solid #E2E8F0',
-          boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+          overflow: 'hidden',
         }}
-        styles={{ body: { padding: '8px 18px 0' } }}
       >
-        <Tabs
-          activeKey={activeTab}
-          onChange={(k: any) => setActiveTab(k)}
-          items={[
-            { key: 'all', label: <span style={{ fontWeight: 700 }}>All Collections ({payments.length})</span> },
-            { key: 'Completed', label: <span style={{ fontWeight: 700, color: '#10B981' }}>Completed Payments</span> },
-            { key: 'Partially Allocated', label: <span style={{ fontWeight: 700, color: '#D97706' }}>Partially Allocated</span> },
-            { key: 'Unallocated', label: <span style={{ fontWeight: 700, color: '#7C3AED' }}>Unallocated Advances</span> },
-          ]}
-        />
-      </Card>
+        {/* Sleek Integrated Toolbar */}
+        <div
+          style={{
+            padding: '14px 20px',
+            borderBottom: '1px solid #F1F5F9',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+            backgroundColor: '#FAFAFA',
+          }}
+        >
+          {/* Pill Tabs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Button
+              type={activeTab === 'all' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setActiveTab('all')}
+              style={{
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 12,
+                backgroundColor: activeTab === 'all' ? ROYAL_PURPLE : '#FFFFFF',
+                borderColor: activeTab === 'all' ? ROYAL_PURPLE : '#E2E8F0',
+                color: activeTab === 'all' ? '#FFFFFF' : '#475569',
+              }}
+            >
+              All Collections ({payments.length})
+            </Button>
+            <Button
+              type={activeTab === 'Completed' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setActiveTab('Completed')}
+              style={{
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 12,
+                backgroundColor: activeTab === 'Completed' ? '#059669' : '#FFFFFF',
+                borderColor: activeTab === 'Completed' ? '#059669' : '#E2E8F0',
+                color: activeTab === 'Completed' ? '#FFFFFF' : '#059669',
+              }}
+            >
+              Completed Payments
+            </Button>
+            <Button
+              type={activeTab === 'Partially Allocated' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setActiveTab('Partially Allocated')}
+              style={{
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 12,
+                backgroundColor: activeTab === 'Partially Allocated' ? '#D97706' : '#FFFFFF',
+                borderColor: activeTab === 'Partially Allocated' ? '#D97706' : '#E2E8F0',
+                color: activeTab === 'Partially Allocated' ? '#FFFFFF' : '#D97706',
+              }}
+            >
+              Partially Allocated
+            </Button>
+            <Button
+              type={activeTab === 'Unallocated' ? 'primary' : 'default'}
+              size="small"
+              onClick={() => setActiveTab('Unallocated')}
+              style={{
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 12,
+                backgroundColor: activeTab === 'Unallocated' ? '#7C3AED' : '#FFFFFF',
+                borderColor: activeTab === 'Unallocated' ? '#7C3AED' : '#E2E8F0',
+                color: activeTab === 'Unallocated' ? '#FFFFFF' : '#7C3AED',
+              }}
+            >
+              Unallocated Advances
+            </Button>
+          </div>
 
-      {/* Filter Toolbar */}
-      <Card
-        bordered
-        style={{
-          borderRadius: 14,
-          marginBottom: 16,
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-        }}
-        styles={{ body: { padding: '14px 18px' } }}
-      >
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-          <Input
-            prefix={<Search size={14} color="#64748B" />}
-            placeholder="Search receipt #, customer, UTR, inv..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-          />
-
-          <Select value={modeFilter} onChange={setModeFilter}>
-            <Select.Option value="ALL">All Payment Modes</Select.Option>
-            <Select.Option value="Bank Transfer (NEFT/RTGS)">Bank Transfer (NEFT/RTGS)</Select.Option>
-            <Select.Option value="UPI">UPI Remittance</Select.Option>
-            <Select.Option value="Cheque">Bank Cheque</Select.Option>
-            <Select.Option value="Cash">Cash Counter</Select.Option>
-          </Select>
+          {/* Search & Mode Filters */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <Input
+              prefix={<Search size={14} color="#94A3B8" />}
+              placeholder="Search receipt #, customer, UTR, inv..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ width: 260, height: 34, borderRadius: 8 }}
+              allowClear
+            />
+            <Select
+              value={modeFilter}
+              onChange={setModeFilter}
+              style={{ width: 190, height: 34 }}
+              options={[
+                { value: 'ALL', label: 'All Payment Modes' },
+                { value: 'Bank Transfer (NEFT/RTGS)', label: 'Bank Transfer (NEFT/RTGS)' },
+                { value: 'UPI', label: 'UPI Remittance' },
+                { value: 'Cheque', label: 'Bank Cheque' },
+                { value: 'Cash', label: 'Cash Counter' },
+              ]}
+            />
+          </div>
         </div>
-      </Card>
 
-      {/* Table */}
-      <Card
-        bordered
-        style={{
-          borderRadius: 14,
-          border: '1px solid #E2E8F0',
-          boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
-        }}
-        styles={{ body: { padding: 0 } }}
-      >
+        {/* Table */}
         <Table
           dataSource={filteredData}
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 8, showSizeChanger: true, showTotal: (total) => `Total ${total} collections` }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1150 }}
           size="middle"
         />
-      </Card>
+      </div>
 
       {/* Record Payment Receipt Modal */}
       <Modal
