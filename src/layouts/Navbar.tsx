@@ -607,7 +607,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
 
         {/* Notifications Button */}
         <Dropdown
-          dropdownRender={() => notificationMenuContent}
+          popupRender={() => notificationMenuContent}
           trigger={['click']}
           placement="bottomRight"
         >

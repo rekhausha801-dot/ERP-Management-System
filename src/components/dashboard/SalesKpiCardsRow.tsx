@@ -31,7 +31,7 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
                   ? 'linear-gradient(135deg, #3B1678 0%, #581C87 50%, #6D28D9 100%)'
                   : '#FFFFFF',
                 borderRadius: 22,
-                padding: '16px 14px',
+                padding: '16px 18px',
                 border: isDark
                   ? '1px solid rgba(255, 255, 255, 0.18)'
                   : '1px solid rgba(226, 232, 240, 0.85)',
@@ -42,9 +42,8 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
-                height: 120,
-                minHeight: 120,
-                maxHeight: 120,
+                height: 124,
+                minHeight: 124,
                 boxSizing: 'border-box',
                 color: isDark ? '#FFFFFF' : '#1E1B4B',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -53,19 +52,19 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
               {/* Left Circular Badge Icon */}
               <div
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 44,
+                  height: 44,
                   borderRadius: '50%',
                   background: isDark ? '#FFFFFF' : c.iconBg || '#EDE9FE',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  marginRight: 10,
+                  marginRight: 14,
                   boxShadow: isDark
                     ? '0 4px 12px rgba(0, 0, 0, 0.15)'
                     : '0 2px 8px rgba(109, 40, 217, 0.12)',
-                  color: isDark ? '#6D28D9' : '#6D28D9',
+                  color: '#6D28D9',
                 }}
               >
                 {c.icon}
@@ -87,7 +86,7 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
                     fontSize: 12,
                     fontWeight: 700,
                     color: isDark ? 'rgba(255, 255, 255, 0.88)' : '#64748B',
-                    marginBottom: 3,
+                    marginBottom: 4,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -99,12 +98,12 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
                 <div
                   title={c.value}
                   style={{
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: 900,
                     color: isDark ? '#FFFFFF' : '#0F172A',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.2,
-                    marginBottom: 3,
+                    marginBottom: 4,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -116,7 +115,7 @@ export const SalesKpiCardsRow: React.FC<SalesKpiCardsRowProps> = ({ cards }) => 
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 4,
+                    gap: 5,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

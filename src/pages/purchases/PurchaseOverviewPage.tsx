@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import {
+  Row,
+  Col,
   Table,
   Tag,
   Progress,
@@ -7,7 +9,7 @@ import {
   Select,
   Tooltip,
   message,
-  Tabs,
+  Card,
   Badge,
 } from 'antd';
 import {
@@ -29,148 +31,65 @@ import {
   DollarSign,
   ArrowUpRight,
   Filter,
+  Package,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
 import { SalesModuleHeader } from '../sales/SalesPages';
 import { SalesKpiCardsRow } from '../../components/dashboard/SalesKpiCardsRow';
 import { useNavigate } from 'react-router-dom';
+import { usePurchaseStore } from '../../mock/purchaseManagementStore';
+
+// Monthly trend data
+const MONTHLY_PROCUREMENT_TRENDS = [
+  { month: 'Jun', spend: 32.4, budget: 40.0, orders: 18 },
+  { month: 'Jul', spend: 38.6, budget: 42.0, orders: 22 },
+  { month: 'Aug', spend: 41.2, budget: 45.0, orders: 26 },
+  { month: 'Sep', spend: 44.8, budget: 46.0, orders: 29 },
+  { month: 'Oct', spend: 47.5, budget: 48.0, orders: 31 },
+  { month: 'Nov', spend: 48.5, budget: 50.0, orders: 34 },
+];
 
 export const PurchaseOverviewPage: React.FC = () => {
   const navigate = useNavigate();
+  const {
+    departments,
+    suppliers,
+    orders,
+    bills,
+    totalProcurementSpend,
+    totalOrdersCount,
+    pendingApprovalsCount,
+    pendingDeliveriesCount,
+    totalOutstandingPayables,
+  } = usePurchaseStore();
+
   const [selectedDept, setSelectedDept] = useState('ALL');
-  const [activeTab, setActiveTab] = useState<'departments' | 'buyers'>('departments');
+  const [activeTab, setActiveTab] = useState<'departments' | 'trends' | 'suppliers' | 'deliveries'>('departments');
 
-  // Summary Metrics
-  const totalPO = 142;
-  const totalSpend = 4850000;
-  const pendingApprovals = 6;
-  const pendingDeliveries = 14;
-  const outstandingPayments = 1250000;
-  const totalSuppliers = 28;
-
-  // Department-Wise Purchase Summary
-  const departmentData = [
-    {
-      key: '1',
-      deptCode: 'MFG-01',
-      deptName: 'Manufacturing & Production',
-      deptHead: 'Rajesh Khanna',
-      headEmail: 'rajesh.k@company.com',
-      totalOrders: 58,
-      totalSpend: 2450000,
-      budgetAllocated: 3000000,
-      utilizationPercent: 81.6,
-      pendingDeliveries: 6,
-      status: 'High Volume',
-    },
-    {
-      key: '2',
-      deptCode: 'RND-02',
-      deptName: 'R&D and Engineering',
-      deptHead: 'Dr. S. Ramanathan',
-      headEmail: 's.ramanathan@company.com',
-      totalOrders: 32,
-      totalSpend: 1120000,
-      budgetAllocated: 1500000,
-      utilizationPercent: 74.6,
-      pendingDeliveries: 3,
-      status: 'On Target',
-    },
-    {
-      key: '3',
-      deptCode: 'OPS-03',
-      deptName: 'Operations & Maintenance',
-      deptHead: 'Gokul Chandran',
-      headEmail: 'gokul.c@company.com',
-      totalOrders: 28,
-      totalSpend: 780000,
-      budgetAllocated: 1000000,
-      utilizationPercent: 78.0,
-      pendingDeliveries: 4,
-      status: 'On Target',
-    },
-    {
-      key: '4',
-      deptCode: 'IT-04',
-      deptName: 'IT & Infrastructure',
-      deptHead: 'Kavitha Murugan',
-      headEmail: 'kavitha.m@company.com',
-      totalOrders: 16,
-      totalSpend: 380000,
-      budgetAllocated: 600000,
-      utilizationPercent: 63.3,
-      pendingDeliveries: 1,
-      status: 'Under Budget',
-    },
-    {
-      key: '5',
-      deptCode: 'ADM-05',
-      deptName: 'Administration & Facility',
-      deptHead: 'Anand Kumar',
-      headEmail: 'anand.k@company.com',
-      totalOrders: 8,
-      totalSpend: 120000,
-      budgetAllocated: 250000,
-      utilizationPercent: 48.0,
-      pendingDeliveries: 0,
-      status: 'Optimal',
-    },
-  ];
-
-  // Buyer / Employee Purchasing Performance
-  const employeeData = [
-    {
-      key: 'e1',
-      empId: 'EMP-1021',
-      empName: 'Suresh Varma',
-      role: 'Senior Procurement Lead',
-      dept: 'Manufacturing & Production',
-      ordersCreated: 24,
-      totalNegotiatedSpend: 1180000,
-      negotiatedSavings: 84000,
-      savingsPercent: '6.6%',
-      onTimeDeliveryRate: 94,
-    },
-    {
-      key: 'e2',
-      empId: 'EMP-1044',
-      empName: 'Meenakshi Iyer',
-      role: 'Procurement Specialist',
-      dept: 'Manufacturing & Production',
-      ordersCreated: 19,
-      totalNegotiatedSpend: 820000,
-      negotiatedSavings: 52000,
-      savingsPercent: '6.0%',
-      onTimeDeliveryRate: 96,
-    },
-    {
-      key: 'e3',
-      empId: 'EMP-1088',
-      empName: 'Karthik Raja',
-      role: 'Technical Sourcing Engineer',
-      dept: 'R&D and Engineering',
-      ordersCreated: 21,
-      totalNegotiatedSpend: 740000,
-      negotiatedSavings: 68000,
-      savingsPercent: '8.4%',
-      onTimeDeliveryRate: 91,
-    },
-    {
-      key: 'e4',
-      empId: 'EMP-1102',
-      empName: 'Deepa Natarajan',
-      role: 'Operations Buyer',
-      dept: 'Operations & Maintenance',
-      ordersCreated: 15,
-      totalNegotiatedSpend: 420000,
-      negotiatedSavings: 31000,
-      savingsPercent: '6.9%',
-      onTimeDeliveryRate: 98,
-    },
-  ];
-
-  const filteredDepts = departmentData.filter(
+  const filteredDepts = departments.filter(
     (d) => selectedDept === 'ALL' || d.deptName === selectedDept
   );
+
+  // Top suppliers by spend
+  const topSuppliersList = [...suppliers]
+    .sort((a, b) => b.totalSpend - a.totalSpend)
+    .slice(0, 5);
+
+  // Active upcoming deliveries
+  const upcomingDeliveriesList = orders
+    .filter((o) => o.approvalStatus === 'Approved' && o.grnStatus !== 'Completely Received')
+    .slice(0, 5);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -180,8 +99,6 @@ export const PurchaseOverviewPage: React.FC = () => {
         subtitle="Consolidated real-time monitoring of procurement expenditure, department budgets, approvals, and supplier execution."
         icon={<ShoppingCart size={20} />}
         searchPlaceholder="Filter purchase metrics..."
-        primaryActionLabel="New Purchase Order"
-        onPrimaryAction={() => navigate('/app/sales/purchase-orders')}
         extraActions={
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Button
@@ -225,33 +142,37 @@ export const PurchaseOverviewPage: React.FC = () => {
         cards={[
           {
             title: 'Procurement Spend',
-            value: `₹${(totalSpend / 100000).toFixed(1)} Lakhs`,
-            growth: `${totalPO} Orders`,
+            value: `₹${(totalProcurementSpend / 100000).toFixed(1)} Lakhs`,
+            growth: `${totalOrdersCount} POs Total`,
             isDark: true,
             icon: <ShoppingCart size={20} color="#5421A8" />,
+            pillExtra: 'Approved',
           },
           {
             title: 'Pending Approvals',
-            value: `${pendingApprovals} Orders`,
-            growth: 'Action Required',
+            value: `${pendingApprovalsCount} Orders`,
+            growth: 'Needs Action',
             isPositive: false,
             isDark: false,
             icon: <Clock size={20} color="#F59E0B" />,
+            pillExtra: 'Workflow',
           },
           {
             title: 'Pending Deliveries',
-            value: `${pendingDeliveries} In Transit`,
+            value: `${pendingDeliveriesCount} In Transit`,
             growth: 'GRN Awaited',
             isDark: true,
             icon: <Truck size={20} color="#0284C7" />,
+            pillExtra: 'Shipments',
           },
           {
             title: 'Outstanding Payables',
-            value: `₹${(outstandingPayments / 100000).toFixed(2)}L`,
-            growth: `${totalSuppliers} Active Vendors`,
+            value: `₹${(totalOutstandingPayables / 100000).toFixed(2)}L`,
+            growth: `${suppliers.length} Vendors`,
             isPositive: true,
             isDark: false,
             icon: <CreditCard size={20} color="#6D28D9" />,
+            pillExtra: 'Due Bills',
           },
         ]}
       />
@@ -281,7 +202,7 @@ export const PurchaseOverviewPage: React.FC = () => {
             background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF9FE 100%)',
           }}
         >
-          {/* Left Title with Pill Switcher */}
+          {/* Left Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div
               style={{
@@ -296,25 +217,40 @@ export const PurchaseOverviewPage: React.FC = () => {
                 boxShadow: '0 4px 12px rgba(84, 33, 168, 0.25)',
               }}
             >
-              {activeTab === 'departments' ? <Building size={20} /> : <Users size={20} />}
+              {activeTab === 'departments' ? (
+                <Building size={20} />
+              ) : activeTab === 'trends' ? (
+                <TrendingUp size={20} />
+              ) : activeTab === 'suppliers' ? (
+                <Users size={20} />
+              ) : (
+                <Truck size={20} />
+              )}
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#1E1B4B', letterSpacing: '-0.2px' }}>
                 {activeTab === 'departments'
-                  ? 'Department Procurement & Budget Monitoring'
-                  : 'Procurement Buyer & Negotiation Performance'}
+                  ? 'Department Procurement & Budget Allocation'
+                  : activeTab === 'trends'
+                  ? 'Monthly Spend & Budget Variance Trends'
+                  : activeTab === 'suppliers'
+                  ? 'Top Supplier Spend & Benchmark Performance'
+                  : 'Upcoming Consignment Deliveries & Tracking'}
               </div>
               <div style={{ fontSize: 12, color: '#64748B', fontWeight: 500, marginTop: 1 }}>
                 {activeTab === 'departments'
-                  ? 'Real-time allocation, spend, budget utilization percentage, and pending inward shipments'
-                  : 'Track individual buyer savings, order volume, and supplier delivery compliance'}
+                  ? 'Real-time allocation, spend, budget utilization percentage across all 5 key departments'
+                  : activeTab === 'trends'
+                  ? '6-month rolling procurement expenditure vs allocated financial budget limits'
+                  : activeTab === 'suppliers'
+                  ? 'Strategic supplier partner volume, delivery compliance rating, and payment standing'
+                  : 'Active purchase orders dispatched by suppliers awaiting warehouse GRN receipt'}
               </div>
             </div>
           </div>
 
           {/* Right Controls: Tab Switcher & Department Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            {/* Elegant Segmented Switcher */}
             <div
               style={{
                 display: 'inline-flex',
@@ -344,12 +280,11 @@ export const PurchaseOverviewPage: React.FC = () => {
                   gap: 6,
                 }}
               >
-                <Building size={14} />
-                Departments ({departmentData.length})
+                <Building size={14} /> Departments ({departments.length})
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('buyers')}
+                onClick={() => setActiveTab('trends')}
                 style={{
                   border: 'none',
                   outline: 'none',
@@ -359,32 +294,70 @@ export const PurchaseOverviewPage: React.FC = () => {
                   fontSize: 12,
                   fontWeight: 700,
                   transition: 'all 0.18s ease',
-                  background: activeTab === 'buyers' ? '#FFFFFF' : 'transparent',
-                  color: activeTab === 'buyers' ? '#5421A8' : '#64748B',
-                  boxShadow: activeTab === 'buyers' ? '0 2px 8px rgba(84, 33, 168, 0.12)' : 'none',
+                  background: activeTab === 'trends' ? '#FFFFFF' : 'transparent',
+                  color: activeTab === 'trends' ? '#5421A8' : '#64748B',
+                  boxShadow: activeTab === 'trends' ? '0 2px 8px rgba(84, 33, 168, 0.12)' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
                 }}
               >
-                <Users size={14} />
-                Buyers & Negotiation ({employeeData.length})
+                <TrendingUp size={14} /> Monthly Trends
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('suppliers')}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  padding: '6px 14px',
+                  borderRadius: 11,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  transition: 'all 0.18s ease',
+                  background: activeTab === 'suppliers' ? '#FFFFFF' : 'transparent',
+                  color: activeTab === 'suppliers' ? '#5421A8' : '#64748B',
+                  boxShadow: activeTab === 'suppliers' ? '0 2px 8px rgba(84, 33, 168, 0.12)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Users size={14} /> Top Suppliers
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('deliveries')}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  padding: '6px 14px',
+                  borderRadius: 11,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  transition: 'all 0.18s ease',
+                  background: activeTab === 'deliveries' ? '#FFFFFF' : 'transparent',
+                  color: activeTab === 'deliveries' ? '#5421A8' : '#64748B',
+                  boxShadow: activeTab === 'deliveries' ? '0 2px 8px rgba(84, 33, 168, 0.12)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Truck size={14} /> Deliveries ({upcomingDeliveriesList.length})
               </button>
             </div>
 
-            {/* Department Filter (Visible when departments tab is active) */}
             {activeTab === 'departments' && (
               <Select
                 value={selectedDept}
                 onChange={setSelectedDept}
-                style={{ width: 200, height: 34 }}
+                style={{ width: 220, height: 34 }}
                 options={[
                   { label: 'All Departments', value: 'ALL' },
-                  { label: 'Manufacturing & Production', value: 'Manufacturing & Production' },
-                  { label: 'R&D and Engineering', value: 'R&D and Engineering' },
-                  { label: 'Operations & Maintenance', value: 'Operations & Maintenance' },
-                  { label: 'IT & Infrastructure', value: 'IT & Infrastructure' },
-                  { label: 'Administration & Facility', value: 'Administration & Facility' },
+                  ...departments.map((d) => ({ label: d.deptName, value: d.deptName })),
                 ]}
               />
             )}
@@ -397,542 +370,341 @@ export const PurchaseOverviewPage: React.FC = () => {
             <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left' }}>
               <thead>
                 <tr style={{ backgroundColor: '#FAF9FE' }}>
-                  <th
-                    style={{
-                      padding: '12px 20px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 260,
-                    }}
-                  >
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', width: 260 }}>
                     Department & Head
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'center',
-                      width: 110,
-                    }}
-                  >
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'center', width: 110 }}>
                     Orders
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 140,
-                    }}
-                  >
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', width: 140 }}>
                     Total Spend
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 140,
-                    }}
-                  >
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', width: 140 }}>
                     Budget Allocation
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      minWidth: 200,
-                    }}
-                  >
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', minWidth: 200 }}>
                     Budget Utilization
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'center',
-                      width: 130,
-                    }}
-                  >
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'center', width: 130 }}>
                     Pending Inward
                   </th>
-                  <th
-                    style={{
-                      padding: '12px 20px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'right',
-                      width: 100,
-                    }}
-                  >
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'right', width: 100 }}>
                     Action
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredDepts.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
-                      No department data matching filter.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredDepts.map((d, idx) => {
-                    const isNearCap = d.utilizationPercent > 80;
-                    return (
-                      <tr
-                        key={d.key}
-                        style={{
-                          transition: 'background-color 0.15s ease',
-                          backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F6F2FD')}
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE')
-                        }
-                      >
-                        {/* 1. Department & Head */}
-                        <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div
-                              style={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: 10,
-                                background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)',
-                                border: '1px solid #DDD6FE',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#5421A8',
-                                fontWeight: 800,
-                                fontSize: 11,
-                                flexShrink: 0,
-                              }}
-                            >
-                              {d.deptCode}
-                            </div>
-                            <div>
-                              <div style={{ fontWeight: 800, color: '#1E1B4B', fontSize: 13 }}>
-                                {d.deptName}
-                              </div>
-                              <div style={{ fontSize: 11.5, color: '#64748B', display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
-                                <span>Head:</span>
-                                <strong style={{ color: '#475569' }}>{d.deptHead}</strong>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* 2. Total Orders */}
-                        <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
-                          <span
+                {filteredDepts.map((d, idx) => {
+                  const utilization = Math.round((d.actualSpend / d.allocatedBudget) * 100);
+                  const isNearCap = utilization > 80;
+                  return (
+                    <tr
+                      key={d.deptCode}
+                      style={{
+                        transition: 'background-color 0.15s ease',
+                        backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F6F2FD')}
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE')
+                      }
+                    >
+                      <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div
                             style={{
-                              display: 'inline-block',
-                              padding: '3px 10px',
-                              borderRadius: 12,
-                              background: '#F1EDF9',
+                              width: 38,
+                              height: 38,
+                              borderRadius: 10,
+                              background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)',
+                              border: '1px solid #DDD6FE',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                               color: '#5421A8',
                               fontWeight: 800,
-                              fontSize: 12,
+                              fontSize: 11,
+                              flexShrink: 0,
                             }}
                           >
-                            {d.totalOrders} POs
-                          </span>
-                        </td>
-
-                        {/* 3. Total Spend */}
-                        <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                          <div style={{ fontWeight: 800, color: '#5421A8', fontSize: 13.5 }}>
-                            ₹{d.totalSpend.toLocaleString()}
+                            {d.deptCode}
                           </div>
-                          <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
-                            {((d.totalSpend / totalSpend) * 100).toFixed(1)}% of total
-                          </div>
-                        </td>
-
-                        {/* 4. Budget Allocation */}
-                        <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                          <div style={{ fontWeight: 700, color: '#334155', fontSize: 13 }}>
-                            ₹{d.budgetAllocated.toLocaleString()}
-                          </div>
-                          <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
-                            Remaining: ₹{(d.budgetAllocated - d.totalSpend).toLocaleString()}
-                          </div>
-                        </td>
-
-                        {/* 5. Budget Utilization */}
-                        <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                          <div style={{ width: '100%', maxWidth: 220 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, marginBottom: 4 }}>
-                              <span style={{ color: isNearCap ? '#D97706' : '#5421A8' }}>
-                                {d.utilizationPercent}% Used
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: 10.5,
-                                  fontWeight: 700,
-                                  color: isNearCap ? '#B45309' : '#059669',
-                                  padding: '1px 6px',
-                                  borderRadius: 8,
-                                  background: isNearCap ? '#FEF3C7' : '#D1FAE5',
-                                }}
-                              >
-                                {d.status}
-                              </span>
+                          <div>
+                            <div style={{ fontWeight: 800, color: '#1E1B4B', fontSize: 13 }}>
+                              {d.deptName}
                             </div>
-                            <Progress
-                              percent={d.utilizationPercent}
-                              size="small"
-                              strokeColor={isNearCap ? '#F59E0B' : '#7544D6'}
-                              trailColor="#EDE9FE"
-                              showInfo={false}
-                            />
+                            <div style={{ fontSize: 11.5, color: '#64748B', display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                              <span>Head:</span>
+                              <strong style={{ color: '#475569' }}>{d.deptHead}</strong>
+                            </div>
                           </div>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* 6. Pending Inward */}
-                        <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
-                          {d.pendingDeliveries > 0 ? (
+                      <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '3px 10px',
+                            borderRadius: 12,
+                            background: '#F1EDF9',
+                            color: '#5421A8',
+                            fontWeight: 800,
+                            fontSize: 12,
+                          }}
+                        >
+                          {d.ordersCount} POs
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
+                        <div style={{ fontWeight: 800, color: '#5421A8', fontSize: 13.5 }}>
+                          ₹{d.actualSpend.toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
+                          {((d.actualSpend / (totalProcurementSpend || 1)) * 100).toFixed(1)}% of total
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
+                        <div style={{ fontWeight: 700, color: '#334155', fontSize: 13 }}>
+                          ₹{d.allocatedBudget.toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
+                          Remaining: ₹{(d.allocatedBudget - d.actualSpend).toLocaleString()}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
+                        <div style={{ width: '100%', maxWidth: 220 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontWeight: 700, marginBottom: 4 }}>
+                            <span style={{ color: isNearCap ? '#D97706' : '#5421A8' }}>
+                              {utilization}% Used
+                            </span>
                             <span
                               style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 4,
-                                padding: '3px 10px',
-                                borderRadius: 12,
-                                background: '#E0F2FE',
-                                color: '#0284C7',
+                                fontSize: 10.5,
                                 fontWeight: 700,
-                                fontSize: 11.5,
+                                color: isNearCap ? '#B45309' : '#059669',
+                                padding: '1px 6px',
+                                borderRadius: 8,
+                                background: isNearCap ? '#FEF3C7' : '#D1FAE5',
                               }}
                             >
-                              <Truck size={12} />
-                              {d.pendingDeliveries} In Transit
+                              {d.status}
                             </span>
-                          ) : (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 4,
-                                padding: '3px 10px',
-                                borderRadius: 12,
-                                background: '#D1FAE5',
-                                color: '#059669',
-                                fontWeight: 700,
-                                fontSize: 11.5,
-                              }}
-                            >
-                              <CheckCircle2 size={12} />
-                              Cleared
-                            </span>
-                          )}
-                        </td>
+                          </div>
+                          <Progress
+                            percent={utilization}
+                            size="small"
+                            strokeColor={isNearCap ? '#F59E0B' : '#7544D6'}
+                            railColor="#EDE9FE"
+                            showInfo={false}
+                          />
+                        </div>
+                      </td>
 
-                        {/* 7. Action */}
-                        <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA', textAlign: 'right' }}>
-                          <button
-                            type="button"
-                            onClick={() => navigate('/app/sales/purchase-orders')}
+                      <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
+                        {d.pendingDeliveries > 0 ? (
+                          <span
                             style={{
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              color: '#5421A8',
-                              fontWeight: 700,
-                              fontSize: 12,
-                              padding: '4px 8px',
-                              borderRadius: 6,
-                              transition: 'all 0.15s ease',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: 2,
+                              gap: 4,
+                              padding: '3px 10px',
+                              borderRadius: 12,
+                              background: '#E0F2FE',
+                              color: '#0284C7',
+                              fontWeight: 700,
+                              fontSize: 11.5,
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#EDE9FE')}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                           >
-                            Orders <ArrowUpRight size={13} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
+                            <Truck size={12} />
+                            {d.pendingDeliveries} In Transit
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              padding: '3px 10px',
+                              borderRadius: 12,
+                              background: '#D1FAE5',
+                              color: '#059669',
+                              fontWeight: 700,
+                              fontSize: 11.5,
+                            }}
+                          >
+                            <CheckCircle2 size={12} />
+                            Cleared
+                          </span>
+                        )}
+                      </td>
+
+                      <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA', textAlign: 'right' }}>
+                        <button
+                          type="button"
+                          onClick={() => navigate('/app/sales/purchase-orders')}
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            color: '#5421A8',
+                            fontWeight: 700,
+                            fontSize: 12,
+                            padding: '4px 8px',
+                            borderRadius: 6,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 2,
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#EDE9FE')}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                        >
+                          Orders <ArrowUpRight size={13} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
 
-        {/* Tab 2: Buyers & Negotiation Table */}
-        {activeTab === 'buyers' && (
+        {/* Tab 2: Monthly Procurement Trends Chart */}
+        {activeTab === 'trends' && (
+          <div style={{ padding: '24px 28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#1E1B4B' }}>
+                  Procurement Spend vs Monthly Budget Ceiling (in ₹ Lakhs)
+                </h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#64748B' }}>
+                  Track expenditure velocity against authorized company capital allocation
+                </p>
+              </div>
+            </div>
+            <div style={{ width: '100%', height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={MONTHLY_PROCUREMENT_TRENDS} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorSpend" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                  <XAxis dataKey="month" stroke="#94A3B8" fontSize={12} />
+                  <YAxis stroke="#94A3B8" fontSize={12} unit="L" />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Area type="monotone" dataKey="spend" name="Actual Spend (₹L)" stroke="#7C3AED" strokeWidth={3} fillOpacity={1} fill="url(#colorSpend)" />
+                  <Area type="monotone" dataKey="budget" name="Approved Budget (₹L)" stroke="#10B981" strokeWidth={2} strokeDasharray="4 4" fillOpacity={1} fill="url(#colorBudget)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Top Suppliers Leaderboard */}
+        {activeTab === 'suppliers' && (
           <div style={{ overflowX: 'auto', width: '100%' }}>
             <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left' }}>
               <thead>
                 <tr style={{ backgroundColor: '#FAF9FE' }}>
-                  <th
-                    style={{
-                      padding: '12px 20px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 250,
-                    }}
-                  >
-                    Buyer Details
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 200,
-                    }}
-                  >
-                    Assigned Division
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'center',
-                      width: 110,
-                    }}
-                  >
-                    Orders Executed
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 150,
-                    }}
-                  >
-                    Negotiated Spend
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      width: 170,
-                    }}
-                  >
-                    Price Savings Achieved
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 18px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'center',
-                      width: 150,
-                    }}
-                  >
-                    Supplier On-Time Rate
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 20px',
-                      fontSize: 11,
-                      color: '#64748B',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                      borderBottom: '1px solid #ECE8F6',
-                      textAlign: 'right',
-                      width: 120,
-                    }}
-                  >
-                    Rating
-                  </th>
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Supplier Name</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Type & GSTIN</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'center' }}>Total POs</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Total Spend</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Outstanding Balance</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'center' }}>On-Time Rate</th>
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'right' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {employeeData.map((emp, idx) => (
-                  <tr
-                    key={emp.key}
-                    style={{
-                      transition: 'background-color 0.15s ease',
-                      backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F6F2FD')}
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE')
-                    }
-                  >
-                    {/* 1. Buyer Details */}
+                {topSuppliersList.map((sup, idx) => (
+                  <tr key={sup.id} style={{ backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE' }}>
                     <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div
-                          style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-                            color: '#FFFFFF',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 800,
-                            fontSize: 12,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {emp.empName
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 800, color: '#1E1B4B', fontSize: 13 }}>
-                            {emp.empName}
-                          </div>
-                          <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>
-                            {emp.role} • {emp.empId}
-                          </div>
-                        </div>
-                      </div>
+                      <div style={{ fontWeight: 800, color: '#1E1B4B', fontSize: 13 }}>{sup.supplierName}</div>
+                      <div style={{ fontSize: 11, color: '#64748B' }}>{sup.city}, {sup.state}</div>
                     </td>
-
-                    {/* 2. Assigned Division */}
                     <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
-                        {emp.dept}
-                      </span>
+                      <Tag color="purple">{sup.supplierType}</Tag>
+                      <div style={{ fontSize: 10.5, fontFamily: 'monospace', color: '#6B7280', marginTop: 2 }}>{sup.gstin}</div>
                     </td>
-
-                    {/* 3. Orders Executed */}
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center', fontWeight: 800, color: '#5421A8' }}>
+                      {sup.totalOrders}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', fontWeight: 800, color: '#1E1B4B' }}>
+                      ₹{sup.totalSpend.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', fontWeight: 800, color: sup.outstandingBalance > 0 ? '#DC2626' : '#10B981' }}>
+                      ₹{sup.outstandingBalance.toLocaleString()}
+                    </td>
                     <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: 12,
-                          background: '#F1EDF9',
-                          color: '#5421A8',
-                          fontWeight: 800,
-                          fontSize: 12,
-                        }}
-                      >
-                        {emp.ordersCreated} POs
-                      </span>
+                      <Tag color="cyan">{sup.onTimeDeliveryRate}%</Tag>
                     </td>
-
-                    {/* 4. Negotiated Spend */}
-                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                      <div style={{ fontWeight: 800, color: '#1E1B4B', fontSize: 13 }}>
-                        ₹{emp.totalNegotiatedSpend.toLocaleString()}
-                      </div>
-                    </td>
-
-                    {/* 5. Negotiated Savings */}
-                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          padding: '3px 10px',
-                          borderRadius: 12,
-                          background: '#D1FAE5',
-                          color: '#059669',
-                          fontWeight: 800,
-                          fontSize: 12,
-                        }}
-                      >
-                        +₹{emp.negotiatedSavings.toLocaleString()} ({emp.savingsPercent})
-                      </span>
-                    </td>
-
-                    {/* 6. On-Time Delivery Rate */}
-                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <span
-                          style={{
-                            padding: '3px 10px',
-                            borderRadius: 12,
-                            background: '#F3E8FF',
-                            color: '#6B21A8',
-                            fontWeight: 800,
-                            fontSize: 12,
-                          }}
-                        >
-                          {emp.onTimeDeliveryRate}%
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* 7. Rating */}
                     <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA', textAlign: 'right' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          color: '#F59E0B',
-                          fontWeight: 800,
-                          fontSize: 12,
-                        }}
+                      <Tag color="success">{sup.complianceStatus}</Tag>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Tab 4: Upcoming Deliveries */}
+        {activeTab === 'deliveries' && (
+          <div style={{ overflowX: 'auto', width: '100%' }}>
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#FAF9FE' }}>
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>PO Number</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Supplier</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Expected Date</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Warehouse</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6' }}>Order Value</th>
+                  <th style={{ padding: '12px 18px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'center' }}>GRN Status</th>
+                  <th style={{ padding: '12px 20px', fontSize: 11, color: '#64748B', fontWeight: 800, textTransform: 'uppercase', borderBottom: '1px solid #ECE8F6', textAlign: 'right' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingDeliveriesList.map((po, idx) => (
+                  <tr key={po.id} style={{ backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FCFBFE' }}>
+                    <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA', fontWeight: 800, color: '#5421A8' }}>
+                      {po.poNumber}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', fontWeight: 700, color: '#1E1B4B' }}>
+                      {po.supplierName}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', color: '#64748B', fontSize: 12 }}>
+                      {po.expectedDeliveryDate}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', color: '#475569', fontSize: 12 }}>
+                      {po.deliveryWarehouse}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', fontWeight: 800, color: '#1E1B4B' }}>
+                      ₹{po.grossTotal.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA', textAlign: 'center' }}>
+                      <Tag color="orange">{po.grnStatus}</Tag>
+                    </td>
+                    <td style={{ padding: '14px 20px', borderBottom: '1px solid #F3F0FA', textAlign: 'right' }}>
+                      <Button
+                        size="small"
+                        type="primary"
+                        style={{ backgroundColor: '#7C3AED', borderColor: '#7C3AED', borderRadius: 8, fontSize: 11 }}
+                        onClick={() => navigate('/app/sales/grn')}
                       >
-                        <Award size={14} /> Top Buyer
-                      </span>
+                        Create GRN
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -961,7 +733,7 @@ export const PurchaseOverviewPage: React.FC = () => {
             <span>Audit-compliant statutory procurement tracking active. FY 2026-27 Q3.</span>
           </div>
           <div>
-            Showing <strong style={{ color: '#5421A8' }}>{activeTab === 'departments' ? filteredDepts.length : employeeData.length}</strong> active records
+            Connected to Live Procurement Store: <strong style={{ color: '#5421A8' }}>{orders.length} Orders</strong> &bull; <strong style={{ color: '#10B981' }}>{suppliers.length} Verified Suppliers</strong>
           </div>
         </div>
       </div>

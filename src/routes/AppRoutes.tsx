@@ -27,28 +27,37 @@ import { SalesDashboard } from '../modules/sales-erp/dashboard/SalesDashboard';
 import { ServicesDashboard } from '../modules/services-erp/dashboard/ServicesDashboard';
 
 // Sales Pages
+import { SalesQuotationsPage } from '../pages/sales/SalesQuotationsPage';
+import { SalesProformaInvoicesPage } from '../pages/sales/SalesProformaInvoicesPage';
 import {
-  SalesQuotationsPage,
   SalesQuotationTemplatesPage,
   SalesOrdersPage,
   SalesOrderTrackingPage,
-  SalesProformaInvoicesPage,
-  SalesTargetsPage,
   SalesCommissionsPage,
-  SalesReturnsPage,
   SalesTeamPage,
   SalesInvoicesPage as InvoicesPage,
   SalesPaymentsPage as PaymentsPage,
   SalesCustomersPage as CustomersPage,
   SalesProductsPage,
 } from '../pages/sales/SalesPages';
+import { SalesTargetsPage } from '../pages/sales/SalesTargetsPage';
+import { SalesReturnsPage } from '../pages/sales/SalesReturnsPage';
+import { SalesOverviewPage } from '../pages/sales/SalesOverviewPage';
 import { ConfirmedSalesOrdersPage } from '../pages/sales/ConfirmedSalesOrdersPage';
+import { PosSalesPage } from '../pages/sales/PosSalesPage';
 import { PurchaseOverviewPage } from '../pages/purchases/PurchaseOverviewPage';
 import { PurchaseOrdersPage } from '../pages/purchases/PurchaseOrdersPage';
+import { PurchaseRequisitionsPage } from '../pages/purchases/PurchaseRequisitionsPage';
 import { GoodsReceivedPage } from '../pages/purchases/GoodsReceivedPage';
 import { SuppliersPage } from '../pages/purchases/SuppliersPage';
 import { PurchaseReturnsPage } from '../pages/purchases/PurchaseReturnsPage';
 import { PurchaseAnalyticsPage } from '../pages/purchases/PurchaseAnalyticsPage';
+import { InvoiceTemplatesPage } from '../pages/billing/InvoiceTemplatesPage';
+import { PaymentRemindersPage } from '../pages/billing/PaymentRemindersPage';
+import { HrRecruitmentPage } from '../pages/hr/HrRecruitmentPage';
+import { CustomReportBuilderPage } from '../pages/reports/CustomReportBuilderPage';
+import { NotificationsRemindersPage } from '../pages/operations/NotificationsRemindersPage';
+import { RoleBasedDashboardsPage } from '../pages/dashboard/RoleBasedDashboardsPage';
 
 // Inventory Management Pages
 import { InventoryOverviewPage } from '../pages/inventory/InventoryOverviewPage';
@@ -215,6 +224,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/proforma-invoices" element={<ModuleAccessRoute><SalesProformaInvoicesPage /></ModuleAccessRoute>} />
 
         {/* 06. CRM MANAGEMENT (SALES & COMPLETE) */}
+        <Route path="crm/leads" element={<ModuleAccessRoute><LeadsListPage /></ModuleAccessRoute>} />
+        <Route path="crm/pipeline" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
+        <Route path="crm/follow-ups" element={<ModuleAccessRoute><CentralFollowUpsPage /></ModuleAccessRoute>} />
         <Route path="sales/crm" element={<ModuleAccessRoute><CrmDashboardPage /></ModuleAccessRoute>} />
         <Route path="sales/crm-pipeline" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
         <Route path="sales/pipeline" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
@@ -241,7 +253,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/returns" element={<ModuleAccessRoute><SalesReturnsPage /></ModuleAccessRoute>} />
 
         {/* 05. DELIVERY MANAGEMENT */}
-        <Route path="delivery/overview" element={<ModuleAccessRoute><GenericModuleView title="Delivery Overview" /></ModuleAccessRoute>} />
+        <Route path="delivery/overview" element={<ModuleAccessRoute><DeliveryManagementPage /></ModuleAccessRoute>} />
         <Route path="delivery/orders" element={<ModuleAccessRoute><GenericModuleView title="Delivery Orders" /></ModuleAccessRoute>} />
         <Route path="delivery/tracking" element={<ModuleAccessRoute><GenericModuleView title="Delivery Tracking" /></ModuleAccessRoute>} />
         <Route path="delivery/shipments" element={<ModuleAccessRoute><GenericModuleView title="Shipment Management" /></ModuleAccessRoute>} />
@@ -316,12 +328,14 @@ export const AppRoutes: React.FC = () => {
         <Route path="assets/history" element={<GenericModuleView title="Asset History" />} />
 
         {/* 08. PRODUCT MANAGEMENT */}
-        <Route path="sales/products" element={<ModuleAccessRoute><SalesProductsPage /></ModuleAccessRoute>} />
-        <Route path="sales/price-lists" element={<ModuleAccessRoute><GenericModuleView title="Product Pricing" /></ModuleAccessRoute>} />
-        <Route path="sales/discounts" element={<ModuleAccessRoute><GenericModuleView title="Discounts & Offers" /></ModuleAccessRoute>} />
-        <Route path="sales/product-categories" element={<ModuleAccessRoute><GenericModuleView title="Product Categories" /></ModuleAccessRoute>} />
-        <Route path="sales/brands" element={<ModuleAccessRoute><GenericModuleView title="Brand Management" /></ModuleAccessRoute>} />
-        <Route path="sales/brand-products" element={<ModuleAccessRoute><GenericModuleView title="Brand-wise Products" /></ModuleAccessRoute>} />
+        <Route path="sales/products" element={<ModuleAccessRoute><AllProductsPage /></ModuleAccessRoute>} />
+        <Route path="sales/brands" element={<ModuleAccessRoute><BrandManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/brand-products" element={<ModuleAccessRoute><BrandWiseProductsPage /></ModuleAccessRoute>} />
+        <Route path="sales/product-categories" element={<ModuleAccessRoute><ProductCategoriesPage /></ModuleAccessRoute>} />
+        <Route path="sales/price-lists" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
+        <Route path="sales/pricing" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
+        <Route path="sales/rate-contracts" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
+        <Route path="sales/discounts" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
         <Route path="sales/uom" element={<ModuleAccessRoute><GenericModuleView title="Units of Measurement" /></ModuleAccessRoute>} />
 
         {/* 11. INVENTORY MANAGEMENT */}
@@ -338,6 +352,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/stock-history" element={<ModuleAccessRoute><StockInOutPage /></ModuleAccessRoute>} />
         <Route path="sales/batch-serial" element={<ModuleAccessRoute><InventoryAnalyticsReportsPage /></ModuleAccessRoute>} />
 
+        {/* 01. DASHBOARD */}
+        <Route path="sales/dashboard" element={<SalesDashboard />} />
+        <Route path="sales/dashboard/roles" element={<RoleBasedDashboardsPage />} />
+
+        {/* 04. SALES MANAGEMENT */}
+        <Route path="sales/pos" element={<ModuleAccessRoute><PosSalesPage /></ModuleAccessRoute>} />
+
         {/* 12. PURCHASE MANAGEMENT */}
         <Route path="sales/purchases" element={<ModuleAccessRoute><PurchaseOverviewPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-orders" element={<ModuleAccessRoute><PurchaseOrdersPage /></ModuleAccessRoute>} />
@@ -345,7 +366,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/suppliers" element={<ModuleAccessRoute><SuppliersPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-returns" element={<ModuleAccessRoute><PurchaseReturnsPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-analytics" element={<ModuleAccessRoute><PurchaseAnalyticsPage /></ModuleAccessRoute>} />
-        <Route path="sales/purchase-requisitions" element={<ModuleAccessRoute><GenericModuleView title="Purchase Requisitions" /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-requisitions" element={<ModuleAccessRoute><PurchaseRequisitionsPage /></ModuleAccessRoute>} />
+        <Route path="sales/rfqs" element={<ModuleAccessRoute><PurchaseRequisitionsPage /></ModuleAccessRoute>} />
         <Route path="sales/supplier-payments" element={<ModuleAccessRoute><GenericModuleView title="Supplier Payments" /></ModuleAccessRoute>} />
 
         {/* 13. FINANCE & ACCOUNTS */}
@@ -354,17 +376,17 @@ export const AppRoutes: React.FC = () => {
         <Route path="finance/create-invoice" element={<FinanceBillingPage />} />
         <Route path="sales/invoices" element={<FinanceBillingPage />} />
         <Route path="finance/proforma-invoices" element={<GenericModuleView title="Proforma Invoices" />} />
-        <Route path="finance/recurring-invoices" element={<GenericModuleView title="Recurring Invoices" />} />
-        <Route path="finance/credit-notes" element={<GenericModuleView title="Credit Notes" />} />
-        <Route path="finance/debit-notes" element={<GenericModuleView title="Debit Notes" />} />
-        <Route path="finance/creditors" element={<GenericModuleView title="Creditors" />} />
-        <Route path="finance/debtors" element={<GenericModuleView title="Debtors" />} />
+        <Route path="finance/credit-notes" element={<CreditNotesPage />} />
+        <Route path="finance/debit-notes" element={<DebitNotesPage />} />
+        <Route path="finance/creditors" element={<CreditorsPage />} />
+        <Route path="finance/debtors" element={<DebtorsPage />} />
         <Route path="finance/general-ledger" element={<GenericModuleView title="General Ledger" />} />
         <Route path="finance/journal-entries" element={<GenericModuleView title="Journal Entries" />} />
         <Route path="finance/cash-flow" element={<GenericModuleView title="Cash Flow" />} />
         <Route path="finance/income" element={<GenericModuleView title="Income" />} />
         <Route path="finance/balance-sheet" element={<GenericModuleView title="Balance Sheet" />} />
-        <Route path="finance/invoice-templates" element={<GenericModuleView title="Invoice Templates" />} />
+        <Route path="finance/invoice-templates" element={<InvoiceTemplatesPage />} />
+        <Route path="finance/payment-reminders" element={<PaymentRemindersPage />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="finance/payment-history" element={<GenericModuleView title="Payment History" />} />
         <Route path="finance/refunds" element={<GenericModuleView title="Refund Management" />} />
@@ -377,22 +399,33 @@ export const AppRoutes: React.FC = () => {
         <Route path="finance/profit-loss" element={<GenericModuleView title="Profit & Loss" />} />
 
         {/* 12. APPROVAL MANAGEMENT */}
-        <Route path="approvals/pending" element={<GenericModuleView title="Pending Approvals" />} />
-        <Route path="approvals/workflows" element={<GenericModuleView title="Approval Workflows" />} />
-        <Route path="approvals/history" element={<GenericModuleView title="Approval History" />} />
+        <Route path="approvals" element={<ApprovalManagementPage />} />
+        <Route path="approvals/pending" element={<ApprovalManagementPage />} />
+        <Route path="approvals/workflows" element={<ApprovalManagementPage />} />
+        <Route path="approvals/history" element={<ApprovalManagementPage />} />
 
-        {/* 13. REPORTS & ANALYTICS */}
-        <Route path="reports" element={<GenericModuleView title="Reports Overview" />} />
-        <Route path="reports/sales" element={<GenericModuleView title="Sales Reports" />} />
-        <Route path="reports/purchase" element={<GenericModuleView title="Purchase Reports" />} />
-        <Route path="reports/inventory" element={<GenericModuleView title="Inventory Reports" />} />
-        <Route path="reports/customers" element={<GenericModuleView title="Customer Reports" />} />
-        <Route path="reports/financial" element={<GenericModuleView title="Financial Reports" />} />
-        <Route path="reports/outstanding" element={<GenericModuleView title="Outstanding Reports" />} />
-        <Route path="reports/hr" element={<GenericModuleView title="HR Reports" />} />
+        {/* 14. ENTERPRISE DELIVERY, DOCUMENTS & COMMUNICATION */}
+        <Route path="delivery" element={<DeliveryManagementPage />} />
+        <Route path="delivery/overview" element={<DeliveryManagementPage />} />
+        <Route path="documents" element={<DocumentManagementPage />} />
+        <Route path="documents/overview" element={<DocumentManagementPage />} />
+        <Route path="communication" element={<CommunicationTaskManagementPage />} />
+        <Route path="communication/tasks" element={<CommunicationTaskManagementPage />} />
+        <Route path="operations/notifications" element={<NotificationsRemindersPage />} />
+
+        {/* 13. REPORTS & ANALYTICS (7 DEDICATED SUITE PAGES + CUSTOM BUILDER) */}
+        <Route path="reports" element={<Navigate to="/app/reports/sales" replace />} />
+        <Route path="reports/sales" element={<SalesReportsPage />} />
+        <Route path="reports/purchase" element={<PurchaseReportsPage />} />
+        <Route path="reports/inventory" element={<InventoryReportsPage />} />
+        <Route path="reports/customers" element={<CustomerReportsPage />} />
+        <Route path="reports/financial" element={<FinancialReportsPage />} />
+        <Route path="reports/outstanding" element={<OutstandingReportsPage />} />
+        <Route path="reports/hr" element={<HrReportsPage />} />
+        <Route path="reports/custom-builder" element={<CustomReportBuilderPage />} />
         <Route path="reports/service" element={<GenericModuleView title="Service Reports" />} />
         <Route path="reports/activities" element={<GenericModuleView title="Activity Reports" />} />
-        <Route path="reports/custom" element={<GenericModuleView title="Custom Reports" />} />
+        <Route path="reports/custom" element={<CustomReportBuilderPage />} />
 
         {/* 14. ENTERPRISE PORTALS */}
         <Route path="portal/customer" element={<CustomerPortal />} />
@@ -400,9 +433,10 @@ export const AppRoutes: React.FC = () => {
         <Route path="portal/supplier" element={<SupplierPortal />} />
         <Route path="portal/technician" element={<EmployeePortal />} />
 
-        {/* 15. EMPLOYEE & HR MANAGEMENT (CONSOLIDATED 9 MAIN PAGES) */}
+        {/* 15. EMPLOYEE & HR MANAGEMENT */}
         <Route path="hr/dashboard" element={<HrDashboardPage />} />
         <Route path="hr/employees" element={<EmployeeManagementPage />} />
+        <Route path="hr/recruitment" element={<HrRecruitmentPage />} />
         <Route path="hr/attendance" element={<AttendanceManagementPage />} />
         <Route path="hr/leave" element={<LeaveManagementPage />} />
         <Route path="hr/payroll" element={<PayrollManagementPage />} />

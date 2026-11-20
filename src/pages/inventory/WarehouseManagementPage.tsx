@@ -258,7 +258,7 @@ export const WarehouseManagementPage: React.FC = () => {
                       percent={w.storageUtilizationPercent}
                       size="small"
                       strokeColor={w.storageUtilizationPercent > 80 ? '#F59E0B' : '#7544D6'}
-                      trailColor="#EDE9FE"
+                      railColor="#EDE9FE"
                       showInfo={false}
                     />
                   </td>

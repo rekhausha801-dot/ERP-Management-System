@@ -1,99 +1,185 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Row,
-  Col,
   Table,
   Button,
   Tag,
   Input,
   Select,
-  Modal,
-  Form,
-  InputNumber,
   DatePicker,
+  Modal,
+  Drawer,
+  Form,
   Space,
   Tooltip,
   message,
+  InputNumber,
+  Upload,
+  Divider,
 } from 'antd';
 import {
   FileText,
-  Clock,
-  CheckCircle,
-  IndianRupee,
-  Search,
   Plus,
+  Search,
   Eye,
   Download,
-  ChevronRight,
-  TrendingUp,
+  RotateCcw,
+  CheckCircle2,
+  Clock,
+  IndianRupee,
+  Building,
+  Printer,
+  ShieldCheck,
+  Check,
+  Paperclip,
+  UploadCloud,
+  FileCheck,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { DebitNoteRecord } from './billingData';
 import { INITIAL_DEBIT_NOTES } from './billingMockData';
 
-const BRAND_PURPLE = '#5421A8';
+const BRAND_PURPLE = '#441A87';
 
 export const DebitNotesPage: React.FC = () => {
   const [debitNotes, setDebitNotes] = useState<DebitNoteRecord[]>(INITIAL_DEBIT_NOTES);
+
+  // Filters State
   const [searchTerm, setSearchTerm] = useState('');
   const [partyTypeFilter, setPartyTypeFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [reasonFilter, setReasonFilter] = useState('ALL');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
 
+  // Modal & Drawer State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<DebitNoteRecord | null>(null);
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
   const [form] = Form.useForm();
 
-  // Metrics
+  // Dynamic calculations for the 4 Summary Cards (Single Row)
   const metrics = useMemo(() => {
     const totalCount = debitNotes.length;
-    const pendingCount = debitNotes.filter((d) => d.status === 'Pending Approval').length;
-    const issuedCount = debitNotes.filter((d) => d.status === 'Approved' || d.status === 'Issued').length;
-    const totalAmount = debitNotes.reduce((acc, d) => acc + d.totalDebitAmount, 0);
+    const pendingApprovalCount = debitNotes.filter((d) => d.status === 'Pending Approval').length;
+    const approvedCount = debitNotes.filter((d) => d.status === 'Approved' || d.status === 'Issued').length;
+    const totalDebitValue = debitNotes.reduce((acc, d) => acc + (d.totalDebitAmount || 0), 0);
 
-    return { totalCount, pendingCount, issuedCount, totalAmount };
+    return {
+      totalCount,
+      pendingApprovalCount,
+      approvedCount,
+      totalDebitValue,
+    };
+  }, [debitNotes]);
+
+  // Unique reasons for dropdown
+  const uniqueReasons = useMemo(() => {
+    return Array.from(new Set(debitNotes.map((d) => d.reason))).filter(Boolean);
   }, [debitNotes]);
 
   // Filtered List
   const filteredNotes = useMemo(() => {
     return debitNotes.filter((dn) => {
       const matchSearch =
+        !searchTerm ||
         dn.debitNoteNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         dn.referenceInvoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dn.partyName.toLowerCase().includes(searchTerm.toLowerCase());
+        dn.partyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (dn.partyCode && dn.partyCode.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchParty = partyTypeFilter === 'ALL' || dn.partyType === partyTypeFilter;
       const matchStatus = statusFilter === 'ALL' || dn.status === statusFilter;
+      const matchReason = reasonFilter === 'ALL' || dn.reason === reasonFilter;
 
-      return matchSearch && matchParty && matchStatus;
+      let matchDate = true;
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const d = dayjs(dn.debitNoteDate);
+        matchDate =
+          (d.isAfter(dateRange[0], 'day') || d.isSame(dateRange[0], 'day')) &&
+          (d.isBefore(dateRange[1], 'day') || d.isSame(dateRange[1], 'day'));
+      }
+
+      return matchSearch && matchParty && matchStatus && matchReason && matchDate;
     });
-  }, [debitNotes, searchTerm, partyTypeFilter, statusFilter]);
+  }, [debitNotes, searchTerm, partyTypeFilter, statusFilter, reasonFilter, dateRange]);
 
-  const handleCreateSubmit = (values: any) => {
-    const taxable = Number(values.taxableAmount) || 0;
-    const taxRate = Number(values.taxRate) || 18;
-    const taxAmt = (taxable * taxRate) / 100;
-    const totalDebit = taxable + taxAmt;
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setPartyTypeFilter('ALL');
+    setStatusFilter('ALL');
+    setReasonFilter('ALL');
+    setDateRange(null);
+  };
 
-    const newNote: DebitNoteRecord = {
-      id: `DN-${Date.now()}`,
-      debitNoteNumber: `DN-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-      referenceInvoice: values.referenceInvoice,
-      partyName: values.partyName,
-      partyType: values.partyType,
-      partyCode: 'PTY-GEN',
-      debitNoteDate: values.debitNoteDate.format('YYYY-MM-DD'),
-      reason: values.reason,
-      taxableAmount: taxable,
-      taxAmount: taxAmt,
-      totalDebitAmount: totalDebit,
-      adjustmentStatus: 'Pending',
-      status: 'Pending Approval',
-      notes: values.notes,
-    };
+  // Status Badge Helper for Approval Status
+  const renderApprovalBadge = (status: string) => {
+    switch (status) {
+      case 'Approved':
+        return (
+          <Tag style={{ background: '#F0FDF4', color: '#15803D', border: '1px solid #BBF7D0', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Approved
+          </Tag>
+        );
+      case 'Issued':
+        return (
+          <Tag style={{ background: '#FAF5FF', color: '#6B21A8', border: '1px solid #E9D5FF', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Issued
+          </Tag>
+        );
+      case 'Pending Approval':
+        return (
+          <Tag style={{ background: '#FFFBEB', color: '#B45309', border: '1px solid #FDE68A', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Pending Approval
+          </Tag>
+        );
+      case 'Rejected':
+        return (
+          <Tag style={{ background: '#FEF2F2', color: '#B91C1C', border: '1px solid #FECACA', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Rejected
+          </Tag>
+        );
+      case 'Draft':
+        return (
+          <Tag style={{ background: '#F3F4F6', color: '#4B5563', border: '1px solid #E5E7EB', borderRadius: 4, fontWeight: 600, fontSize: 11.5 }}>
+            Draft
+          </Tag>
+        );
+      default:
+        return (
+          <Tag style={{ background: '#F3F4F6', color: '#4B5563', border: '1px solid #E5E7EB', borderRadius: 4, fontWeight: 600, fontSize: 11.5 }}>
+            {status}
+          </Tag>
+        );
+    }
+  };
 
-    setDebitNotes([newNote, ...debitNotes]);
-    message.success(`Debit Note ${newNote.debitNoteNumber} created successfully!`);
-    setIsCreateModalOpen(false);
-    form.resetFields();
+  // Status Badge Helper for Adjustment Status
+  const renderAdjustmentBadge = (adjustment: string) => {
+    switch (adjustment) {
+      case 'Applied':
+        return (
+          <Tag style={{ background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Applied
+          </Tag>
+        );
+      case 'Partially Applied':
+        return (
+          <Tag style={{ background: '#FFFBEB', color: '#B45309', border: '1px solid #FDE68A', borderRadius: 4, fontWeight: 700, fontSize: 11.5 }}>
+            Partially Applied
+          </Tag>
+        );
+      case 'Pending':
+        return (
+          <Tag style={{ background: '#F9FAFB', color: '#6B7280', border: '1px solid #E5E7EB', borderRadius: 4, fontWeight: 600, fontSize: 11.5 }}>
+            Pending
+          </Tag>
+        );
+      default:
+        return (
+          <Tag style={{ background: '#F3F4F6', color: '#4B5563', border: '1px solid #E5E7EB', borderRadius: 4, fontWeight: 600, fontSize: 11.5 }}>
+            {adjustment}
+          </Tag>
+        );
+    }
   };
 
   const handleApprove = (id: string) => {
@@ -102,141 +188,317 @@ export const DebitNotesPage: React.FC = () => {
         dn.id === id ? { ...dn, status: 'Approved', adjustmentStatus: 'Applied' } : dn
       )
     );
-    message.success('Debit note approved and balance adjusted.');
+    message.success('Debit Note approved and ledger adjustment applied.');
   };
 
-  // Columns
+  const handleCreateSubmit = (values: any) => {
+    const taxable = Number(values.taxableAmount) || 0;
+    const taxRate = Number(values.taxRate) || 18;
+    const taxAmt = Math.round((taxable * taxRate) / 100);
+    const totalDebit = taxable + taxAmt;
+    const nextNumber = `DN-2026-${String(100 + debitNotes.length + 1).padStart(4, '0')}`;
+
+    const newNote: DebitNoteRecord = {
+      id: `DN-${Date.now()}`,
+      debitNoteNumber: nextNumber,
+      referenceInvoice: values.referenceInvoice,
+      partyName: values.partyName,
+      partyType: values.partyType,
+      partyCode: values.partyCode || 'PTY-GEN',
+      debitNoteDate: values.debitNoteDate ? values.debitNoteDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+      reason: values.reason,
+      taxableAmount: taxable,
+      taxAmount: taxAmt,
+      totalDebitAmount: totalDebit,
+      adjustmentStatus: 'Pending',
+      status: 'Pending Approval',
+      notes: values.notes || 'Supplementary debit note raised against invoice/bill discrepancy.',
+    };
+
+    setDebitNotes([newNote, ...debitNotes]);
+    message.success(`Debit Note ${newNote.debitNoteNumber} submitted for approval successfully!`);
+    setIsCreateModalOpen(false);
+    form.resetFields();
+  };
+
+  // Columns for the Professional Data Table
   const columns = [
     {
       title: 'Debit Note #',
       dataIndex: 'debitNoteNumber',
       key: 'debitNoteNumber',
-      render: (val: string) => <span style={{ fontWeight: 700, color: BRAND_PURPLE }}>{val}</span>,
-    },
-    {
-      title: 'Reference Invoice/Bill',
-      dataIndex: 'referenceInvoice',
-      key: 'referenceInvoice',
+      width: 140,
       render: (val: string) => (
-        <Tag color="cyan" style={{ borderRadius: 6, fontWeight: 600 }}>
+        <span
+          style={{
+            fontFamily: 'monospace',
+            fontWeight: 800,
+            color: BRAND_PURPLE,
+            backgroundColor: '#FAF5FF',
+            border: '1px solid #E9D5FF',
+            padding: '3px 8px',
+            borderRadius: 6,
+            fontSize: 12,
+          }}
+        >
           {val}
-        </Tag>
+        </span>
       ),
     },
     {
-      title: 'Party Name',
+      title: 'Reference Invoice / Bill',
+      dataIndex: 'referenceInvoice',
+      key: 'referenceInvoice',
+      width: 165,
+      render: (ref: string) => (
+        <span style={{ fontWeight: 600, color: '#4B5563', fontSize: 12 }}>
+          {ref}
+        </span>
+      ),
+    },
+    {
+      title: 'Party Name & Type',
       dataIndex: 'partyName',
       key: 'partyName',
+      width: 230,
       render: (name: string, record: DebitNoteRecord) => (
         <div>
-          <span style={{ fontWeight: 700, color: '#0F172A' }}>{name}</span>
-          <div>
-            <Tag color={record.partyType === 'Customer' ? 'blue' : 'purple'} style={{ fontSize: 10, borderRadius: 6 }}>
-              {record.partyType}
-            </Tag>
+          <div style={{ fontWeight: 700, color: '#111827', fontSize: 13 }}>{name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                padding: '1px 6px',
+                borderRadius: 4,
+                backgroundColor: record.partyType === 'Customer' ? '#EFF6FF' : '#FAF5FF',
+                color: record.partyType === 'Customer' ? '#1D4ED8' : '#7C3AED',
+                border: `1px solid ${record.partyType === 'Customer' ? '#BFDBFE' : '#DDD6FE'}`,
+              }}
+            >
+              {record.partyType === 'Customer' ? 'Customer' : 'Supplier'}
+            </span>
+            <span style={{ fontSize: 11, color: '#6B7280', fontFamily: 'monospace' }}>
+              {record.partyCode}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Date',
+      title: 'Debit Note Date',
       dataIndex: 'debitNoteDate',
       key: 'debitNoteDate',
-      render: (d: string) => <span style={{ fontSize: 12 }}>{d}</span>,
+      width: 120,
+      render: (d: string) => <span style={{ fontSize: 12, color: '#4B5563' }}>{d}</span>,
     },
     {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
-      render: (r: string) => <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>{r}</span>,
+      width: 175,
+      render: (r: string) => (
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>
+          {r}
+        </span>
+      ),
+    },
+    {
+      title: 'Taxable Amount',
+      dataIndex: 'taxableAmount',
+      key: 'taxableAmount',
+      width: 130,
+      align: 'right' as const,
+      render: (amt: number) => (
+        <span style={{ fontSize: 12.5, fontWeight: 600, color: '#374151' }}>
+          ₹{Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </span>
+      ),
+    },
+    {
+      title: 'GST Amount',
+      dataIndex: 'taxAmount',
+      key: 'taxAmount',
+      width: 120,
+      align: 'right' as const,
+      render: (amt: number) => (
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#6B7280' }}>
+          ₹{Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </span>
+      ),
     },
     {
       title: 'Total Debit',
       dataIndex: 'totalDebitAmount',
       key: 'totalDebitAmount',
+      width: 135,
       align: 'right' as const,
       render: (amt: number) => (
-        <span style={{ fontWeight: 800, color: '#1E3A8A' }}>
-          ₹{Number(amt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        <span style={{ fontWeight: 800, color: BRAND_PURPLE, fontSize: 13 }}>
+          ₹{Number(amt || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
         </span>
       ),
     },
     {
-      title: 'Adjustment',
+      title: 'Adjustment Status',
       dataIndex: 'adjustmentStatus',
       key: 'adjustmentStatus',
-      render: (st: string) => {
-        let col = 'default';
-        if (st === 'Applied') col = 'green';
-        if (st === 'Pending') col = 'gold';
-        return <Tag color={col} style={{ borderRadius: 8, fontWeight: 700 }}>{st}</Tag>;
-      },
+      width: 135,
+      render: (adj: string) => renderAdjustmentBadge(adj),
     },
     {
-      title: 'Status',
+      title: 'Approval Status',
       dataIndex: 'status',
       key: 'status',
-      render: (st: string) => {
-        let col = 'blue';
-        if (st === 'Approved' || st === 'Issued') col = 'green';
-        if (st === 'Pending Approval') col = 'orange';
-        return <Tag color={col} style={{ borderRadius: 8, fontWeight: 700 }}>{st}</Tag>;
-      },
+      width: 140,
+      render: (st: string) => renderApprovalBadge(st),
     },
     {
       title: 'Actions',
       key: 'actions',
+      width: 125,
+      fixed: 'right' as const,
+      align: 'center' as const,
       render: (_: any, record: DebitNoteRecord) => (
-        <Space size="small">
-          {record.status === 'Pending Approval' && (
-            <Button
-              type="text"
-              size="small"
-              onClick={() => handleApprove(record.id)}
-              style={{ color: '#16A34A', fontWeight: 700, backgroundColor: '#DCFCE7', borderRadius: 6 }}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          {/* View Details Drawer */}
+          <Tooltip title="View Debit Note Details">
+            <button
+              onClick={() => {
+                setSelectedNote(record);
+                setIsDetailDrawerOpen(true);
+              }}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: '50%',
+                border: '1px solid #E5E7EB',
+                background: '#FFFFFF',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#6B7280',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = BRAND_PURPLE;
+                e.currentTarget.style.color = BRAND_PURPLE;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#E5E7EB';
+                e.currentTarget.style.color = '#6B7280';
+              }}
             >
-              Approve
-            </Button>
-          )}
-          <Tooltip title="Download PDF">
-            <Button
-              type="text"
-              size="small"
-              icon={<Download size={14} color="#2563EB" />}
-              onClick={() => message.success(`Downloading Debit Note ${record.debitNoteNumber}`)}
-              style={{ backgroundColor: '#DBEAFE', borderRadius: 6 }}
-            />
+              <Eye size={14} />
+            </button>
           </Tooltip>
-        </Space>
+
+          {/* Quick Approve Action */}
+          {record.status === 'Pending Approval' && (
+            <Tooltip title="Approve Debit Note">
+              <button
+                onClick={() => handleApprove(record.id)}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  border: '1px solid #BBF7D0',
+                  background: '#F0FDF4',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#16A34A',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#16A34A';
+                  e.currentTarget.style.background = '#DCFCE7';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#BBF7D0';
+                  e.currentTarget.style.background = '#F0FDF4';
+                }}
+              >
+                <Check size={14} />
+              </button>
+            </Tooltip>
+          )}
+
+          {/* Download PDF */}
+          <Tooltip title="Download PDF">
+            <button
+              onClick={() => message.info(`Downloading PDF for Debit Note: ${record.debitNoteNumber}`)}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: '50%',
+                border: '1px solid #E5E7EB',
+                background: '#FFFFFF',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#0284C7',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#0284C7';
+                e.currentTarget.style.background = '#F0F9FF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#E5E7EB';
+                e.currentTarget.style.background = '#FFFFFF';
+              }}
+            >
+              <Download size={14} />
+            </button>
+          </Tooltip>
+        </div>
       ),
     },
   ];
 
   return (
-    <div style={{ padding: '0 0 32px 0' }}>
-      {/* 1. Header */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
+      {/* 1. Header (Compact title, description, and primary button) */}
       <div
         style={{
+          background: '#FFFFFF',
+          borderRadius: 14,
+          padding: '20px 24px',
+          border: '1px solid #E5E7EB',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 20,
-          flexWrap: 'wrap',
-          gap: 12,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748B', marginBottom: 4 }}>
-            <span>Invoice & Billing</span>
-            <ChevronRight size={13} />
-            <span style={{ color: BRAND_PURPLE, fontWeight: 700 }}>Debit Notes</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              backgroundColor: BRAND_PURPLE,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 10px rgba(68, 26, 135, 0.2)',
+            }}
+          >
+            <FileText size={22} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Customer & Supplier Debit Notes
-          </h1>
-          <p style={{ margin: 0, fontSize: 13, color: '#64748B', fontWeight: 500 }}>
-            Manage supplementary debits, freight charges, underbilling corrections, and price differences
-          </p>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: '#111827', letterSpacing: '-0.01em' }}>
+              Debit Notes
+            </div>
+            <div style={{ fontSize: 12.5, color: '#6B7280', marginTop: 2 }}>
+              Manage supplementary debits, freight charges, underbilling corrections, and price differences for customers & suppliers.
+            </div>
+          </div>
         </div>
 
         <Button
@@ -247,212 +509,345 @@ export const DebitNotesPage: React.FC = () => {
             setIsCreateModalOpen(true);
           }}
           style={{
-            backgroundColor: BRAND_PURPLE,
+            background: BRAND_PURPLE,
             borderColor: BRAND_PURPLE,
-            borderRadius: 12,
-            fontWeight: 700,
+            borderRadius: 8,
             height: 38,
-            boxShadow: '0 4px 14px rgba(84, 33, 168, 0.25)',
+            fontWeight: 700,
+            fontSize: 13,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '0 18px',
+            boxShadow: '0 2px 6px rgba(68, 26, 135, 0.25)',
           }}
         >
-          Create Debit Note
+          + Create Debit Note
         </Button>
       </div>
 
-      {/* 2. 4 Summary Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+      {/* 2. 4 Summary Cards in One Horizontal Row (100% Width CSS Grid) */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+          gap: 16,
+          width: '100%',
+        }}
+      >
         {/* Card 1: Total Debit Notes */}
-        <Col xs={24} sm={12} lg={6}>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FAF5FF 0%, #F5EEFD 100%)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            border: '1px solid #E9D5FF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 2px 4px rgba(68, 26, 135, 0.04)',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: BRAND_PURPLE }}>
+              Total Debit Notes
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginTop: 4 }}>
+              {metrics.totalCount}
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+              All issued & pending records
+            </div>
+          </div>
           <div
             style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E9D5FF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: BRAND_PURPLE,
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <FileText size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Debit Notes</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>{metrics.totalCount} Generated</div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Customer & supplier notes</div>
+            <FileText size={20} />
           </div>
-        </Col>
+        </div>
 
         {/* Card 2: Pending Approval */}
-        <Col xs={24} sm={12} lg={6}>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            border: '1px solid #FDE68A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 2px 4px rgba(217, 119, 6, 0.04)',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#B45309' }}>
+              Pending Approval
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginTop: 4 }}>
+              {metrics.pendingApprovalCount}
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+              Awaiting manager sign-off
+            </div>
+          </div>
           <div
             style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #FDE68A',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#D97706',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <Clock size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Pending Approval</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#D97706' }}>{metrics.pendingCount} Pending</div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Awaiting financial signoff</div>
+            <Clock size={20} />
           </div>
-        </Col>
+        </div>
 
-        {/* Card 3: Issued Debit Notes */}
-        <Col xs={24} sm={12} lg={6}>
+        {/* Card 3: Approved / Issued */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            border: '1px solid #BBF7D0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 2px 4px rgba(22, 163, 74, 0.04)',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#15803D' }}>
+              Approved / Issued
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginTop: 4 }}>
+              {metrics.approvedCount}
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+              Formally approved and issued
+            </div>
+          </div>
           <div
             style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #BBF7D0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#16A34A',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <CheckCircle size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Issued & Applied</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#16A34A' }}>{metrics.issuedCount} Notes</div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Posted to account balances</div>
+            <CheckCircle2 size={20} />
           </div>
-        </Col>
+        </div>
 
-        {/* Card 4: Total Debit Amount */}
-        <Col xs={24} sm={12} lg={6}>
+        {/* Card 4: Total Debit Value */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            border: '1px solid #BFDBFE',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 2px 4px rgba(29, 78, 216, 0.04)',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#1D4ED8' }}>
+              Total Debit Value
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginTop: 4 }}>
+              ₹{(metrics.totalDebitValue / 1000).toFixed(1)}k
+            </div>
+            <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+              Total supplementary debit value
+            </div>
+          </div>
           <div
             style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #BFDBFE',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#2563EB',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <IndianRupee size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Debit Value</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>
-              ₹{(metrics.totalAmount / 1000).toFixed(1)}k
-            </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Supplementary bill additions</div>
+            <IndianRupee size={20} />
           </div>
-        </Col>
-      </Row>
+        </div>
+      </div>
 
-      {/* 3. Table Section */}
+      {/* 3. Search & Filters (Single Horizontal Toolbar) */}
       <div
         style={{
           background: '#FFFFFF',
-          borderRadius: 20,
-          padding: '22px 24px',
-          border: '1px solid #ECE6F8',
-          boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
+          borderRadius: 12,
+          padding: '14px 18px',
+          border: '1px solid #E5E7EB',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          flexWrap: 'nowrap',
+          overflowX: 'auto',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
         }}
       >
-        <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', alignItems: 'center' }}>
+        {/* Search */}
+        <div style={{ flex: '1 1 240px', minWidth: 200 }}>
           <Input
-            prefix={<Search size={15} color="#94A3B8" />}
-            placeholder="Search debit note, party, ref..."
+            prefix={<Search size={15} style={{ color: '#9CA3AF' }} />}
+            placeholder="Search Debit Note # / Invoice / Party"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: 280, borderRadius: 10 }}
             allowClear
+            style={{ borderRadius: 8, height: 36, fontSize: 12.5 }}
           />
-          <Select
-            value={partyTypeFilter}
-            onChange={setPartyTypeFilter}
-            style={{ width: 160 }}
-            options={[
-              { value: 'ALL', label: 'All Parties' },
-              { value: 'Customer', label: 'Customers' },
-              { value: 'Supplier', label: 'Suppliers' },
-            ]}
-          />
-          <Select
-            value={statusFilter}
-            onChange={setStatusFilter}
-            style={{ width: 160 }}
-            options={[
-              { value: 'ALL', label: 'All Status' },
-              { value: 'Pending Approval', label: 'Pending Approval' },
-              { value: 'Approved', label: 'Approved' },
-            ]}
-          />
+        </div>
+
+        {/* Party Type Filter */}
+        <Select
+          value={partyTypeFilter}
+          onChange={setPartyTypeFilter}
+          style={{ width: 155, height: 36 }}
+          options={[
+            { label: 'All Parties', value: 'ALL' },
+            { label: 'Customer Only', value: 'Customer' },
+            { label: 'Supplier Only', value: 'Supplier' },
+          ]}
+        />
+
+        {/* Approval Status Filter */}
+        <Select
+          value={statusFilter}
+          onChange={setStatusFilter}
+          style={{ width: 165, height: 36 }}
+          options={[
+            { label: 'All Statuses', value: 'ALL' },
+            { label: 'Approved', value: 'Approved' },
+            { label: 'Pending Approval', value: 'Pending Approval' },
+            { label: 'Issued', value: 'Issued' },
+            { label: 'Draft', value: 'Draft' },
+            { label: 'Rejected', value: 'Rejected' },
+          ]}
+        />
+
+        {/* Reason Filter */}
+        <Select
+          value={reasonFilter}
+          onChange={setReasonFilter}
+          style={{ width: 175, height: 36 }}
+          options={[
+            { label: 'All Reasons', value: 'ALL' },
+            ...uniqueReasons.map((r) => ({ label: r, value: r })),
+          ]}
+        />
+
+        {/* Date Range Picker */}
+        <DatePicker.RangePicker
+          value={dateRange}
+          onChange={(dates) => setDateRange(dates as any)}
+          style={{ height: 36, borderRadius: 8, minWidth: 220 }}
+          placeholder={['Start Date', 'End Date']}
+        />
+
+        {/* Reset Filter Button */}
+        {(searchTerm || partyTypeFilter !== 'ALL' || statusFilter !== 'ALL' || reasonFilter !== 'ALL' || dateRange) && (
+          <Button
+            icon={<RotateCcw size={14} />}
+            onClick={handleResetFilters}
+            style={{
+              height: 36,
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#6B7280',
+              borderColor: '#D1D5DB',
+            }}
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+
+      {/* 4. Professional Data Table */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderRadius: 14,
+          padding: '16px 20px',
+          border: '1px solid #E5E7EB',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>
+            Debit Note Records ({filteredNotes.length})
+          </div>
+          <span style={{ fontSize: 12, color: '#6B7280' }}>
+            Debit notes increase accounts receivable (customer) or decrease payables (supplier).
+          </span>
         </div>
 
         <Table
           columns={columns}
           dataSource={filteredNotes}
           rowKey="id"
-          pagination={{ pageSize: 6, size: 'small', showTotal: (t) => `Total ${t} debit notes` }}
-          size="middle"
+          pagination={{ pageSize: 8, showSizeChanger: true, showTotal: (t) => `Total ${t} Debit Notes` }}
+          scroll={{ x: 1540 }}
+          style={{ borderRadius: 8, overflow: 'hidden' }}
         />
       </div>
 
-      {/* 4. Create Modal */}
+      {/* 5. Create Debit Note Modal (Comprehensive Form with 8 Clear Business Sections) */}
       <Modal
-        title="Create Supplementary Debit Note"
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 6 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: BRAND_PURPLE,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+              }}
+            >
+              <FileText size={17} />
+            </div>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
+              Create Supplementary Debit Note
+            </span>
+          </div>
+        }
         open={isCreateModalOpen}
         onCancel={() => setIsCreateModalOpen(false)}
         footer={null}
-        width={620}
+        width={760}
       >
         <Form
           form={form}
@@ -461,87 +856,258 @@ export const DebitNotesPage: React.FC = () => {
           initialValues={{
             debitNoteDate: dayjs(),
             partyType: 'Customer',
-            reason: 'Freight Charges',
+            reason: 'Underbilling Correction',
             taxRate: 18,
+            adjustmentMethod: 'Adjust in ledger and next bill cycle',
+            approver: 'Finance Controller',
           }}
+          style={{ marginTop: 12 }}
         >
-          <Row gutter={12}>
-            <Col span={12}>
-              <Form.Item label="Party Classification" name="partyType" rules={[{ required: true }]}>
-                <Select
-                  options={[
-                    { value: 'Customer', label: 'Customer (Charge to Customer)' },
-                    { value: 'Supplier', label: 'Supplier (Debit to Supplier)' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Party Name" name="partyName" rules={[{ required: true }]}>
-                <Input placeholder="e.g. Apex Industrial Dynamics" />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Section 1 & 2: Basic & Party Details */}
+          <div style={{ fontSize: 13, fontWeight: 700, color: BRAND_PURPLE, marginBottom: 12, borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
+            1. Basic & Party Details
+          </div>
 
-          <Row gutter={12}>
-            <Col span={12}>
-              <Form.Item label="Reference Invoice / Bill" name="referenceInvoice" rules={[{ required: true }]}>
-                <Input placeholder="e.g. INV-2026-0081 or BILL-2026-045" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Debit Note Date" name="debitNoteDate" rules={[{ required: true }]}>
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 16px' }}>
+            <Form.Item label="Party Type" name="partyType" rules={[{ required: true }]}>
+              <Select
+                options={[
+                  { value: 'Customer', label: 'Customer (Sales Underbilling / Charges)' },
+                  { value: 'Supplier', label: 'Supplier (Purchase Return / Re-debit)' },
+                ]}
+              />
+            </Form.Item>
 
-          <Form.Item label="Debit Reason" name="reason" rules={[{ required: true }]}>
-            <Select
-              options={[
-                { value: 'Additional Charges', label: 'Additional Charges' },
-                { value: 'Underbilling Correction', label: 'Underbilling Correction' },
-                { value: 'Price Difference', label: 'Price Difference' },
-                { value: 'Freight Charges', label: 'Freight Charges' },
-                { value: 'Tax Adjustment', label: 'Tax Adjustment' },
-                { value: 'Service Charges', label: 'Service Charges' },
-              ]}
-            />
+            <Form.Item label="Party Name" name="partyName" rules={[{ required: true, message: 'Please enter party name' }]}>
+              <Input placeholder="e.g. Apex Industrial Dynamics" />
+            </Form.Item>
+
+            <Form.Item label="Party Code" name="partyCode">
+              <Input placeholder="e.g. CUST-1001 or SUP-204" />
+            </Form.Item>
+          </div>
+
+          {/* Section 3 & 4: Reference & Debit Information */}
+          <div style={{ fontSize: 13, fontWeight: 700, color: BRAND_PURPLE, marginBottom: 12, marginTop: 6, borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
+            2. Reference Details & Debit Reason
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0 16px' }}>
+            <Form.Item label="Reference Invoice / Bill #" name="referenceInvoice" rules={[{ required: true, message: 'Enter reference bill/invoice' }]}>
+              <Input placeholder="e.g. INV-2026-0081" />
+            </Form.Item>
+
+            <Form.Item label="Debit Note Date" name="debitNoteDate" rules={[{ required: true }]}>
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item label="Debit Reason" name="reason" rules={[{ required: true }]}>
+              <Select
+                options={[
+                  { value: 'Underbilling Correction', label: 'Underbilling Correction' },
+                  { value: 'Additional Charges', label: 'Additional Charges' },
+                  { value: 'Price Difference', label: 'Price Difference' },
+                  { value: 'Freight Charges', label: 'Freight Charges' },
+                  { value: 'Tax Adjustment', label: 'Tax Adjustment' },
+                  { value: 'Service Charges', label: 'Service Charges' },
+                  { value: 'Quantity Difference', label: 'Quantity Difference' },
+                ]}
+              />
+            </Form.Item>
+          </div>
+
+          {/* Section 5: Tax Breakdown & Financial Amounts */}
+          <div style={{ fontSize: 13, fontWeight: 700, color: BRAND_PURPLE, marginBottom: 12, marginTop: 6, borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
+            3. Tax Breakdown & Financial Amounts
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0 16px' }}>
+            <Form.Item label="Taxable Amount (₹)" name="taxableAmount" rules={[{ required: true, message: 'Enter taxable amount' }]}>
+              <InputNumber style={{ width: '100%' }} min={1} prefix="₹" />
+            </Form.Item>
+
+            <Form.Item label="GST Tax Rate (%)" name="taxRate" rules={[{ required: true }]}>
+              <Select
+                options={[
+                  { value: 0, label: '0% Nil' },
+                  { value: 5, label: '5%' },
+                  { value: 12, label: '12%' },
+                  { value: 18, label: '18% Standard GST' },
+                  { value: 28, label: '28%' },
+                ]}
+              />
+            </Form.Item>
+          </div>
+
+          {/* Section 6 & 7: Adjustment & Approval Details */}
+          <div style={{ fontSize: 13, fontWeight: 700, color: BRAND_PURPLE, marginBottom: 12, marginTop: 6, borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
+            4. Adjustment & Approval Details
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0 16px' }}>
+            <Form.Item label="Adjustment Instructions / Method" name="adjustmentMethod">
+              <Input placeholder="e.g. Direct adjustment on upcoming monthly billing" />
+            </Form.Item>
+
+            <Form.Item label="Assigning Approver" name="approver">
+              <Input placeholder="e.g. Finance Controller / Accounts Head" />
+            </Form.Item>
+          </div>
+
+          <Form.Item label="Detailed Description / Audit Justification" name="notes">
+            <Input.TextArea rows={2} placeholder="Explain reason for extra charge, differential quantity or pricing revision..." />
           </Form.Item>
 
-          <Row gutter={12}>
-            <Col span={12}>
-              <Form.Item label="Taxable Amount (₹)" name="taxableAmount" rules={[{ required: true }]}>
-                <InputNumber style={{ width: '100%' }} min={1} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="GST Tax Rate (%)" name="taxRate" rules={[{ required: true }]}>
-                <Select
-                  options={[
-                    { value: 0, label: '0%' },
-                    { value: 5, label: '5%' },
-                    { value: 12, label: '12%' },
-                    { value: 18, label: '18%' },
-                    { value: 28, label: '28%' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Section 8: Attachments */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#4B5563', marginBottom: 6 }}>
+            Supporting Documents (Optional)
+          </div>
+          <Upload maxCount={1} beforeUpload={() => false}>
+            <Button icon={<UploadCloud size={14} />} style={{ borderRadius: 6, fontSize: 12 }}>
+              Attach Supporting Invoice / Proof Document
+            </Button>
+          </Upload>
 
-          <Form.Item label="Supporting Notes & Comments" name="notes">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
             <Button onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: BRAND_PURPLE, borderColor: BRAND_PURPLE }}>
-              Create Debit Note
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: BRAND_PURPLE,
+                borderColor: BRAND_PURPLE,
+                fontWeight: 700,
+              }}
+            >
+              Submit Debit Note
             </Button>
           </div>
         </Form>
       </Modal>
+
+      {/* 6. Details Drawer */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <FileText size={18} color={BRAND_PURPLE} />
+              <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>
+                Debit Note: {selectedNote?.debitNoteNumber}
+              </span>
+            </div>
+            {selectedNote && renderApprovalBadge(selectedNote.status)}
+          </div>
+        }
+        open={isDetailDrawerOpen}
+        onClose={() => setIsDetailDrawerOpen(false)}
+        width={580}
+      >
+        {selectedNote && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Quick Actions Header */}
+            <div style={{ display: 'flex', gap: 10, paddingBottom: 16, borderBottom: '1px solid #E5E7EB' }}>
+              <Button
+                icon={<Printer size={15} />}
+                onClick={() => message.info(`Printing Debit Note ${selectedNote.debitNoteNumber}`)}
+              >
+                Print
+              </Button>
+              <Button
+                icon={<Download size={15} />}
+                onClick={() => message.info(`Downloading PDF for ${selectedNote.debitNoteNumber}`)}
+              >
+                Download PDF
+              </Button>
+              {selectedNote.status === 'Pending Approval' && (
+                <Button
+                  type="primary"
+                  icon={<Check size={15} />}
+                  onClick={() => {
+                    handleApprove(selectedNote.id);
+                    setIsDetailDrawerOpen(false);
+                  }}
+                  style={{ background: '#16A34A', borderColor: '#16A34A', fontWeight: 700 }}
+                >
+                  Approve Debit Note
+                </Button>
+              )}
+            </div>
+
+            {/* Party & Reference Card */}
+            <div style={{ background: '#FAF5FF', padding: '14px 18px', borderRadius: 10, border: '1px solid #E9D5FF' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: BRAND_PURPLE, textTransform: 'uppercase' }}>
+                  {selectedNote.partyType} Information
+                </span>
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                    backgroundColor: selectedNote.partyType === 'Customer' ? '#EFF6FF' : '#FAF5FF',
+                    color: selectedNote.partyType === 'Customer' ? '#1D4ED8' : '#7C3AED',
+                    border: `1px solid ${selectedNote.partyType === 'Customer' ? '#BFDBFE' : '#DDD6FE'}`,
+                  }}
+                >
+                  {selectedNote.partyType}
+                </span>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1F2937', marginTop: 4 }}>
+                {selectedNote.partyName}
+              </div>
+              <div style={{ fontSize: 12, color: '#4B5563', marginTop: 2 }}>
+                Party Code: <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{selectedNote.partyCode}</span>
+              </div>
+              <div style={{ fontSize: 12, color: '#4B5563', marginTop: 2 }}>
+                Reference Bill/Invoice: <strong style={{ color: BRAND_PURPLE }}>{selectedNote.referenceInvoice}</strong>
+              </div>
+            </div>
+
+            {/* Financial Calculation Breakdown */}
+            <div style={{ background: '#F9FAFB', borderRadius: 10, padding: 16, border: '1px solid #E5E7EB' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 12 }}>
+                Financial Debit Calculation
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#4B5563', marginBottom: 6 }}>
+                <span>Date of Issue:</span>
+                <span style={{ fontWeight: 600 }}>{selectedNote.debitNoteDate}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#4B5563', marginBottom: 6 }}>
+                <span>Reason:</span>
+                <span style={{ fontWeight: 600 }}>{selectedNote.reason}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#4B5563', marginBottom: 6 }}>
+                <span>Taxable Amount:</span>
+                <span style={{ fontWeight: 600 }}>₹{Number(selectedNote.taxableAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: '#4B5563', marginBottom: 6 }}>
+                <span>Tax Amount (GST):</span>
+                <span style={{ fontWeight: 600 }}>₹{Number(selectedNote.taxAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <Divider style={{ margin: '8px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, fontWeight: 800, color: '#111827' }}>
+                <span>Total Debit Note Amount:</span>
+                <span style={{ color: BRAND_PURPLE }}>₹{Number(selectedNote.totalDebitAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginTop: 8 }}>
+                <span>Adjustment Status:</span>
+                <span>{renderAdjustmentBadge(selectedNote.adjustmentStatus)}</span>
+              </div>
+            </div>
+
+            {/* Notes & Justifications */}
+            <div style={{ background: '#FFFFFF', borderRadius: 10, padding: 14, border: '1px solid #E5E7EB' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase' }}>
+                Audit Justification & Notes
+              </div>
+              <div style={{ fontSize: 12.5, color: '#4B5563', marginTop: 6, lineHeight: 1.5 }}>
+                {selectedNote.notes || 'Supplementary charge entered in accordance with commercial discrepancy review.'}
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 };
