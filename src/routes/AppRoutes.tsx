@@ -39,6 +39,51 @@ import {
   SalesReturnsPage,
   SalesTeamPage,
 } from '../pages/sales/SalesPages';
+import { SalesOverviewPage } from '../pages/sales/SalesOverviewPage';
+import { ConfirmedSalesOrdersPage } from '../pages/sales/ConfirmedSalesOrdersPage';
+import { PurchaseOverviewPage } from '../pages/purchases/PurchaseOverviewPage';
+import { PurchaseOrdersPage } from '../pages/purchases/PurchaseOrdersPage';
+import { GoodsReceivedPage } from '../pages/purchases/GoodsReceivedPage';
+import { SuppliersPage } from '../pages/purchases/SuppliersPage';
+import { PurchaseReturnsPage } from '../pages/purchases/PurchaseReturnsPage';
+import { PurchaseAnalyticsPage } from '../pages/purchases/PurchaseAnalyticsPage';
+
+// Inventory Management Pages
+import { InventoryOverviewPage } from '../pages/inventory/InventoryOverviewPage';
+import { StockManagementPage } from '../pages/inventory/StockManagementPage';
+import { StockInOutPage } from '../pages/inventory/StockInOutPage';
+import { StockTransfersPage } from '../pages/inventory/StockTransfersPage';
+import { StockAdjustmentsPage } from '../pages/inventory/StockAdjustmentsPage';
+import { LowStockAlertsPage } from '../pages/inventory/LowStockAlertsPage';
+import { WarehouseManagementPage } from '../pages/inventory/WarehouseManagementPage';
+import { InventoryAnalyticsReportsPage } from '../pages/inventory/InventoryAnalyticsReportsPage';
+
+// Product & Brand Management Pages
+import { AllProductsPage } from '../pages/products/AllProductsPage';
+import { BrandManagementPage } from '../pages/products/BrandManagementPage';
+import { BrandWiseProductsPage } from '../pages/products/BrandWiseProductsPage';
+import { ProductCategoriesPage } from '../pages/products/ProductCategoriesPage';
+import { ProductPricingPage } from '../pages/products/ProductPricingPage';
+
+// Invoicing, Billing, Creditors & Debtors Pages
+import { AllInvoicesPage } from '../pages/billing/AllInvoicesPage';
+import { CreateInvoicePage } from '../pages/billing/CreateInvoicePage';
+import { CreditNotesPage } from '../pages/billing/CreditNotesPage';
+import { DebitNotesPage } from '../pages/billing/DebitNotesPage';
+import { UnifiedNotesPage } from '../pages/billing/UnifiedNotesPage';
+import { PaymentsReceivedPage } from '../pages/billing/PaymentsReceivedPage';
+import { PurchaseInvoicesBillsPage } from '../pages/purchases/PurchaseInvoicesBillsPage';
+import { PaymentsMadePage } from '../pages/purchases/PaymentsMadePage';
+import { ChartOfAccountsPage } from '../pages/finance/ChartOfAccountsPage';
+import { BankReconciliationPage } from '../pages/finance/BankReconciliationPage';
+import { AccountsReceivablePayablePage } from '../pages/finance/AccountsReceivablePayablePage';
+import { EInvoicePage } from '../pages/gst/EInvoicePage';
+import { EWayBillPage } from '../pages/gst/EWayBillPage';
+import { GstReportsPage } from '../pages/gst/GstReportsPage';
+import { CreditorsPage } from '../pages/billing/CreditorsPage';
+import { DebtorsPage } from '../pages/billing/DebtorsPage';
+import { OutstandingPayablesPage } from '../pages/billing/OutstandingPayablesPage';
+import { OutstandingReceivablesPage } from '../pages/billing/OutstandingReceivablesPage';
 
 import { CompanyProfileSettingsPage as SettingsPage } from '../pages/settings/CompanySettingsPages';
 import { BranchManagementPage } from '../pages/settings/BranchManagementPage';
@@ -75,12 +120,41 @@ import { SupplierPortal } from '../pages/portals/SupplierPortal';
 import { EmployeePortal } from '../pages/portals/EmployeePortal';
 import { FinanceBillingPage } from '../pages/finance/FinanceBillingPage';
 
+// Reports & Analytics Suite (All 7 Dedicated Pages)
+import {
+  SalesReportsPage,
+  PurchaseReportsPage,
+  InventoryReportsPage,
+  CustomerReportsPage,
+  FinancialReportsPage,
+  OutstandingReportsPage,
+  HrReportsPage,
+} from '../pages/reports';
+
+// Asset Management Suite (All 8 Dedicated Pages)
+import {
+  AssetOverviewPage,
+  AllAssetsPage,
+  AssetCategoriesPage,
+  AssetAllocationPage,
+  AssetTransfersPage,
+  AssetMaintenancePage,
+  AssetDisposalPage,
+  AssetHistoryPage,
+} from '../pages/assets';
+
+// Additional Enterprise Suite Pages
+import { DeliveryManagementPage } from '../pages/delivery/DeliveryManagementPage';
+import { ApprovalManagementPage } from '../pages/approvals/ApprovalManagementPage';
+import { DocumentManagementPage } from '../pages/documents/DocumentManagementPage';
+import { CommunicationTaskManagementPage } from '../pages/communication/CommunicationTaskManagementPage';
+
 // Consolidated Employee & HR Management Pages
 import { HrDashboardPage } from '../pages/hr/HrDashboardPage';
 import { EmployeeManagementPage } from '../pages/hr/EmployeeManagementPage';
 import { AttendanceManagementPage } from '../pages/hr/AttendanceManagementPage';
 import { LeaveManagementPage } from '../pages/hr/LeaveManagementPage';
-import { PayrollManagementPage } from '../pages/hr/PayrollManagementPage';
+import { PayrollManagementPage } from '../pages/payroll/PayrollManagementPage';
 import { TaskManagementPage } from '../pages/hr/TaskManagementPage';
 import { PerformanceManagementPage } from '../pages/hr/PerformanceManagementPage';
 import { ExpenseManagementPage } from '../pages/hr/ExpenseManagementPage';
@@ -177,6 +251,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="documents/history" element={<GenericModuleView title="Document History" />} />
 
         {/* 05. SALES MANAGEMENT (SALES & COMPLETE) */}
+        <Route path="sales/overview" element={<ModuleAccessRoute><SalesOverviewPage /></ModuleAccessRoute>} />
         <Route path="sales/dashboard" element={<ModuleAccessRoute><SalesDashboard /></ModuleAccessRoute>} />
         <Route path="sales/targets" element={<ModuleAccessRoute><GenericModuleView title="Sales Targets" /></ModuleAccessRoute>} />
         <Route path="sales/performance" element={<ModuleAccessRoute><GenericModuleView title="Sales Performance" /></ModuleAccessRoute>} />
@@ -202,9 +277,11 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/quotation-approvals" element={<ModuleAccessRoute><GenericModuleView title="Quotation Approvals" /></ModuleAccessRoute>} />
         <Route path="sales/quotation-history" element={<ModuleAccessRoute><GenericModuleView title="Quotation History" /></ModuleAccessRoute>} />
 
-        <Route path="sales/orders" element={<ModuleAccessRoute><SalesOrdersPage /></ModuleAccessRoute>} />
-        <Route path="sales/order-approvals" element={<ModuleAccessRoute><GenericModuleView title="Order Approvals" /></ModuleAccessRoute>} />
-        <Route path="sales/order-tracking" element={<ModuleAccessRoute><GenericModuleView title="Order Tracking" /></ModuleAccessRoute>} />
+        <Route path="sales/orders" element={<ModuleAccessRoute><ConfirmedSalesOrdersPage /></ModuleAccessRoute>} />
+        <Route path="sales/order-approvals" element={<ModuleAccessRoute><SalesOrdersPage /></ModuleAccessRoute>} />
+        <Route path="sales/order-tracking" element={<ModuleAccessRoute><SalesOrderTrackingPage /></ModuleAccessRoute>} />
+        <Route path="sales/customers-mgmt" element={<ModuleAccessRoute><CustomerManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/payments-received" element={<ModuleAccessRoute><PaymentsReceivedPage /></ModuleAccessRoute>} />
         <Route path="sales/delivery-management" element={<ModuleAccessRoute><GenericModuleView title="Delivery Management" /></ModuleAccessRoute>} />
         <Route path="sales/returns" element={<ModuleAccessRoute><SalesReturnsPage /></ModuleAccessRoute>} />
 
@@ -236,27 +313,58 @@ export const AppRoutes: React.FC = () => {
         <Route path="services/spare-parts" element={<ModuleAccessRoute><ServiceSparesPage /></ModuleAccessRoute>} />
         <Route path="services/billing" element={<ModuleAccessRoute><ServiceBillingPage /></ModuleAccessRoute>} />
         <Route path="services/service-invoices" element={<ModuleAccessRoute><GenericModuleView title="Service Invoices" /></ModuleAccessRoute>} />
-        <Route path="services/settings/company" element={<ModuleAccessRoute><ServiceCompanySettingsPage /></ModuleAccessRoute>} />
+
+        {/* 08. PROJECT MANAGEMENT */}
+        <Route path="projects/overview" element={<GenericModuleView title="Project Overview" />} />
+        <Route path="projects/list" element={<GenericModuleView title="Projects" />} />
+        <Route path="projects/tasks" element={<GenericModuleView title="Project Tasks" />} />
+        <Route path="projects/task-assignment" element={<GenericModuleView title="Task Assignment" />} />
+        <Route path="projects/milestones" element={<GenericModuleView title="Project Milestones" />} />
+        <Route path="projects/progress" element={<GenericModuleView title="Project Progress" />} />
+
+        {/* 09. ASSET MANAGEMENT (ALL 8 DEDICATED SUITE PAGES) */}
+        <Route path="assets" element={<Navigate to="/app/assets/overview" replace />} />
+        <Route path="assets/overview" element={<AssetOverviewPage />} />
+        <Route path="assets/register" element={<AllAssetsPage />} />
+        <Route path="assets/categories" element={<AssetCategoriesPage />} />
+        <Route path="assets/allocation" element={<AssetAllocationPage />} />
+        <Route path="assets/transfers" element={<AssetTransfersPage />} />
+        <Route path="assets/maintenance" element={<AssetMaintenancePage />} />
+        <Route path="assets/disposal" element={<AssetDisposalPage />} />
+        <Route path="assets/history" element={<AssetHistoryPage />} />
 
         {/* 08. PRODUCT MANAGEMENT */}
-        <Route path="sales/products" element={<ModuleAccessRoute><SalesProductsPage /></ModuleAccessRoute>} />
-        <Route path="sales/price-lists" element={<ModuleAccessRoute><GenericModuleView title="Price Lists" /></ModuleAccessRoute>} />
-        <Route path="sales/discounts" element={<ModuleAccessRoute><GenericModuleView title="Discounts & Offers" /></ModuleAccessRoute>} />
-        <Route path="sales/product-categories" element={<ModuleAccessRoute><GenericModuleView title="Product Categories" /></ModuleAccessRoute>} />
-        <Route path="sales/brands" element={<ModuleAccessRoute><GenericModuleView title="Brands" /></ModuleAccessRoute>} />
+        <Route path="sales/products" element={<ModuleAccessRoute><AllProductsPage /></ModuleAccessRoute>} />
+        <Route path="sales/brands" element={<ModuleAccessRoute><BrandManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/brand-products" element={<ModuleAccessRoute><BrandWiseProductsPage /></ModuleAccessRoute>} />
+        <Route path="sales/product-categories" element={<ModuleAccessRoute><ProductCategoriesPage /></ModuleAccessRoute>} />
+        <Route path="sales/price-lists" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
+        <Route path="sales/discounts" element={<ModuleAccessRoute><ProductPricingPage /></ModuleAccessRoute>} />
         <Route path="sales/uom" element={<ModuleAccessRoute><GenericModuleView title="Units of Measurement" /></ModuleAccessRoute>} />
 
-        {/* 09. INVENTORY MANAGEMENT */}
-        <Route path="sales/inventory" element={<ModuleAccessRoute><SalesProductsPage /></ModuleAccessRoute>} />
-        <Route path="sales/stock-management" element={<ModuleAccessRoute><GenericModuleView title="Stock Management" /></ModuleAccessRoute>} />
-        <Route path="sales/stock-transfers" element={<ModuleAccessRoute><GenericModuleView title="Stock Transfers" /></ModuleAccessRoute>} />
-        <Route path="sales/stock-adjustments" element={<ModuleAccessRoute><GenericModuleView title="Stock Adjustments" /></ModuleAccessRoute>} />
-        <Route path="sales/warehouses" element={<ModuleAccessRoute><GenericModuleView title="Warehouse Management" /></ModuleAccessRoute>} />
-        <Route path="sales/low-stock-alerts" element={<ModuleAccessRoute><GenericModuleView title="Low Stock Alerts" /></ModuleAccessRoute>} />
-        <Route path="sales/stock-history" element={<ModuleAccessRoute><GenericModuleView title="Stock History" /></ModuleAccessRoute>} />
+        {/* 11. INVENTORY MANAGEMENT */}
+        <Route path="sales/inventory" element={<ModuleAccessRoute><InventoryOverviewPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-management" element={<ModuleAccessRoute><StockManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-in-out" element={<ModuleAccessRoute><StockInOutPage /></ModuleAccessRoute>} />
+        <Route path="sales/low-stock-alerts" element={<ModuleAccessRoute><LowStockAlertsPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-transfers" element={<ModuleAccessRoute><StockTransfersPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-adjustments" element={<ModuleAccessRoute><StockAdjustmentsPage /></ModuleAccessRoute>} />
+        <Route path="sales/warehouses" element={<ModuleAccessRoute><WarehouseManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/inventory-reports" element={<ModuleAccessRoute><InventoryAnalyticsReportsPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-valuation" element={<ModuleAccessRoute><InventoryAnalyticsReportsPage /></ModuleAccessRoute>} />
+        <Route path="sales/reorder-levels" element={<ModuleAccessRoute><LowStockAlertsPage /></ModuleAccessRoute>} />
+        <Route path="sales/stock-history" element={<ModuleAccessRoute><StockInOutPage /></ModuleAccessRoute>} />
+        <Route path="sales/batch-serial" element={<ModuleAccessRoute><InventoryAnalyticsReportsPage /></ModuleAccessRoute>} />
 
-        {/* 10. PURCHASE MANAGEMENT */}
-        <Route path="sales/purchases" element={<ModuleAccessRoute><SalesOrdersPage /></ModuleAccessRoute>} />
+        {/* 12. PURCHASE MANAGEMENT */}
+        <Route path="sales/purchases" element={<ModuleAccessRoute><PurchaseOverviewPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-orders" element={<ModuleAccessRoute><PurchaseOrdersPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-bills" element={<ModuleAccessRoute><PurchaseInvoicesBillsPage /></ModuleAccessRoute>} />
+        <Route path="sales/payments-made" element={<ModuleAccessRoute><PaymentsMadePage /></ModuleAccessRoute>} />
+        <Route path="sales/grn" element={<ModuleAccessRoute><GoodsReceivedPage /></ModuleAccessRoute>} />
+        <Route path="sales/suppliers" element={<ModuleAccessRoute><SuppliersPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-returns" element={<ModuleAccessRoute><PurchaseReturnsPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-analytics" element={<ModuleAccessRoute><PurchaseAnalyticsPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-requisitions" element={<ModuleAccessRoute><GenericModuleView title="Purchase Requisitions" /></ModuleAccessRoute>} />
         <Route path="sales/suppliers" element={<ModuleAccessRoute><CustomersPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-orders" element={<ModuleAccessRoute><GenericModuleView title="Purchase Orders" /></ModuleAccessRoute>} />
@@ -264,37 +372,66 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/purchase-returns" element={<ModuleAccessRoute><GenericModuleView title="Purchase Returns" /></ModuleAccessRoute>} />
         <Route path="sales/supplier-payments" element={<ModuleAccessRoute><GenericModuleView title="Supplier Payments" /></ModuleAccessRoute>} />
 
-        {/* 11. FINANCE & ACCOUNTS */}
-        <Route path="billing" element={<FinanceBillingPage />} />
-        <Route path="finance/invoices" element={<FinanceBillingPage />} />
-        <Route path="sales/invoices" element={<FinanceBillingPage />} />
+        {/* 13. FINANCE & ACCOUNTS */}
+        <Route path="billing" element={<AllInvoicesPage />} />
+        <Route path="finance/invoices" element={<AllInvoicesPage />} />
+        <Route path="finance/create-invoice" element={<CreateInvoicePage />} />
+        <Route path="sales/invoices" element={<AllInvoicesPage />} />
+        <Route path="finance/chart-of-accounts" element={<ChartOfAccountsPage />} />
+        <Route path="finance/bank-reconciliation" element={<BankReconciliationPage />} />
+        <Route path="finance/ar-ap" element={<AccountsReceivablePayablePage />} />
+        <Route path="finance/notes" element={<UnifiedNotesPage />} />
+        <Route path="finance/credit-debit-notes" element={<UnifiedNotesPage />} />
+        <Route path="finance/gst/e-invoice" element={<EInvoicePage />} />
+        <Route path="finance/gst/e-way-bill" element={<EWayBillPage />} />
+        <Route path="finance/gst/reports" element={<GstReportsPage />} />
         <Route path="finance/proforma-invoices" element={<GenericModuleView title="Proforma Invoices" />} />
         <Route path="finance/recurring-invoices" element={<GenericModuleView title="Recurring Invoices" />} />
-        <Route path="finance/credit-notes" element={<GenericModuleView title="Credit Notes" />} />
-        <Route path="finance/debit-notes" element={<GenericModuleView title="Debit Notes" />} />
+        <Route path="finance/credit-notes" element={<CreditNotesPage />} />
+        <Route path="finance/debit-notes" element={<DebitNotesPage />} />
+        <Route path="finance/creditors" element={<CreditorsPage />} />
+        <Route path="finance/debtors" element={<DebtorsPage />} />
+        <Route path="finance/general-ledger" element={<GenericModuleView title="General Ledger" />} />
+        <Route path="finance/journal-entries" element={<GenericModuleView title="Journal Entries" />} />
+        <Route path="finance/cash-flow" element={<GenericModuleView title="Cash Flow" />} />
+        <Route path="finance/income" element={<GenericModuleView title="Income" />} />
+        <Route path="finance/balance-sheet" element={<GenericModuleView title="Balance Sheet" />} />
         <Route path="finance/invoice-templates" element={<GenericModuleView title="Invoice Templates" />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="finance/payment-history" element={<GenericModuleView title="Payment History" />} />
         <Route path="finance/refunds" element={<GenericModuleView title="Refund Management" />} />
         <Route path="finance/reconciliation" element={<GenericModuleView title="Payment Reconciliation" />} />
-        <Route path="finance/receivables" element={<GenericModuleView title="Accounts Receivable" />} />
-        <Route path="finance/payables" element={<GenericModuleView title="Accounts Payable" />} />
+        <Route path="finance/receivables" element={<OutstandingReceivablesPage />} />
+        <Route path="finance/payables" element={<OutstandingPayablesPage />} />
         <Route path="finance/expenses" element={<GenericModuleView title="Expenses" />} />
         <Route path="finance/tax" element={<GenericModuleView title="Tax & GST Management" />} />
         <Route path="finance/bank-cash" element={<GenericModuleView title="Bank & Cash Management" />} />
         <Route path="finance/profit-loss" element={<GenericModuleView title="Profit & Loss" />} />
 
         {/* 12. APPROVAL MANAGEMENT */}
-        <Route path="approvals/pending" element={<GenericModuleView title="Pending Approvals" />} />
-        <Route path="approvals/workflows" element={<GenericModuleView title="Approval Workflows" />} />
-        <Route path="approvals/history" element={<GenericModuleView title="Approval History" />} />
+        <Route path="approvals" element={<ApprovalManagementPage />} />
+        <Route path="approvals/pending" element={<ApprovalManagementPage />} />
+        <Route path="approvals/workflows" element={<ApprovalManagementPage />} />
+        <Route path="approvals/history" element={<ApprovalManagementPage />} />
 
-        {/* 13. REPORTS & ANALYTICS */}
-        <Route path="reports" element={<GenericModuleView title="Reports Overview" />} />
-        <Route path="reports/sales" element={<GenericModuleView title="Sales Reports" />} />
+        {/* 14. ENTERPRISE DELIVERY, DOCUMENTS & COMMUNICATION */}
+        <Route path="delivery" element={<DeliveryManagementPage />} />
+        <Route path="delivery/overview" element={<DeliveryManagementPage />} />
+        <Route path="documents" element={<DocumentManagementPage />} />
+        <Route path="documents/overview" element={<DocumentManagementPage />} />
+        <Route path="communication" element={<CommunicationTaskManagementPage />} />
+        <Route path="communication/tasks" element={<CommunicationTaskManagementPage />} />
+
+        {/* 13. REPORTS & ANALYTICS (7 DEDICATED SUITE PAGES) */}
+        <Route path="reports" element={<Navigate to="/app/reports/sales" replace />} />
+        <Route path="reports/sales" element={<SalesReportsPage />} />
+        <Route path="reports/purchase" element={<PurchaseReportsPage />} />
+        <Route path="reports/inventory" element={<InventoryReportsPage />} />
+        <Route path="reports/customers" element={<CustomerReportsPage />} />
+        <Route path="reports/financial" element={<FinancialReportsPage />} />
+        <Route path="reports/outstanding" element={<OutstandingReportsPage />} />
+        <Route path="reports/hr" element={<HrReportsPage />} />
         <Route path="reports/service" element={<GenericModuleView title="Service Reports" />} />
-        <Route path="reports/customers" element={<GenericModuleView title="Customer Reports" />} />
-        <Route path="reports/financial" element={<GenericModuleView title="Financial Reports" />} />
         <Route path="reports/activities" element={<GenericModuleView title="Activity Reports" />} />
         <Route path="reports/custom" element={<GenericModuleView title="Custom Reports" />} />
 

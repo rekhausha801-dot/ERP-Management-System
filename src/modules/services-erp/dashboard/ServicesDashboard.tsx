@@ -85,7 +85,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Field Jobs Today"
             value={kpis.activeJobs}
             trend={{ value: '42 Technicians Assigned', isPositive: true }}
-            icon={<FiTool size={20} color="#4C1D95" />}
+            icon={<Wrench size={20} color="#4C1D95" />}
             iconBgColor="#F3E8FF"
             onClick={() => navigate('/app/services/jobs')}
           />
@@ -126,7 +126,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Service Revenue (INR)"
             value="₹48.20 L"
             trend={{ value: '+12% vs target', isPositive: true }}
-            icon={<TbCurrencyRupee size={22} color="#4C1D95" />}
+            icon={<IndianRupee size={22} color="#4C1D95" />}
             iconBgColor="#F3E8FF"
             onClick={() => navigate('/app/services/billing')}
           />
