@@ -54,7 +54,7 @@ export const ExitManagementPage: React.FC = () => {
   };
 
   const columns = [
-    { title: 'Exit ID', dataIndex: 'exitId', key: 'exitId', render: (t: string) => <Text strong style={{ color: '#6E56CF' }}>{t}</Text> },
+    { title: 'Exit ID', dataIndex: 'exitId', key: 'exitId', render: (t: string) => <Text strong style={{ color: '#4C1D95' }}>{t}</Text> },
     { title: 'Employee', dataIndex: 'empName', key: 'empName', render: (n: string) => <strong>{n}</strong> },
     { title: 'Department', dataIndex: 'department', key: 'department', render: (d: string) => <Tag color="blue">{d}</Tag> },
     { title: 'Resigned On', dataIndex: 'resignationDate', key: 'resignationDate' },
@@ -86,7 +86,7 @@ export const ExitManagementPage: React.FC = () => {
       title: 'Action',
       key: 'action',
       render: (_: any, r: ExitItem) => r.clearanceStatus !== 'Fully Cleared' ? (
-        <Button size="small" type="primary" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }} onClick={() => {
+        <Button size="small" type="primary" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => {
           setExits(exits.map(e => e.exitId === r.exitId ? { ...e, clearanceStatus: 'Fully Cleared', settlementStatus: 'Ready for Payout' } : e));
           message.success(`Clearance checklist signed off for ${r.empName}!`);
         }}>
@@ -139,7 +139,7 @@ export const ExitManagementPage: React.FC = () => {
         </Col>
         <Col xs={12} sm={6}>
           <Card bordered={false} style={{ borderRadius: 12 }}>
-            <Statistic title="Exited Alumni Total" value={exits.filter(e => e.status === 'Exited').length} prefix={<History size={16} color="#6E56CF" />} valueStyle={{ color: '#6E56CF', fontWeight: 700 }} />
+            <Statistic title="Exited Alumni Total" value={exits.filter(e => e.status === 'Exited').length} prefix={<History size={16} color="#4C1D95" />} valueStyle={{ color: '#4C1D95', fontWeight: 700 }} />
           </Card>
         </Col>
       </Row>
@@ -156,7 +156,12 @@ export const ExitManagementPage: React.FC = () => {
           ]}
         />
 
-        <Table dataSource={exits} columns={columns} pagination={{ pageSize: 8 }} />
+        <Table
+          dataSource={exits}
+          columns={columns}
+          pagination={{ pageSize: 8 }}
+          scroll={{ x: 'max-content' }}
+        />
       </Card>
 
       {/* Resignation Modal */}

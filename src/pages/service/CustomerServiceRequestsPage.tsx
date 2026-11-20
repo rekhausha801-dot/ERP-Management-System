@@ -282,7 +282,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div>
       {/* 1. Header Section */}
       <div
         style={{
@@ -299,7 +299,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
             style={{
               width: 48,
               height: 48,
-              borderRadius: 14,
+              borderRadius: 20,
               backgroundColor: '#EFF6FF',
               display: 'flex',
               alignItems: 'center',
@@ -345,48 +345,231 @@ export const CustomerServiceRequestsPage: React.FC = () => {
         </Space>
       </div>
 
-      {/* 2. Top Summary KPI Row */}
+      {/* 2. Top Summary KPI Row - Modern Soft Pill Cards matching Leave Management */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <div style={{ fontSize: 13, color: '#8C89A0', marginBottom: 4 }}>Pending Approval Queue</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Clock size={20} />
-              {pendingRequests.length}
+        {/* Card 1: Pending Approval Queue - Soft Peach / Warm Amber Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #FFFDF8 0%, #FFF5EB 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(245, 158, 11, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#FFE8CC',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#EA580C',
+                }}
+              >
+                <Clock size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Pending Approvals
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#D97706', lineHeight: 1 }}>
+                  {pendingRequests.length}
+                </div>
+              </div>
             </div>
-          </Card>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#D97706',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <div style={{ fontSize: 13, color: '#8C89A0', marginBottom: 4 }}>Approved & Dispatched</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#4C1D95', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <CheckCircle size={20} />
-              {requests.filter((r) => r.status === 'Approved').length}
+
+        {/* Card 2: Approved & Dispatched - Soft Pastel Green Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #F8FFF9 0%, #EEFDF3 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(16, 185, 129, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  backgroundColor: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              >
+                <CheckCircle size={22} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Approved & Dispatched
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#059669', lineHeight: 1 }}>
+                  {requests.filter((r) => r.status === 'Approved').length}
+                </div>
+              </div>
             </div>
-          </Card>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#059669',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <div style={{ fontSize: 13, color: '#8C89A0', marginBottom: 4 }}>Info Queries to Staff</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#6E56CF', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AlertCircle size={20} />
-              {requests.filter((r) => r.status === 'More Information Required').length}
+
+        {/* Card 3: Info Queries - Soft Sky Blue Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #F9FBFF 0%, #EFF6FF 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#DBEAFE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#2563EB',
+                }}
+              >
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Info Queries
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#1D4ED8', lineHeight: 1 }}>
+                  {requests.filter((r) => r.status === 'More Information Required').length}
+                </div>
+              </div>
             </div>
-          </Card>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2563EB',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <div style={{ fontSize: 13, color: '#8C89A0', marginBottom: 4 }}>Total Intake History</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: '#181433', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <PhoneCall size={20} />
-              {requests.length}
+
+        {/* Card 4: Total Intake History - Soft Violet / Purple Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #FAF7FF 0%, #F3E8FF 100%)',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(124, 58, 237, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#EDE9FE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#7C3AED',
+                }}
+              >
+                <PhoneCall size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Total Intake History
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#7C3AED', lineHeight: 1 }}>
+                  {requests.length}
+                </div>
+              </div>
             </div>
-          </Card>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#7C3AED',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
       </Row>
 
       {/* 3. Main Action Tabs */}
-      <Card bordered={false} style={{ borderRadius: 14 }}>
+      <Card bordered={false}  style={{ borderRadius: 20 }}>
         <Tabs
           activeKey={activeTab}
           onChange={(k: any) => setActiveTab(k)}
@@ -403,6 +586,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
                 </span>
               ),
             },
+            /*
             {
               key: 'all',
               label: (
@@ -412,6 +596,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
                 </span>
               ),
             },
+            */
             {
               key: 'intake',
               label: (
@@ -439,17 +624,6 @@ export const CustomerServiceRequestsPage: React.FC = () => {
               </div>
             ) : (
               <>
-                <Alert
-                  type="warning"
-                  showIcon
-                  message={
-                    <span style={{ fontWeight: 700 }}>
-                      {pendingRequests.length} Service Request(s) Awaiting Admin Decision
-                    </span>
-                  }
-                  description="Review customer problem statements, determine warranty or AMC contract coverage, and click 'Review & Approve' to generate unique service tickets and assign technicians."
-                  style={{ marginBottom: 16, borderRadius: 8 }}
-                />
                 <Table
                   dataSource={pendingRequests}
                   columns={columns}
@@ -707,8 +881,7 @@ export const CustomerServiceRequestsPage: React.FC = () => {
             </Descriptions>
 
             {/* Admin Decision Form */}
-            <Card
-              style={{
+            <Card  style={{
                 backgroundColor: '#FAF8FD',
                 border: '1px solid #ECE8F6',
                 borderRadius: 12,
@@ -820,29 +993,6 @@ export const CustomerServiceRequestsPage: React.FC = () => {
                 </div>
               </Form>
             </Card>
-
-            {/* Complete Audit Timeline */}
-            <div style={{ fontWeight: 700, fontSize: 13, color: '#181433', marginBottom: 10 }}>
-              Request & Approval History
-            </div>
-            <Timeline
-              items={selectedRequest.timeline.map((item) => ({
-                color: item.status === 'Approved' ? '#4C1D95' : item.status === 'Rejected' ? 'red' : 'blue',
-                children: (
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: '#181433' }}>
-                      {item.title}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
-                      {item.description}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-                      {item.timestamp} &bull; Actor: <strong>{item.actor}</strong>
-                    </div>
-                  </div>
-                ),
-              }))}
-            />
           </div>
         )}
       </Modal>

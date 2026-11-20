@@ -425,7 +425,7 @@ export const UnifiedDashboard: React.FC = () => {
                 <div style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: '#E6FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Wrench size={17} color="#10B981" />
                 </div>
-                <span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Service Management Overview</span>
+                <span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Service Management</span>
               </div>
             }
             extra={

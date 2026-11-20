@@ -26,7 +26,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: 'usr-abc',
-    name: 'Janani (Admin)',
+    name: 'Rekha (Admin)',
     email: 'admin@abctraders.com',
     role: 'company_admin',
     companyId: 'comp-abc',

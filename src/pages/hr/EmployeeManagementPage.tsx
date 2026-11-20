@@ -81,7 +81,7 @@ export const EmployeeManagementPage: React.FC = () => {
       title: 'Employee ID',
       dataIndex: 'id',
       key: 'id',
-      render: (text: string) => <Text strong style={{ color: '#6E56CF' }}>{text}</Text>,
+      render: (text: string) => <Text strong style={{ color: '#4C1D95' }}>{text}</Text>,
     },
     {
       title: 'Employee Name',
@@ -89,7 +89,7 @@ export const EmployeeManagementPage: React.FC = () => {
       key: 'name',
       render: (name: string, r: EmployeeItem) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: '50%', backgroundColor: '#6E56CF18', color: '#6E56CF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>
+          <div style={{ width: 34, height: 34, borderRadius: '50%', backgroundColor: '#4C1D9518', color: '#4C1D95', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>
             {name.charAt(0)}
           </div>
           <div>
@@ -137,7 +137,7 @@ export const EmployeeManagementPage: React.FC = () => {
       render: (_: any, record: EmployeeItem) => (
         <Space orientation="horizontal">
           <Tooltip title="View Profile Drawer">
-            <Button size="small" type="text" icon={<Eye size={14} color="#6E56CF" />} onClick={() => setDrawerEmployee(record)} />
+            <Button size="small" type="text" icon={<Eye size={14} color="#4C1D95" />} onClick={() => setDrawerEmployee(record)} />
           </Tooltip>
           <Tooltip title="Edit Employee">
             <Button size="small" type="text" icon={<Edit size={14} color="#1890ff" />} onClick={() => message.info(`Edit profile for ${record.name}`)} />
@@ -163,7 +163,7 @@ export const EmployeeManagementPage: React.FC = () => {
             <Button icon={<Download size={15} />} onClick={() => message.success('Employee roster exported as Excel')}>
               Export
             </Button>
-            <Button type="primary" icon={<UserPlus size={15} />} style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }} onClick={() => setIsAddModalOpen(true)}>
+            <Button type="primary" icon={<UserPlus size={15} />} style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => setIsAddModalOpen(true)}>
               Add Employee
             </Button>
           </Space>
@@ -174,7 +174,7 @@ export const EmployeeManagementPage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
         <Col xs={12} sm={6}>
           <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-            <Statistic title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Total Workforce</span>} value={employees.length} prefix={<Users size={16} color="#6E56CF" style={{ marginRight: 6 }} />} valueStyle={{ fontWeight: 700, color: '#19153B' }} />
+            <Statistic title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Total Workforce</span>} value={employees.length} prefix={<Users size={16} color="#4C1D95" style={{ marginRight: 6 }} />} valueStyle={{ fontWeight: 700, color: '#19153B' }} />
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -268,7 +268,7 @@ export const EmployeeManagementPage: React.FC = () => {
                 <Col xs={24} sm={12} md={6} key={i}>
                   <Card style={{ borderRadius: 12, border: '1px solid #ECE8F6' }}>
                     <div style={{ fontWeight: 700, fontSize: 15, color: '#19153B', marginBottom: 8 }}>{dept.name}</div>
-                    <div style={{ fontSize: 12, color: '#8C89A0', marginBottom: 4 }}>Department Head: <strong style={{ color: '#6E56CF' }}>{dept.head}</strong></div>
+                    <div style={{ fontSize: 12, color: '#8C89A0', marginBottom: 4 }}>Department Head: <strong style={{ color: '#4C1D95' }}>{dept.head}</strong></div>
                     <div style={{ fontSize: 12, color: '#8C89A0', marginBottom: 4 }}>Active Staff: <strong>{dept.staffCount} Members</strong></div>
                     <div style={{ fontSize: 12, color: '#8C89A0' }}>Monthly Payroll: <strong>{dept.budget}</strong></div>
                   </Card>
@@ -362,7 +362,7 @@ export const EmployeeManagementPage: React.FC = () => {
           </Row>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
             <Button onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }}>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }}>
               Enroll Employee
             </Button>
           </div>
@@ -379,7 +379,7 @@ export const EmployeeManagementPage: React.FC = () => {
         {drawerEmployee && (
           <div>
             <div style={{ textAlign: 'center', marginBottom: 24, padding: '16px 0', borderBottom: '1px solid #F0EEF8' }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: '#6E56CF', color: '#fff', fontSize: 24, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: '#4C1D95', color: '#fff', fontSize: 24, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                 {drawerEmployee.name.charAt(0)}
               </div>
               <h3 style={{ margin: 0, color: '#19153B' }}>{drawerEmployee.name}</h3>

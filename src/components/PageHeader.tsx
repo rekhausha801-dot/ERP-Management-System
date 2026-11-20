@@ -64,8 +64,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               icon={<Plus size={16} style={{ marginRight: 4 }} />}
               onClick={onActionClick}
               style={{
-                backgroundColor: '#6E56CF',
-                borderColor: '#6E56CF',
+                backgroundColor: '#4C1D95',
+                borderColor: '#4C1D95',
                 borderRadius: 10,
                 fontWeight: 600,
                 boxShadow: '0 6px 20px rgba(110, 86, 207, 0.35)',

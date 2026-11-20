@@ -377,7 +377,7 @@ export const ServiceQuotationsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div>
       {/* Top Header */}
       <PageHeader
         title="Service Quotations"
@@ -429,7 +429,7 @@ export const ServiceQuotationsPage: React.FC = () => {
               onChange={(e) => setSearch(e.target.value)}
               style={{
                 width: 280,
-                borderRadius: 24,
+                borderRadius: 20,
                 backgroundColor: '#FFFFFF',
                 boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)',
                 border: '1px solid rgba(226, 232, 240, 0.8)',
@@ -461,10 +461,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         }}
       >
         {/* Total Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -493,10 +491,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Draft Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -525,10 +521,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Sent Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -557,10 +551,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Approved Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -589,10 +581,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Rejected Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -621,10 +611,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Expired Quotations */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -653,10 +641,8 @@ export const ServiceQuotationsPage: React.FC = () => {
         </Card>
 
         {/* Total Quotation Value */}
-        <Card
-          bordered={false}
-          style={{
-            borderRadius: 14,
+        <Card bordered={false}  style={{
+            borderRadius: 20,
             boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
             border: '1px solid rgba(226, 232, 240, 0.8)',
             backgroundColor: '#FFFFFF',
@@ -688,6 +674,7 @@ export const ServiceQuotationsPage: React.FC = () => {
       </div>
 
       {/* Main Quotations Table */}
+      <Card bordered={false}  style={{ marginTop: 16 }}>
       <Table
         dataSource={filtered}
         columns={columns}
@@ -700,6 +687,7 @@ export const ServiceQuotationsPage: React.FC = () => {
         }}
         size="middle"
       />
+      </Card>
 
       {/* View Details Modal with Accept and Reject buttons */}
       <Modal
