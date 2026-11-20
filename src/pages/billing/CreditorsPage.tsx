@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { CreditorRecord } from './billingData';
 import { INITIAL_CREDITORS, INITIAL_PAYABLES } from './billingMockData';
+import { SalesKpiCardsRow } from '../../components/dashboard/SalesKpiCardsRow';
 
 const BRAND_NAVY = '#1E3A8A';
 const BRAND_PURPLE = '#5421A8';
@@ -387,155 +388,43 @@ export const CreditorsPage: React.FC = () => {
       </div>
 
       {/* 2. Exactly 4 Meaningful Summary Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        {/* Card 1: Total Creditors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <Users size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Creditors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>
-              {metrics.totalCount} Suppliers
-            </div>
-            <div style={{ fontSize: 11, color: '#5421A8', marginTop: 4, fontWeight: 700 }}>
-              {metrics.withPayableCount} with active payable balances
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 2: Active Creditors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <CheckCircle size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Active Creditors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#16A34A' }}>
-              {metrics.activeCount} Accounts
-            </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-              Active procurement credit facilities
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 3: Total Payable */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <IndianRupee size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Payable</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>
-              ₹{(metrics.totalPayable / 100000).toFixed(2)} Lakhs
-            </div>
-            <div style={{ fontSize: 11, color: '#D97706', marginTop: 4, fontWeight: 700 }}>
-              Company supplier liability
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 4: Overdue Creditors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <Clock size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Overdue Creditors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#DC2626' }}>
-              {metrics.overdueCount} Overdue
-            </div>
-            <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4, fontWeight: 700 }}>
-              ₹{(metrics.overduePayables / 100000).toFixed(2)} Lakhs past due date
-            </div>
-          </div>
-        </Col>
-      </Row>
+      <SalesKpiCardsRow
+        cards={[
+          {
+            title: 'Total Creditors',
+            value: `${metrics.totalCount}`,
+            growth: `${metrics.withPayableCount} Active Bal`,
+            isDark: true,
+            icon: <Users size={20} color="#5421A8" />,
+            pillExtra: 'Suppliers',
+          },
+          {
+            title: 'Active Creditors',
+            value: `${metrics.activeCount}`,
+            growth: 'Active Lines',
+            isDark: false,
+            icon: <CheckCircle size={20} color="#10B981" />,
+            pillExtra: 'Open Terms',
+          },
+          {
+            title: 'Total Payable',
+            value: `₹${(metrics.totalPayable / 100000).toFixed(2)}L`,
+            growth: 'Company Debt',
+            isDark: true,
+            icon: <IndianRupee size={20} color="#F59E0B" />,
+            pillExtra: 'Liability',
+          },
+          {
+            title: 'Overdue Creditors',
+            value: `${metrics.overdueCount}`,
+            growth: `₹${(metrics.overduePayables / 100000).toFixed(2)}L Past Due`,
+            isPositive: false,
+            isDark: false,
+            icon: <Clock size={20} color="#DC2626" />,
+            pillExtra: 'Critical',
+          },
+        ]}
+      />
 
       {/* 3. Filter Section & Table */}
       <div

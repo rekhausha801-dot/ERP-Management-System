@@ -1,661 +1,738 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Table,
   Button,
   Tag,
-  Space,
   Input,
   Select,
   Modal,
   Form,
   Row,
   Col,
-  message,
+  Space,
   Tooltip,
-  Badge,
-  DatePicker,
   Drawer,
+  message,
+  Popconfirm,
+  Progress,
+  Radio,
+  DatePicker,
+  Timeline,
   Divider,
-  Dropdown,
 } from 'antd';
-import type { MenuProps } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import {
-  Target,
+  TrendingUp,
   Plus,
   Search,
-  CheckCircle,
-  Clock,
-  ArrowRight,
-  Phone,
-  Mail,
-  Building,
-  UserCheck,
-  Calendar,
   Eye,
-  Edit,
-  DollarSign,
-  FileText,
-  UserPlus,
-  AlertTriangle,
-  Download,
-  Settings,
-  ChevronDown,
-  TrendingUp,
-  Flame,
-  Award,
+  Edit3,
+  Trash2,
+  Calendar,
+  Building,
+  CheckCircle,
   XCircle,
-  MoreVertical,
-  History,
-  RotateCcw,
-  Bell,
-  GitBranch,
+  Clock,
   Layers,
-  Sparkles,
+  Award,
+  Filter,
+  IndianRupee,
+  LayoutGrid,
+  List as ListIcon,
+  ChevronRight,
+  UserCheck,
+  FileText,
+  DollarSign,
+  PhoneCall,
+  Briefcase,
+  AlertCircle,
+  BarChart2,
+  PieChart,
+  ShieldAlert,
+  ArrowRight,
+  RotateCcw,
 } from 'lucide-react';
-import { INITIAL_CUSTOMERS, ExtendedCustomer } from '../../mock/customerData';
+import dayjs from 'dayjs';
 
-export type PipelineStage =
-  | 'New Lead'
-  | 'Contacted'
-  | 'Qualified'
-  | 'Proposal Sent'
+// Enterprise Purple Palette
+const BRAND_PURPLE = '#441A87';
+const BRAND_PURPLE_LIGHT = '#6E39CB';
+const BRAND_PURPLE_TINT = '#F5EEFD';
+
+export type PipelineStageType =
+  | 'New Opportunity'
+  | 'Requirement Analysis'
+  | 'Proposal / Quotation'
   | 'Negotiation'
   | 'Won'
   | 'Lost';
 
-export interface DealItem {
+export type OpportunityPriority = 'Low' | 'Medium' | 'High' | 'Urgent';
+
+export interface OpportunityActivity {
   id: string;
-  leadNumber: string;
-  companyName: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  source: string;
-  dealValue: number;
-  assignedExecutive: string;
-  stage: PipelineStage;
-  priority: 'High' | 'Medium' | 'Low';
-  expectedCloseDate: string;
-  daysInStage: number;
-  nextFollowUpDate: string;
-  notes?: string;
-  history: { stage: PipelineStage; date: string; user: string; note?: string }[];
+  type: 'Call' | 'Meeting' | 'Email' | 'Discussion' | 'Note';
+  title: string;
+  timestamp: string;
+  performedBy: string;
+  details: string;
+  outcome?: string;
 }
 
-const INITIAL_DEALS: DealItem[] = [
-  {
-    id: 'deal-1',
-    leadNumber: 'LD-2026-001',
-    companyName: 'Apex Precision Tools Ltd',
-    contactName: 'Ramesh Sundaram',
-    email: 'ramesh@apexprecision.com',
-    phone: '+91 98412 11002',
-    source: 'Referral',
-    dealValue: 450000,
-    assignedExecutive: 'Vikram Seth',
-    stage: 'Qualified',
-    priority: 'High',
-    expectedCloseDate: '2026-11-30',
-    daysInStage: 4,
-    nextFollowUpDate: '2026-11-20',
-    notes: 'Requires 15KW Variable Frequency Drives for machinery overhaul.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-10', user: 'Vikram Seth', note: 'Lead created from client referral' },
-      { stage: 'Contacted', date: '2026-11-12', user: 'Vikram Seth', note: 'Discovery call completed' },
-      { stage: 'Qualified', date: '2026-11-14', user: 'Vikram Seth', note: 'Budget & technical match approved' },
-    ],
-  },
-  {
-    id: 'deal-2',
-    leadNumber: 'LD-2026-002',
-    companyName: 'Omni Infra Ventures',
-    contactName: 'Priya Narayanan',
-    email: 'priya@omniinfra.in',
-    phone: '+91 97890 33441',
-    source: 'Website',
-    dealValue: 1200000,
-    assignedExecutive: 'Ananya Sharma',
-    stage: 'Proposal Sent',
-    priority: 'High',
-    expectedCloseDate: '2026-12-05',
-    daysInStage: 3,
-    nextFollowUpDate: '2026-11-22',
-    notes: 'Commercial quotation Q-1049 submitted. Reviewing SLA terms.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-08', user: 'Ananya Sharma' },
-      { stage: 'Contacted', date: '2026-11-11', user: 'Ananya Sharma' },
-      { stage: 'Qualified', date: '2026-11-13', user: 'Ananya Sharma' },
-      { stage: 'Proposal Sent', date: '2026-11-15', user: 'Ananya Sharma', note: 'Quotation sent' },
-    ],
-  },
-  {
-    id: 'deal-3',
-    leadNumber: 'LD-2026-003',
-    companyName: 'Southern Automation Works',
-    contactName: 'Karthik Raja',
-    email: 'karthik@southauto.com',
-    phone: '+91 94441 55667',
-    source: 'Direct Contact',
-    dealValue: 850000,
-    assignedExecutive: 'Vikram Seth',
-    stage: 'Negotiation',
-    priority: 'Medium',
-    expectedCloseDate: '2026-11-25',
-    daysInStage: 6,
-    nextFollowUpDate: '2026-11-19',
-    notes: 'Negotiating volume discount and 2-year warranty extension.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-05', user: 'Vikram Seth' },
-      { stage: 'Contacted', date: '2026-11-07', user: 'Vikram Seth' },
-      { stage: 'Qualified', date: '2026-11-09', user: 'Vikram Seth' },
-      { stage: 'Proposal Sent', date: '2026-11-11', user: 'Vikram Seth' },
-      { stage: 'Negotiation', date: '2026-11-12', user: 'Vikram Seth', note: 'Pricing revision under review' },
-    ],
-  },
-  {
-    id: 'deal-4',
-    leadNumber: 'LD-2026-004',
-    companyName: 'Bharat Bio Labs',
-    contactName: 'Dr. Ashok Kumar',
-    email: 'ashok@bharatbio.org',
-    phone: '+91 98210 99882',
-    source: 'Campaign',
-    dealValue: 620000,
-    assignedExecutive: 'Ananya Sharma',
-    stage: 'New Lead',
-    priority: 'Medium',
-    expectedCloseDate: '2026-12-15',
-    daysInStage: 2,
-    nextFollowUpDate: '2026-11-21',
-    notes: 'Inbound enquiry from digital healthcare marketing campaign.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-16', user: 'Ananya Sharma', note: 'Web lead captured' },
-    ],
-  },
-  {
-    id: 'deal-5',
-    leadNumber: 'LD-2026-005',
-    companyName: 'Verma Fabricators & Co',
-    contactName: 'Manish Verma',
-    email: 'verma@vermafab.com',
-    phone: '+91 98455 12099',
-    source: 'Advertisement',
-    dealValue: 310000,
-    assignedExecutive: 'Vikram Seth',
-    stage: 'Contacted',
-    priority: 'Low',
-    expectedCloseDate: '2026-11-12', // Overdue
-    daysInStage: 8,
-    nextFollowUpDate: '2026-11-15',
-    notes: 'Introductory pitch conducted over Zoom. Awaiting specifications.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-06', user: 'Vikram Seth' },
-      { stage: 'Contacted', date: '2026-11-10', user: 'Vikram Seth' },
-    ],
-  },
-  {
-    id: 'deal-6',
-    leadNumber: 'LD-2026-006',
-    companyName: 'Zenith Marine Hydraulics',
-    contactName: 'Capt. Arvind Nair',
-    email: 'arvind@zenithmarine.com',
-    phone: '+91 98840 55110',
-    source: 'Exhibition',
-    dealValue: 1850000,
-    assignedExecutive: 'Vikram Seth',
-    stage: 'Won',
-    priority: 'High',
-    expectedCloseDate: '2026-11-14',
-    daysInStage: 1,
-    nextFollowUpDate: '2026-11-28',
-    notes: 'Order confirmed with advance PO. Delivery scheduled for Q1.',
-    history: [
-      { stage: 'New Lead', date: '2026-10-25', user: 'Vikram Seth' },
-      { stage: 'Proposal Sent', date: '2026-11-02', user: 'Vikram Seth' },
-      { stage: 'Negotiation', date: '2026-11-08', user: 'Vikram Seth' },
-      { stage: 'Won', date: '2026-11-14', user: 'Vikram Seth', note: 'PO Received' },
-    ],
-  },
-  {
-    id: 'deal-7',
-    leadNumber: 'LD-2026-007',
-    companyName: 'Delta Agro Systems',
-    contactName: 'K. Balaji',
-    email: 'balaji@deltaagro.in',
-    phone: '+91 97900 11223',
-    source: 'Social Media',
-    dealValue: 420000,
-    assignedExecutive: 'Ananya Sharma',
-    stage: 'Lost',
-    priority: 'Low',
-    expectedCloseDate: '2026-11-10',
-    daysInStage: 7,
-    nextFollowUpDate: '—',
-    notes: 'Client opted for a local low-cost reconditioned alternative.',
-    history: [
-      { stage: 'New Lead', date: '2026-11-01', user: 'Ananya Sharma' },
-      { stage: 'Contacted', date: '2026-11-04', user: 'Ananya Sharma' },
-      { stage: 'Lost', date: '2026-11-11', user: 'Ananya Sharma', note: 'Budget mismatch' },
-    ],
-  },
+export interface OpportunityItem {
+  id: string;
+  opportunityNumber: string;
+  name: string;
+  companyName: string;
+  customerName: string;
+  productService: string;
+  dealValue: number;
+  probability: number;
+  stage: PipelineStageType;
+  assignedSalesperson: string;
+  expectedClosingDate: string;
+  nextFollowUp: string;
+  priority: OpportunityPriority;
+  createdDate: string;
+  relatedLeadNumber?: string;
+  relatedQuotation?: string;
+  proposedAmount?: number;
+  negotiationDetails?: string;
+  winLossReason?: string;
+  competitorInfo?: string;
+  closedDate?: string;
+  salesOrderNumber?: string;
+  notes?: string;
+  activities: OpportunityActivity[];
+}
+
+const PIPELINE_STAGES: PipelineStageType[] = [
+  'New Opportunity',
+  'Requirement Analysis',
+  'Proposal / Quotation',
+  'Negotiation',
+  'Won',
+  'Lost',
 ];
 
-const STAGES_CONFIG: { key: PipelineStage; label: string; color: string; badgeBg: string }[] = [
-  { key: 'New Lead', label: 'New Lead', color: '#0284C7', badgeBg: '#E0F2FE' },
-  { key: 'Contacted', label: 'Contacted', color: '#7C3AED', badgeBg: '#EDE9FE' },
-  { key: 'Qualified', label: 'Qualified', color: '#10B981', badgeBg: '#DCFCE7' },
-  { key: 'Proposal Sent', label: 'Proposal Sent', color: '#F97316', badgeBg: '#FFEDD5' },
-  { key: 'Negotiation', label: 'Negotiation', color: '#4338CA', badgeBg: '#E0E7FF' },
-  { key: 'Won', label: 'Won', color: '#059669', badgeBg: '#D1FAE5' },
-  { key: 'Lost', label: 'Lost', color: '#EF4444', badgeBg: '#FEE2E2' },
+const SALESPERSON_LIST = [
+  'Vikram Seth',
+  'Ananya Sharma',
+  'Murugan Selvam',
+  'Rajesh Kannan',
+  'Pooja Hegde',
+];
+
+const INITIAL_OPPORTUNITIES: OpportunityItem[] = [
+  {
+    id: 'opp-1',
+    opportunityNumber: 'OPP-2026-081',
+    name: 'Assembly Line 15kW VFD Overhaul',
+    companyName: 'Apex Precision Tools Ltd',
+    customerName: 'Ramesh Sundaram',
+    productService: 'Heavy-Duty Variable Frequency Inverters 15kW',
+    dealValue: 450000,
+    probability: 80,
+    stage: 'Negotiation',
+    assignedSalesperson: 'Vikram Seth',
+    expectedClosingDate: '2026-11-30',
+    nextFollowUp: '2026-11-22',
+    priority: 'High',
+    createdDate: '2026-11-10',
+    relatedLeadNumber: 'LD-2026-001',
+    relatedQuotation: 'QT-2026-104',
+    proposedAmount: 440000,
+    negotiationDetails: 'Reviewing 30-day payment credit terms and free on-site commissioning.',
+    activities: [
+      {
+        id: 'act-1',
+        type: 'Call',
+        title: 'Commercial Terms Discussion',
+        timestamp: '2026-11-18 11:30 AM',
+        performedBy: 'Vikram Seth',
+        details: 'Agreed on 440,000 final deal value with 30-day payment credit.',
+        outcome: 'Purchase order approval in final management round',
+      },
+    ],
+  },
+  {
+    id: 'opp-2',
+    opportunityNumber: 'OPP-2026-082',
+    name: 'Warehouse Automated Stacker Actuators',
+    companyName: 'Omni Infra Ventures',
+    customerName: 'Priya Narayanan',
+    productService: 'High-Pressure Hydraulic Cylinders & Actuators',
+    dealValue: 1200000,
+    probability: 60,
+    stage: 'Proposal / Quotation',
+    assignedSalesperson: 'Ananya Sharma',
+    expectedClosingDate: '2026-12-05',
+    nextFollowUp: '2026-11-24',
+    priority: 'Urgent',
+    createdDate: '2026-11-14',
+    relatedLeadNumber: 'LD-2026-002',
+    relatedQuotation: 'QT-2026-108',
+    proposedAmount: 1180000,
+    negotiationDetails: 'Quotation sent. Customer evaluating 3-week delivery lead time.',
+    activities: [
+      {
+        id: 'act-2',
+        type: 'Email',
+        title: 'Detailed Engineering Proposal Sent',
+        timestamp: '2026-11-16 03:00 PM',
+        performedBy: 'Ananya Sharma',
+        details: 'Submitted formal proposal for 20 cylinder actuator assemblies.',
+      },
+    ],
+  },
+  {
+    id: 'opp-3',
+    opportunityNumber: 'OPP-2026-083',
+    name: 'Factory Packaging Line PLC Retrofit',
+    companyName: 'Southern Automation Works',
+    customerName: 'Karthik Raja',
+    productService: 'Modular PLC & Industrial I/O Modules',
+    dealValue: 850000,
+    probability: 40,
+    stage: 'Requirement Analysis',
+    assignedSalesperson: 'Vikram Seth',
+    expectedClosingDate: '2026-12-15',
+    nextFollowUp: '2026-11-25',
+    priority: 'Medium',
+    createdDate: '2026-11-12',
+    relatedLeadNumber: 'LD-2026-003',
+    negotiationDetails: 'Scoping existing machine wiring and Modbus network topology.',
+    activities: [
+      {
+        id: 'act-3',
+        type: 'Meeting',
+        title: 'On-site IO Audit',
+        timestamp: '2026-11-15 02:00 PM',
+        performedBy: 'Vikram Seth',
+        details: 'Counted 64 digital inputs and 32 analog channels required.',
+        outcome: 'Bill of Materials being finalized',
+      },
+    ],
+  },
+  {
+    id: 'opp-4',
+    opportunityNumber: 'OPP-2026-084',
+    name: 'Cleanroom Environmental HVAC System',
+    companyName: 'Bharat Bio Labs',
+    customerName: 'Dr. Ashok Kumar',
+    productService: 'Laboratory Clean-Room HVAC Regulators',
+    dealValue: 620000,
+    probability: 20,
+    stage: 'New Opportunity',
+    assignedSalesperson: 'Ananya Sharma',
+    expectedClosingDate: '2026-12-20',
+    nextFollowUp: '2026-11-23',
+    priority: 'Medium',
+    createdDate: '2026-11-19',
+    relatedLeadNumber: 'LD-2026-004',
+    activities: [],
+  },
+  {
+    id: 'opp-5',
+    opportunityNumber: 'OPP-2026-085',
+    name: 'IE3 Energy Efficient Motor Upgrades',
+    companyName: 'Coimbatore Foundry Cluster',
+    customerName: 'Suresh Menon',
+    productService: '3-Phase Induction Motors 22kW Heavy Duty',
+    dealValue: 980000,
+    probability: 100,
+    stage: 'Won',
+    assignedSalesperson: 'Rajesh Kannan',
+    expectedClosingDate: '2026-11-18',
+    nextFollowUp: '-',
+    priority: 'High',
+    createdDate: '2026-11-01',
+    closedDate: '2026-11-18',
+    salesOrderNumber: 'SO-2026-398',
+    relatedQuotation: 'QT-2026-095',
+    proposedAmount: 980000,
+    winLossReason: 'Superior energy efficiency class IE3 with quick 10-day local dispatch.',
+    activities: [
+      {
+        id: 'act-4',
+        type: 'Note',
+        title: 'Deal Won & Purchase Order Received',
+        timestamp: '2026-11-18 04:30 PM',
+        performedBy: 'Rajesh Kannan',
+        details: 'Received official PO. Converted to Sales Order SO-2026-398.',
+        outcome: 'Won Deal',
+      },
+    ],
+  },
+  {
+    id: 'opp-6',
+    opportunityNumber: 'OPP-2026-086',
+    name: 'High Precision CNC Spindle Overhaul',
+    companyName: 'Verma Fabricators & Co',
+    customerName: 'Manish Verma',
+    productService: 'CNC Spindle Bearings & Power Belts',
+    dealValue: 310000,
+    probability: 0,
+    stage: 'Lost',
+    assignedSalesperson: 'Murugan Selvam',
+    expectedClosingDate: '2026-11-10',
+    nextFollowUp: '-',
+    priority: 'Low',
+    createdDate: '2026-10-25',
+    closedDate: '2026-11-10',
+    winLossReason: 'Competitor offered 15% discount on bulk bearing packages.',
+    competitorInfo: 'SKF Local Regional Distributor',
+    activities: [
+      {
+        id: 'act-5',
+        type: 'Call',
+        title: 'Lost Deal Debrief',
+        timestamp: '2026-11-10 11:30 AM',
+        performedBy: 'Murugan Selvam',
+        details: 'Client cited extreme price discount from competitor.',
+        outcome: 'Lost Deal',
+      },
+    ],
+  },
 ];
 
 export const CrmPipelinePage: React.FC = () => {
-  const [deals, setDeals] = useState<DealItem[]>(INITIAL_DEALS);
-  const [activeTab, setActiveTab] = useState<'board' | 'table'>('board');
-  const [showInsights, setShowInsights] = useState(false);
+  const [opportunities, setOpportunities] = useState<OpportunityItem[]>(INITIAL_OPPORTUNITIES);
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
-  // Filters
+  // Search & Filters State
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<string>('ALL');
-  const [executiveFilter, setExecutiveFilter] = useState<string>('ALL');
   const [stageFilter, setStageFilter] = useState<string>('ALL');
+  const [salespersonFilter, setSalespersonFilter] = useState<string>('ALL');
   const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
+  const [closingDateMonth, setClosingDateMonth] = useState<string>('ALL');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
 
   // Modals & Drawers
-  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isConvertToCustomerModalOpen, setIsConvertToCustomerModalOpen] = useState(false);
-  const [selectedDealForDrawer, setSelectedDealForDrawer] = useState<DealItem | null>(null);
-  const [selectedDealForConvert, setSelectedDealForConvert] = useState<DealItem | null>(null);
-  const [editingDeal, setEditingDeal] = useState<DealItem | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingOpp, setEditingOpp] = useState<OpportunityItem | null>(null);
+  const [viewOpp, setViewOpp] = useState<OpportunityItem | null>(null);
+  const [winModalOpp, setWinModalOpp] = useState<OpportunityItem | null>(null);
+  const [lostModalOpp, setLostModalOpp] = useState<OpportunityItem | null>(null);
+  const [newActivityOpp, setNewActivityOpp] = useState<OpportunityItem | null>(null);
 
-  const [leadForm] = Form.useForm();
-  const [convertForm] = Form.useForm();
-  const [editDealForm] = Form.useForm();
+  const [form] = Form.useForm();
+  const [winForm] = Form.useForm();
+  const [lostForm] = Form.useForm();
+  const [activityForm] = Form.useForm();
 
-  // Drag and Drop State
-  const [draggedDealId, setDraggedDealId] = useState<string | null>(null);
+  // Drag and drop state for Kanban
+  const [draggedOppId, setDraggedOppId] = useState<string | null>(null);
 
-  // Today Date for Overdue checking
-  const todayStr = '2026-11-18';
+  // 1. Five Summary Metrics (Exact Match to Requirement 3)
+  const metrics = useMemo(() => {
+    const totalDeals = opportunities.length;
+    const openDealsList = opportunities.filter((o) => o.stage !== 'Won' && o.stage !== 'Lost');
+    const openDeals = openDealsList.length;
+    const wonDealsList = opportunities.filter((o) => o.stage === 'Won');
+    const wonDeals = wonDealsList.length;
+    const lostDealsList = opportunities.filter((o) => o.stage === 'Lost');
+    const lostDeals = lostDealsList.length;
 
-  // Metrics Calculations (Business Logic)
-  const activeDealsList = useMemo(() => deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost'), [deals]);
-  const totalPipelineValue = useMemo(() => activeDealsList.reduce((sum, d) => sum + d.dealValue, 0), [activeDealsList]);
-  const activeDealsCount = activeDealsList.length;
-
-  const wonDealsList = useMemo(() => deals.filter(d => d.stage === 'Won'), [deals]);
-  const wonDealsCount = wonDealsList.length;
-  const wonTotalValue = useMemo(() => wonDealsList.reduce((sum, d) => sum + d.dealValue, 0), [wonDealsList]);
-
-  const overdueDealsList = useMemo(() => {
-    return activeDealsList.filter(d => d.expectedCloseDate && d.expectedCloseDate < todayStr);
-  }, [activeDealsList]);
-  const overdueDealsCount = overdueDealsList.length;
-
-  const pipelineConversionRate = deals.length > 0 ? ((wonDealsCount / deals.length) * 100).toFixed(1) : '0.0';
-  const avgDealValue = deals.length > 0 ? Math.round(deals.reduce((acc, d) => acc + d.dealValue, 0) / deals.length) : 0;
-
-  // Filtering
-  const filteredDeals = useMemo(() => {
-    return deals.filter(d => {
-      const q = search.toLowerCase();
-      const matchesSearch =
-        d.companyName.toLowerCase().includes(q) ||
-        d.contactName.toLowerCase().includes(q) ||
-        d.leadNumber.toLowerCase().includes(q) ||
-        d.email.toLowerCase().includes(q);
-
-      const matchesSource = sourceFilter === 'ALL' || d.source === sourceFilter;
-      const matchesExec = executiveFilter === 'ALL' || d.assignedExecutive === executiveFilter;
-      const matchesStage = stageFilter === 'ALL' || d.stage === stageFilter;
-      const matchesPriority = priorityFilter === 'ALL' || d.priority === priorityFilter;
-
-      return matchesSearch && matchesSource && matchesExec && matchesStage && matchesPriority;
-    });
-  }, [deals, search, sourceFilter, executiveFilter, stageFilter, priorityFilter]);
-
-  // Stage transition
-  const handleMoveStage = (dealId: string, newStage: PipelineStage, note?: string) => {
-    setDeals(prev =>
-      prev.map(d => {
-        if (d.id === dealId) {
-          if (d.stage === newStage) return d;
-          const newHistory = [
-            ...d.history,
-            {
-              stage: newStage,
-              date: new Date().toISOString().slice(0, 10),
-              user: 'Current User',
-              note: note || `Moved to ${newStage}`,
-            },
-          ];
-          return {
-            ...d,
-            stage: newStage,
-            daysInStage: 0,
-            history: newHistory,
-          };
-        }
-        return d;
-      })
-    );
-    message.success(`Lead moved to ${newStage}`);
-    if (selectedDealForDrawer && selectedDealForDrawer.id === dealId) {
-      setSelectedDealForDrawer(prev => prev ? { ...prev, stage: newStage, daysInStage: 0 } : null);
-    }
-  };
-
-  // Drag and Drop
-  const handleDragStart = (e: React.DragEvent, dealId: string) => {
-    e.dataTransfer.setData('text/plain', dealId);
-    setDraggedDealId(dealId);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, targetStage: PipelineStage) => {
-    e.preventDefault();
-    const dealId = e.dataTransfer.getData('text/plain') || draggedDealId;
-    if (dealId) {
-      handleMoveStage(dealId, targetStage, 'Drag & Drop Progression');
-    }
-    setDraggedDealId(null);
-  };
-
-  // Convert to Customer
-  const handleOpenConvertModal = (deal: DealItem) => {
-    setSelectedDealForConvert(deal);
-    convertForm.setFieldsValue({
-      companyName: deal.companyName,
-      contactPerson: deal.contactName,
-      email: deal.email,
-      phone: deal.phone,
-      source: deal.source,
-      assignedEmployee: deal.assignedExecutive,
-      category: 'Enterprise',
-      creditLimit: 500000,
-    });
-    setIsConvertToCustomerModalOpen(true);
-  };
-
-  const handleConfirmConvert = (values: any) => {
-    if (!selectedDealForConvert) return;
-
-    const isDup = INITIAL_CUSTOMERS.some(
-      c => c.email.toLowerCase() === values.email.toLowerCase() || c.phone === values.phone
+    const expectedWeightedRevenue = openDealsList.reduce(
+      (sum, o) => sum + (o.dealValue * o.probability) / 100,
+      0
     );
 
-    if (isDup) {
-      message.warning('A customer account with this email/phone already exists in Customer Directory.');
-    } else {
-      const newCust: ExtendedCustomer = {
-        id: `cust-${Date.now()}`,
-        code: `CUST-00${INITIAL_CUSTOMERS.length + 1}`,
-        name: values.companyName,
-        companyName: values.companyName,
-        contactPerson: values.contactPerson,
-        email: values.email,
-        phone: values.phone,
-        gstNumber: values.gstNumber || 'N/A',
-        type: 'Business',
-        category: values.category || 'Enterprise',
-        address: values.address || '',
-        city: values.city || 'Chennai',
-        state: values.state || 'Tamil Nadu',
-        country: 'India',
-        pincode: values.pincode || '',
-        source: values.source || 'Direct',
-        assignedEmployee: values.assignedEmployee || 'Vikram Seth',
-        creditLimit: Number(values.creditLimit) || 500000,
-        currentBalance: 0,
-        status: 'Active',
-        notes: `Converted from Opportunity ${selectedDealForConvert.leadNumber}.`,
-        totalOrdersValue: 0,
-        totalServiceTickets: 0,
-        createdAt: new Date().toISOString().slice(0, 10),
-      };
-      INITIAL_CUSTOMERS.unshift(newCust);
-    }
+    const totalOpenPipelineValue = openDealsList.reduce((sum, o) => sum + o.dealValue, 0);
+    const wonRevenue = wonDealsList.reduce((sum, o) => sum + o.dealValue, 0);
+    const lostValue = lostDealsList.reduce((sum, o) => sum + o.dealValue, 0);
 
-    handleMoveStage(selectedDealForConvert.id, 'Won', 'Converted to Customer');
-    setIsConvertToCustomerModalOpen(false);
-    message.success(`${selectedDealForConvert.companyName} converted to official Customer Account!`);
-  };
-
-  // Add Opportunity
-  const handleAddDealSubmit = (values: any) => {
-    const newDeal: DealItem = {
-      id: `deal-${Date.now()}`,
-      leadNumber: `LD-2026-00${deals.length + 1}`,
-      companyName: values.companyName,
-      contactName: values.contactName,
-      email: values.email,
-      phone: values.phone,
-      source: values.source || 'Website',
-      dealValue: Number(values.dealValue) || 100000,
-      assignedExecutive: values.assignedExecutive || 'Vikram Seth',
-      stage: values.stage || 'New Lead',
-      priority: values.priority || 'Medium',
-      expectedCloseDate: values.expectedCloseDate ? values.expectedCloseDate.format('YYYY-MM-DD') : '2026-12-15',
-      daysInStage: 0,
-      nextFollowUpDate: values.nextFollowUpDate ? values.nextFollowUpDate.format('YYYY-MM-DD') : '2026-11-25',
-      notes: values.notes,
-      history: [
-        {
-          stage: values.stage || 'New Lead',
-          date: new Date().toISOString().slice(0, 10),
-          user: values.assignedExecutive || 'Vikram Seth',
-          note: 'Opportunity registered in pipeline',
-        },
-      ],
+    return {
+      totalDeals,
+      openDeals,
+      wonDeals,
+      lostDeals,
+      expectedWeightedRevenue,
+      totalOpenPipelineValue,
+      wonRevenue,
+      lostValue,
     };
+  }, [opportunities]);
 
-    setDeals([newDeal, ...deals]);
-    message.success('New opportunity added to pipeline!');
-    setIsAddLeadModalOpen(false);
-    leadForm.resetFields();
-  };
+  // 2. Filtered Opportunities
+  const filteredOpps = useMemo(() => {
+    return opportunities.filter((o) => {
+      const q = search.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        o.opportunityNumber.toLowerCase().includes(q) ||
+        o.name.toLowerCase().includes(q) ||
+        o.companyName.toLowerCase().includes(q) ||
+        o.customerName.toLowerCase().includes(q) ||
+        o.productService.toLowerCase().includes(q);
 
-  // Edit Opportunity
-  const handleEditDealSubmit = (values: any) => {
-    if (!editingDeal) return;
-    setDeals(prev =>
-      prev.map(d => {
-        if (d.id === editingDeal.id) {
-          return {
-            ...d,
-            companyName: values.companyName,
-            contactName: values.contactName,
-            email: values.email,
-            phone: values.phone,
-            dealValue: Number(values.dealValue),
-            assignedExecutive: values.assignedExecutive,
-            priority: values.priority,
-            notes: values.notes,
-          };
-        }
-        return d;
-      })
-    );
-    message.success('Opportunity details updated!');
-    setEditingDeal(null);
-  };
+      const matchStage = stageFilter === 'ALL' || o.stage === stageFilter;
+      const matchRep = salespersonFilter === 'ALL' || o.assignedSalesperson === salespersonFilter;
+      const matchPriority = priorityFilter === 'ALL' || o.priority === priorityFilter;
 
-  // Export CSV
-  const handleExportCSV = () => {
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      ['Lead ID,Company,Contact,Deal Value,Stage,Executive,Priority,Expected Close Date']
-        .concat(
-          filteredDeals.map(
-            d =>
-              `"${d.leadNumber}","${d.companyName}","${d.contactName}",${d.dealValue},"${d.stage}","${d.assignedExecutive}","${d.priority}","${d.expectedCloseDate}"`
-          )
+      let matchMonth = true;
+      if (closingDateMonth !== 'ALL') {
+        matchMonth = dayjs(o.expectedClosingDate).format('YYYY-MM') === closingDateMonth;
+      }
+
+      let matchDate = true;
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const d = dayjs(o.expectedClosingDate);
+        matchDate = d.isAfter(dateRange[0].startOf('day')) && d.isBefore(dateRange[1].endOf('day'));
+      }
+
+      return matchSearch && matchStage && matchRep && matchPriority && matchMonth && matchDate;
+    });
+  }, [opportunities, search, stageFilter, salespersonFilter, priorityFilter, closingDateMonth, dateRange]);
+
+  // Handlers
+  const handleSaveOpp = (values: any) => {
+    const val = Number(values.dealValue) || 0;
+    let prob = Number(values.probability) || 50;
+    if (values.stage === 'Won') prob = 100;
+    if (values.stage === 'Lost') prob = 0;
+
+    if (editingOpp) {
+      setOpportunities((prev) =>
+        prev.map((o) =>
+          o.id === editingOpp.id
+            ? {
+                ...o,
+                name: values.name,
+                companyName: values.companyName,
+                customerName: values.customerName,
+                productService: values.productService,
+                dealValue: val,
+                probability: prob,
+                stage: values.stage,
+                assignedSalesperson: values.assignedSalesperson,
+                priority: values.priority,
+                expectedClosingDate: values.expectedClosingDate
+                  ? dayjs(values.expectedClosingDate).format('YYYY-MM-DD')
+                  : o.expectedClosingDate,
+                nextFollowUp: values.nextFollowUp
+                  ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+                  : o.nextFollowUp,
+                relatedQuotation: values.relatedQuotation,
+                notes: values.notes,
+              }
+            : o
         )
-        .join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `crm_pipeline_export_${todayStr}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    message.success('Pipeline CSV exported successfully!');
+      );
+      message.success(`Opportunity ${editingOpp.opportunityNumber} updated`);
+      setEditingOpp(null);
+    } else {
+      const nextNum = opportunities.length + 1;
+      const oppNum = `OPP-2026-${String(nextNum).padStart(3, '0')}`;
+      const newEntry: OpportunityItem = {
+        id: `opp-${Date.now()}`,
+        opportunityNumber: oppNum,
+        name: values.name,
+        companyName: values.companyName,
+        customerName: values.customerName,
+        productService: values.productService,
+        dealValue: val,
+        probability: prob,
+        stage: values.stage || 'New Opportunity',
+        assignedSalesperson: values.assignedSalesperson,
+        priority: values.priority || 'Medium',
+        expectedClosingDate: values.expectedClosingDate
+          ? dayjs(values.expectedClosingDate).format('YYYY-MM-DD')
+          : dayjs().add(20, 'day').format('YYYY-MM-DD'),
+        nextFollowUp: values.nextFollowUp
+          ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+          : dayjs().add(3, 'day').format('YYYY-MM-DD'),
+        createdDate: dayjs().format('YYYY-MM-DD'),
+        relatedQuotation: values.relatedQuotation || '',
+        notes: values.notes || '',
+        activities: [
+          {
+            id: `act-${Date.now()}`,
+            type: 'Note',
+            title: 'Opportunity Created',
+            timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+            performedBy: values.assignedSalesperson,
+            details: 'Deal entered into sales pipeline.',
+          },
+        ],
+      };
+      setOpportunities((prev) => [newEntry, ...prev]);
+      message.success(`New Opportunity ${oppNum} generated!`);
+      setIsAddModalOpen(false);
+    }
+    form.resetFields();
   };
 
-  // Priority badge styling
-  const renderPriorityBadge = (p: 'High' | 'Medium' | 'Low') => {
-    if (p === 'High') {
-      return (
-        <span
-          style={{
-            backgroundColor: '#FEE2E2',
-            color: '#DC2626',
-            fontSize: 10,
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: 12,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 3,
-          }}
-        >
-          <Flame size={11} /> High
-        </span>
-      );
+  const handleStageTransition = (id: string, newStage: PipelineStageType) => {
+    const opp = opportunities.find((o) => o.id === id);
+    if (!opp) return;
+
+    if (newStage === 'Won') {
+      setWinModalOpp(opp);
+      winForm.setFieldsValue({
+        finalDealValue: opp.dealValue,
+        confirmedQuotation: opp.relatedQuotation || `QT-2026-${Math.floor(100 + Math.random() * 900)}`,
+        salesOrderNumber: `SO-2026-${Math.floor(400 + Math.random() * 100)}`,
+        closedDate: dayjs(),
+      });
+      return;
     }
-    if (p === 'Medium') {
-      return (
-        <span
-          style={{
-            backgroundColor: '#FEF3C7',
-            color: '#D97706',
-            fontSize: 10,
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: 12,
-          }}
-        >
-          Medium
-        </span>
-      );
+
+    if (newStage === 'Lost') {
+      setLostModalOpp(opp);
+      lostForm.setFieldsValue({
+        lostDate: dayjs(),
+      });
+      return;
     }
+
+    let defaultProb = opp.probability;
+    if (newStage === 'New Opportunity') defaultProb = 20;
+    else if (newStage === 'Requirement Analysis') defaultProb = 40;
+    else if (newStage === 'Proposal / Quotation') defaultProb = 60;
+    else if (newStage === 'Negotiation') defaultProb = 80;
+
+    setOpportunities((prev) =>
+      prev.map((o) =>
+        o.id === id
+          ? {
+              ...o,
+              stage: newStage,
+              probability: defaultProb,
+              activities: [
+                ...o.activities,
+                {
+                  id: `act-${Date.now()}`,
+                  type: 'Note',
+                  title: `Stage Updated to ${newStage}`,
+                  timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+                  performedBy: o.assignedSalesperson,
+                  details: `Advanced stage to ${newStage} with win probability ${defaultProb}%.`,
+                },
+              ],
+            }
+          : o
+      )
+    );
+    message.success(`Opportunity moved to ${newStage}`);
+  };
+
+  const handleWinDeal = (values: any) => {
+    if (!winModalOpp) return;
+    setOpportunities((prev) =>
+      prev.map((o) =>
+        o.id === winModalOpp.id
+          ? {
+              ...o,
+              stage: 'Won',
+              probability: 100,
+              dealValue: Number(values.finalDealValue) || o.dealValue,
+              relatedQuotation: values.confirmedQuotation,
+              salesOrderNumber: values.salesOrderNumber,
+              closedDate: values.closedDate ? dayjs(values.closedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+              winLossReason: values.winReason || 'Commercial and technical terms accepted',
+              activities: [
+                ...o.activities,
+                {
+                  id: `act-${Date.now()}`,
+                  type: 'Note',
+                  title: 'Deal Won & Closed',
+                  timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+                  performedBy: o.assignedSalesperson,
+                  details: `Final order value ₹${Number(values.finalDealValue || o.dealValue).toLocaleString(
+                    'en-IN'
+                  )}. Linked Sales Order: ${values.salesOrderNumber}`,
+                  outcome: 'Deal Won',
+                },
+              ],
+            }
+          : o
+      )
+    );
+    message.success(`Opportunity ${winModalOpp.opportunityNumber} marked as WON!`);
+    setWinModalOpp(null);
+    winForm.resetFields();
+  };
+
+  const handleLostDeal = (values: any) => {
+    if (!lostModalOpp) return;
+    setOpportunities((prev) =>
+      prev.map((o) =>
+        o.id === lostModalOpp.id
+          ? {
+              ...o,
+              stage: 'Lost',
+              probability: 0,
+              closedDate: values.lostDate ? dayjs(values.lostDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+              winLossReason: values.lostReason,
+              competitorInfo: values.competitorInfo || '',
+              activities: [
+                ...o.activities,
+                {
+                  id: `act-${Date.now()}`,
+                  type: 'Note',
+                  title: 'Deal Marked as Lost',
+                  timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+                  performedBy: o.assignedSalesperson,
+                  details: `Reason: ${values.lostReason}. Competitor: ${values.competitorInfo || 'None specified'}`,
+                  outcome: 'Deal Lost',
+                },
+              ],
+            }
+          : o
+      )
+    );
+    message.warning(`Opportunity ${lostModalOpp.opportunityNumber} marked as LOST`);
+    setLostModalOpp(null);
+    lostForm.resetFields();
+  };
+
+  const handleAddActivity = (values: any) => {
+    if (!newActivityOpp) return;
+    const act: OpportunityActivity = {
+      id: `act-${Date.now()}`,
+      type: values.type,
+      title: values.title,
+      timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+      performedBy: newActivityOpp.assignedSalesperson,
+      details: values.details,
+      outcome: values.outcome,
+    };
+    setOpportunities((prev) =>
+      prev.map((o) =>
+        o.id === newActivityOpp.id
+          ? {
+              ...o,
+              nextFollowUp: values.nextFollowUp
+                ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+                : o.nextFollowUp,
+              activities: [act, ...o.activities],
+            }
+          : o
+      )
+    );
+    message.success('Activity logged successfully');
+    setNewActivityOpp(null);
+    activityForm.resetFields();
+  };
+
+  const handleDeleteOpp = (id: string, num: string) => {
+    setOpportunities((prev) => prev.filter((o) => o.id !== id));
+    if (viewOpp?.id === id) setViewOpp(null);
+    message.success(`Opportunity ${num} deleted`);
+  };
+
+  // Badges & Tag Helpers
+  const getStageBadge = (stage: PipelineStageType) => {
+    const config: Record<PipelineStageType, { bg: string; color: string; border: string }> = {
+      'New Opportunity': { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
+      'Requirement Analysis': { bg: '#F0FDF4', color: '#15803D', border: '#BBF7D0' },
+      'Proposal / Quotation': { bg: '#FAF5FF', color: '#6B21A8', border: '#E9D5FF' },
+      Negotiation: { bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
+      Won: { bg: '#ECFDF5', color: '#047857', border: '#A7F3D0' },
+      Lost: { bg: '#FEF2F2', color: '#B91C1C', border: '#FECACA' },
+    };
+    const c = config[stage] || { bg: '#F8FAFC', color: '#475569', border: '#CBD5E1' };
     return (
       <span
         style={{
-          backgroundColor: '#F3F4F6',
-          color: '#4B5563',
-          fontSize: 10,
-          fontWeight: 600,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
           padding: '2px 8px',
-          borderRadius: 12,
+          borderRadius: 16,
+          fontSize: 11,
+          fontWeight: 700,
+          backgroundColor: c.bg,
+          color: c.color,
+          border: `1px solid ${c.border}`,
+          whiteSpace: 'nowrap',
         }}
       >
-        Low
+        <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: c.color }} />
+        {stage}
       </span>
     );
   };
 
-  // KPI Cards matching CRM Executive Dashboard style
-  const pipelineKpiCards = [
-    {
-      title: 'Total Pipeline Value',
-      value: `₹${(totalPipelineValue / 100000).toFixed(2)}L`,
-      growth: '+14.2%',
-      isDark: true,
-      cardBg: 'linear-gradient(135deg, #3A1078 0%, #5421A8 50%, #43148F 100%)',
-      titleColor: 'rgba(255, 255, 255, 0.85)',
-      valueColor: '#FFFFFF',
-      growthColor: '#4ADE80',
-      icon: <DollarSign size={20} color="#5421A8" />,
-      iconBg: '#FFFFFF',
-      boxShadow: '0 8px 20px rgba(58, 16, 120, 0.22)',
-    },
-    {
-      title: 'Active Deals',
-      value: activeDealsCount.toString(),
-      growth: '+2',
-      isDark: false,
-      cardBg: '#FFFFFF',
-      titleColor: '#6B7280',
-      valueColor: '#111827',
-      growthColor: '#10B981',
-      icon: <Target size={18} color="#FFFFFF" />,
-      iconBg: '#0284C7',
-      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
-    },
-    {
-      title: 'Won Deals',
-      value: wonDealsCount.toString(),
-      growth: `${pipelineConversionRate}%`,
-      isDark: true,
-      cardBg: 'linear-gradient(135deg, #2A0D5C 0%, #4C1D95 50%, #3B0764 100%)',
-      titleColor: 'rgba(255, 255, 255, 0.85)',
-      valueColor: '#FFFFFF',
-      growthColor: '#4ADE80',
-      icon: <Award size={20} color="#4C1D95" />,
-      iconBg: '#FFFFFF',
-      boxShadow: '0 8px 20px rgba(42, 13, 92, 0.22)',
-    },
-    {
-      title: 'Overdue Deals',
-      value: overdueDealsCount.toString(),
-      growth: overdueDealsCount > 0 ? 'Action Req' : '0',
-      isDark: false,
-      cardBg: '#FFFFFF',
-      titleColor: '#6B7280',
-      valueColor: overdueDealsCount > 0 ? '#DC2626' : '#111827',
-      growthColor: overdueDealsCount > 0 ? '#DC2626' : '#10B981',
-      icon: <AlertTriangle size={18} color="#FFFFFF" />,
-      iconBg: overdueDealsCount > 0 ? '#DC2626' : '#10B981',
-      boxShadow: '0 4px 14px rgba(220, 38, 38, 0.08)',
-    },
-  ];
+  const getPriorityBadge = (p: OpportunityPriority) => {
+    const config: Record<OpportunityPriority, { bg: string; color: string; border: string }> = {
+      Urgent: { bg: '#FEF2F2', color: '#DC2626', border: '#FCA5A5' },
+      High: { bg: '#FFF7ED', color: '#C2410C', border: '#FDBA74' },
+      Medium: { bg: '#FEFCE8', color: '#854D0E', border: '#FDE047' },
+      Low: { bg: '#F1F5F9', color: '#475569', border: '#CBD5E1' },
+    };
+    const c = config[p] || { bg: '#F1F5F9', color: '#475569', border: '#CBD5E1' };
+    return (
+      <span
+        style={{
+          padding: '2px 7px',
+          borderRadius: 6,
+          fontSize: 10.5,
+          fontWeight: 700,
+          backgroundColor: c.bg,
+          color: c.color,
+          border: `1px solid ${c.border}`,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {p}
+      </span>
+    );
+  };
 
-  // Table Columns
-  const tableColumns = [
+  // Table Columns for List View (Requirement 7)
+  const columns: ColumnsType<OpportunityItem> = [
     {
-      title: 'Lead ID',
-      dataIndex: 'leadNumber',
-      key: 'leadNumber',
-      width: 140,
-      render: (t: string, r: DealItem) => (
+      title: 'Opportunity ID',
+      dataIndex: 'opportunityNumber',
+      key: 'opportunityNumber',
+      width: 125,
+      render: (text: string, r) => (
         <span
-          onClick={() => setSelectedDealForDrawer(r)}
+          onClick={() => setViewOpp(r)}
           style={{
             fontWeight: 800,
-            color: '#5421A8',
+            color: BRAND_PURPLE,
+            backgroundColor: BRAND_PURPLE_TINT,
+            border: '1px solid #E9D5FF',
+            padding: '3px 8px',
+            borderRadius: 6,
+            fontSize: 11.5,
             cursor: 'pointer',
-            fontSize: 13,
-            whiteSpace: 'nowrap',
             display: 'inline-block',
           }}
         >
-          {t}
+          {text}
         </span>
       ),
     },
     {
-      title: 'Company & Contact',
-      key: 'company',
-      render: (_: any, r: DealItem) => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      title: 'Opportunity Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: 220,
+      render: (text: string, r) => (
+        <div>
           <div
-            onClick={() => setSelectedDealForDrawer(r)}
-            style={{ fontWeight: 700, color: '#1E1B4B', fontSize: 13.5, cursor: 'pointer' }}
+            onClick={() => setViewOpp(r)}
+            style={{ fontWeight: 700, color: '#0F172A', fontSize: 12.5, cursor: 'pointer' }}
           >
-            {r.companyName}
+            {text}
           </div>
-          <div style={{ fontSize: 12, color: '#6B7280', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>👤 {r.contactName}</span>
-            <span style={{ color: '#D1D5DB' }}>&bull;</span>
-            <span style={{ color: '#9CA3AF' }}>{r.email}</span>
-          </div>
+          <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>{r.productService}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Customer',
+      key: 'customer',
+      width: 180,
+      render: (_, r) => (
+        <div>
+          <div style={{ fontWeight: 600, color: '#1E293B', fontSize: 12 }}>{r.companyName}</div>
+          <div style={{ fontSize: 11, color: '#64748B' }}>{r.customerName}</div>
         </div>
       ),
     },
@@ -663,453 +740,126 @@ export const CrmPipelinePage: React.FC = () => {
       title: 'Deal Value',
       dataIndex: 'dealValue',
       key: 'dealValue',
-      width: 140,
-      render: (v: number) => (
-        <span style={{ fontWeight: 800, color: '#10B981', fontSize: 14, whiteSpace: 'nowrap' }}>
-          ₹{v.toLocaleString()}
+      align: 'right',
+      width: 120,
+      sorter: (a, b) => a.dealValue - b.dealValue,
+      render: (val: number) => (
+        <span style={{ fontWeight: 800, color: '#0F172A', fontSize: 12 }}>
+          ₹{val.toLocaleString('en-IN')}
         </span>
       ),
     },
     {
-      title: 'Stage',
-      dataIndex: 'stage',
-      key: 'stage',
-      width: 160,
-      render: (stg: PipelineStage, r: DealItem) => (
-        <Select
-          value={stg}
-          size="small"
-          style={{ width: 145 }}
-          onChange={val => handleMoveStage(r.id, val)}
-          options={STAGES_CONFIG.map(s => ({ label: s.label, value: s.key }))}
-        />
+      title: 'Probability',
+      dataIndex: 'probability',
+      key: 'probability',
+      width: 115,
+      sorter: (a, b) => a.probability - b.probability,
+      render: (prob: number) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Progress
+            percent={prob}
+            size="small"
+            showInfo={false}
+            strokeColor={prob >= 80 ? '#10B981' : prob >= 40 ? '#3B82F6' : '#F59E0B'}
+            style={{ width: 45 }}
+          />
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: '#334155' }}>{prob}%</span>
+        </div>
       ),
     },
     {
-      title: 'Priority',
-      dataIndex: 'priority',
-      key: 'priority',
-      width: 110,
-      align: 'center' as const,
-      render: (p: 'High' | 'Medium' | 'Low') => renderPriorityBadge(p),
-    },
-    {
-      title: 'Executive',
-      dataIndex: 'assignedExecutive',
-      key: 'assignedExecutive',
-      width: 150,
-      render: (o: string) => (
-        <span
-          style={{
-            backgroundColor: '#F3EEFF',
-            color: '#7544D6',
-            fontWeight: 700,
-            fontSize: 11.5,
-            padding: '3px 10px',
-            borderRadius: 14,
-            display: 'inline-block',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {o}
-        </span>
-      ),
-    },
-    {
-      title: 'Expected Close',
-      dataIndex: 'expectedCloseDate',
-      key: 'expectedCloseDate',
-      width: 140,
-      render: (d: string) => {
-        const isOverdue = d && d < todayStr;
+      title: 'Weighted Revenue',
+      key: 'weightedRevenue',
+      align: 'right',
+      width: 135,
+      sorter: (a, b) => (a.dealValue * a.probability) / 100 - (b.dealValue * b.probability) / 100,
+      render: (_, r) => {
+        const weighted = Math.round((r.dealValue * r.probability) / 100);
         return (
-          <span
-            style={{
-              color: isOverdue ? '#DC2626' : '#4B5563',
-              fontWeight: isOverdue ? 800 : 600,
-              fontSize: 12,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {d} {isOverdue && '(Overdue)'}
+          <span style={{ fontWeight: 800, color: BRAND_PURPLE, fontSize: 12 }}>
+            ₹{weighted.toLocaleString('en-IN')}
           </span>
         );
       },
     },
     {
+      title: 'Salesperson',
+      dataIndex: 'assignedSalesperson',
+      key: 'assignedSalesperson',
+      width: 135,
+      render: (rep: string) => (
+        <span style={{ fontSize: 12, color: '#334155', fontWeight: 600 }}>{rep}</span>
+      ),
+    },
+    {
+      title: 'Pipeline Stage',
+      dataIndex: 'stage',
+      key: 'stage',
+      width: 160,
+      render: (st: PipelineStageType) => getStageBadge(st),
+    },
+    {
+      title: 'Expected Closing Date',
+      dataIndex: 'expectedClosingDate',
+      key: 'expectedClosingDate',
+      width: 120,
+      sorter: (a, b) => a.expectedClosingDate.localeCompare(b.expectedClosingDate),
+      render: (d: string) => <span style={{ fontSize: 11.5, color: '#475569' }}>{d}</span>,
+    },
+    {
+      title: 'Priority',
+      dataIndex: 'priority',
+      key: 'priority',
+      width: 90,
+      render: (p: OpportunityPriority) => getPriorityBadge(p),
+    },
+    {
       title: 'Actions',
       key: 'actions',
-      width: 120,
-      align: 'right' as const,
-      render: (_: any, r: DealItem) => (
-        <Space size="small">
-          <Button
-            size="small"
-            icon={<Eye size={13} color="#7544D6" />}
-            onClick={() => setSelectedDealForDrawer(r)}
-            style={{ borderRadius: 6, borderColor: '#ECE8F6' }}
-          />
-          {r.stage !== 'Won' && (
+      width: 100,
+      fixed: 'right',
+      align: 'center',
+      render: (_, r) => (
+        <Space size={4}>
+          <Tooltip title="View Details">
             <Button
               size="small"
-              type="primary"
-              style={{
-                background: '#10B981',
-                borderColor: '#10B981',
-                fontSize: 11.5,
-                fontWeight: 700,
-                borderRadius: 6,
-                boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
+              icon={<Eye size={13} color="#475569" />}
+              style={{ borderRadius: 6, borderColor: '#E2E8F0' }}
+              onClick={() => setViewOpp(r)}
+            />
+          </Tooltip>
+          <Tooltip title="Edit Deal">
+            <Button
+              size="small"
+              icon={<Edit3 size={13} color="#475569" />}
+              style={{ borderRadius: 6, borderColor: '#E2E8F0' }}
+              onClick={() => {
+                setEditingOpp(r);
+                form.setFieldsValue({
+                  ...r,
+                  expectedClosingDate: dayjs(r.expectedClosingDate),
+                  nextFollowUp: r.nextFollowUp && r.nextFollowUp !== '-' ? dayjs(r.nextFollowUp) : null,
+                });
               }}
-              icon={<Award size={12} />}
-              onClick={() => handleOpenConvertModal(r)}
-            >
-              Won
-            </Button>
-          )}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 18,
-        minHeight: '100%',
-        paddingBottom: 24,
-      }}
-    >
-      {/* 1. Top Header Row - Exact CRM Dashboard Style (Single Line) */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. Header Banner */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'nowrap',
-          gap: 20,
-          padding: '12px 20px',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 245, 254, 0.9) 100%)',
-          borderRadius: 18,
-          border: '1px solid #EAE4F5',
-          boxShadow: '0 4px 20px rgba(84, 33, 168, 0.04)',
-          backdropFilter: 'blur(8px)',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: '1 1 auto' }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 3px 8px rgba(84, 33, 168, 0.25)',
-              flexShrink: 0,
-            }}
-          >
-            <GitBranch size={18} color="#FFFFFF" />
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <h1
-              style={{
-                fontSize: 20,
-                fontWeight: 800,
-                color: '#211044',
-                margin: 0,
-                letterSpacing: '-0.3px',
-                whiteSpace: 'nowrap',
-                lineHeight: 1.2,
-              }}
-            >
-              CRM Pipeline & Lead Progression
-            </h1>
-            <p
-              style={{
-                fontSize: 12,
-                color: '#6B7280',
-                margin: '2px 0 0 0',
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              Track opportunities, monitor deal progress, and manage your sales pipeline from initial lead to successful conversion.
-            </p>
-          </div>
-        </div>
-
-        {/* Right Search, Notification, User Pill, and Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <Input
-            prefix={<Search size={14} color="#7544D6" style={{ marginRight: 4 }} />}
-            placeholder="Search leads..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{
-              width: 170,
-              borderRadius: 24,
-              backgroundColor: '#FFFFFF',
-              borderColor: '#ECE8F6',
-              padding: '5px 12px',
-              boxShadow: '0 2px 8px rgba(84, 33, 168, 0.04)',
-              fontSize: 12,
-              fontWeight: 500,
-            }}
-          />
-
-          <Button
-            icon={<Download size={13} />}
-            onClick={handleExportCSV}
-            style={{
-              borderRadius: 20,
-              fontWeight: 600,
-              fontSize: 11.5,
-              borderColor: '#ECE8F6',
-              color: '#4B5563',
-              height: 32,
-              padding: '0 10px',
-            }}
-          >
-            Export
-          </Button>
-
-          <Button
-            icon={<Settings size={13} />}
-            onClick={() => setIsSettingsModalOpen(true)}
-            style={{
-              borderRadius: 20,
-              fontWeight: 600,
-              fontSize: 11.5,
-              borderColor: '#ECE8F6',
-              color: '#4B5563',
-              height: 32,
-              padding: '0 10px',
-            }}
-          >
-            Settings
-          </Button>
-
-          <Button
-            type="primary"
-            icon={<Plus size={14} />}
-            onClick={() => {
-              leadForm.resetFields();
-              leadForm.setFieldsValue({
-                stage: 'New Lead',
-                source: 'Website',
-                priority: 'Medium',
-                assignedExecutive: 'Vikram Seth',
-                dealValue: 350000,
-              });
-              setIsAddLeadModalOpen(true);
-            }}
-            style={{
-              background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-              border: 'none',
-              borderRadius: 20,
-              fontWeight: 700,
-              fontSize: 11.5,
-              boxShadow: '0 3px 10px rgba(84, 33, 168, 0.25)',
-              padding: '0 12px',
-              height: 32,
-            }}
-          >
-            Add Lead
-          </Button>
-
-          {/* Notification Bell */}
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #ECE8F6',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(84, 33, 168, 0.05)',
-              cursor: 'pointer',
-              position: 'relative',
-              flexShrink: 0,
-            }}
-          >
-            <Bell size={15} color="#5421A8" />
-            <span
-              style={{
-                position: 'absolute',
-                top: -1,
-                right: -1,
-                width: 14,
-                height: 14,
-                borderRadius: '50%',
-                backgroundColor: '#EF4444',
-                color: '#FFFFFF',
-                fontSize: 8.5,
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '2px solid #FFFFFF',
-              }}
-            >
-              3
-            </span>
-          </div>
-
-          {/* User Profile Capsule */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '2px 8px 2px 3px',
-              borderRadius: 24,
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #ECE8F6',
-              boxShadow: '0 2px 8px rgba(84, 33, 168, 0.05)',
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #3A1078 0%, #5421A8 100%)',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: 11,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              JD
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#211044', lineHeight: 1.1 }}>
-                Janani D
-              </span>
-              <span style={{ fontSize: 8.5, color: '#7544D6', fontWeight: 600 }}>
-                VP of Sales
-              </span>
-            </div>
-            <ChevronDown size={11} color="#7544D6" />
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Top 4 Compact Premium KPI Cards (Exact Matching Colors from CRM Dashboard) */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 16,
-          width: '100%',
-        }}
-      >
-        {pipelineKpiCards.map((kpi, idx) => (
-          <div
-            key={idx}
-            style={{
-              background: kpi.cardBg,
-              borderRadius: 16,
-              padding: '16px 18px',
-              border: kpi.isDark ? 'none' : '1px solid #ECE8F6',
-              boxShadow: kpi.boxShadow,
-              position: 'relative',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 114,
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            }}
-          >
-            {/* Top row: Icon */}
-            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-              <div
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  backgroundColor: kpi.iconBg,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: kpi.isDark ? '0 4px 10px rgba(0,0,0,0.15)' : '0 2px 6px rgba(0,0,0,0.08)',
-                }}
-              >
-                {kpi.icon}
-              </div>
-            </div>
-
-            {/* Title & Value */}
-            <div style={{ marginTop: 10 }}>
-              <div
-                style={{
-                  fontSize: 13,
-                  color: kpi.titleColor,
-                  fontWeight: 600,
-                  letterSpacing: '0.1px',
-                }}
-              >
-                {kpi.title}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 8,
-                  marginTop: 4,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 800,
-                    color: kpi.valueColor,
-                    letterSpacing: '-0.5px',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {kpi.value}
-                </span>
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: kpi.growthColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  ↑ {kpi.growth}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 3. Filter Bar & View Toggle */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
+          background: 'linear-gradient(135deg, #FAF5FF 0%, #FFFFFF 100%)',
           borderRadius: 16,
-          padding: '14px 20px',
-          border: '1px solid #ECE8F6',
-          boxShadow: '0 4px 18px rgba(84, 33, 168, 0.04)',
+          padding: '18px 24px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 2px 8px rgba(68, 26, 135, 0.04)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -1117,833 +867,1519 @@ export const CrmPipelinePage: React.FC = () => {
           gap: 12,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <Select
-            value={sourceFilter}
-            onChange={setSourceFilter}
-            style={{ width: 140 }}
-            options={[
-              { value: 'ALL', label: 'All Sources' },
-              { value: 'Website', label: 'Website' },
-              { value: 'Referral', label: 'Referral' },
-              { value: 'Campaign', label: 'Campaign' },
-              { value: 'Advertisement', label: 'Advertisement' },
-              { value: 'Direct Contact', label: 'Direct Contact' },
-              { value: 'Exhibition', label: 'Exhibition' },
-            ]}
-          />
-
-          <Select
-            value={executiveFilter}
-            onChange={setExecutiveFilter}
-            style={{ width: 150 }}
-            options={[
-              { value: 'ALL', label: 'All Executives' },
-              { value: 'Vikram Seth', label: 'Vikram Seth' },
-              { value: 'Ananya Sharma', label: 'Ananya Sharma' },
-            ]}
-          />
-
-          <Select
-            value={priorityFilter}
-            onChange={setPriorityFilter}
-            style={{ width: 130 }}
-            options={[
-              { value: 'ALL', label: 'All Priorities' },
-              { value: 'High', label: 'High Priority' },
-              { value: 'Medium', label: 'Medium Priority' },
-              { value: 'Low', label: 'Low Priority' },
-            ]}
-          />
-
-          {(sourceFilter !== 'ALL' || executiveFilter !== 'ALL' || priorityFilter !== 'ALL') && (
-            <Button
-              type="text"
-              onClick={() => {
-                setSourceFilter('ALL');
-                setExecutiveFilter('ALL');
-                setPriorityFilter('ALL');
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              backgroundColor: BRAND_PURPLE_TINT,
+              color: BRAND_PURPLE,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <TrendingUp size={20} />
+          </div>
+          <div>
+            <h1
+              style={{
+                fontSize: 18,
+                fontWeight: 800,
+                color: '#0F172A',
+                margin: 0,
+                letterSpacing: '-0.01em',
               }}
-              style={{ color: '#EF4444', fontWeight: 600, fontSize: 12 }}
             >
-              Clear Filters
-            </Button>
-          )}
+              Opportunities & Sales Pipeline
+            </h1>
+            <p style={{ margin: 0, fontSize: 12, color: '#64748B', marginTop: 2 }}>
+              Manage sales opportunities, track deal progress, monitor win probability and forecast expected revenue.
+            </p>
+          </div>
         </div>
 
-        {/* View Switcher: Board vs Table */}
-        <div
-          style={{
-            display: 'flex',
-            backgroundColor: '#F3EEFF',
-            padding: 3,
-            borderRadius: 8,
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setActiveTab('board')}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Kanban / List View Toggle */}
+          <Radio.Group
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            buttonStyle="solid"
+            style={{ borderRadius: 8 }}
+          >
+            <Radio.Button value="kanban" style={{ height: 38, lineHeight: '36px', fontSize: 12, fontWeight: 600 }}>
+              <LayoutGrid size={13} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
+              Kanban
+            </Radio.Button>
+            <Radio.Button value="list" style={{ height: 38, lineHeight: '36px', fontSize: 12, fontWeight: 600 }}>
+              <ListIcon size={13} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
+              List View
+            </Radio.Button>
+          </Radio.Group>
+
+          <Button
+            type="primary"
+            icon={<Plus size={15} />}
             style={{
-              border: 'none',
-              backgroundColor: activeTab === 'board' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'board' ? '#5421A8' : '#6B7280',
+              backgroundColor: BRAND_PURPLE,
+              borderColor: BRAND_PURPLE,
               fontWeight: 700,
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 6,
-              cursor: 'pointer',
-              boxShadow: activeTab === 'board' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s ease',
+              height: 38,
+              borderRadius: 8,
+              boxShadow: '0 4px 12px rgba(68, 26, 135, 0.2)',
+            }}
+            onClick={() => {
+              setEditingOpp(null);
+              form.resetFields();
+              setIsAddModalOpen(true);
             }}
           >
-            Kanban Board
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('table')}
-            style={{
-              border: 'none',
-              backgroundColor: activeTab === 'table' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'table' ? '#5421A8' : '#6B7280',
-              fontWeight: 700,
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 6,
-              cursor: 'pointer',
-              boxShadow: activeTab === 'table' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            List View
-          </button>
+            + New Opportunity
+          </Button>
         </div>
       </div>
 
-      {/* 4. KANBAN BOARD VIEW (Drag & Drop Progression) */}
-      {activeTab === 'board' ? (
+      {/* 2. 5 Summary Cards - Full 100% Width CSS Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gap: 14,
+          width: '100%',
+        }}
+      >
+        {/* Total Deals */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FAF5FF 0%, #F5EEFD 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #E9D5FF',
+            boxShadow: '0 2px 6px rgba(68, 26, 135, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#6B21A8' }}>
+              Total Deals
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Layers size={14} color={BRAND_PURPLE} />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: BRAND_PURPLE, marginTop: 6 }}>
+            {metrics.totalDeals}
+          </div>
+        </div>
+
+        {/* Open Deals */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #BFDBFE',
+            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#1E40AF' }}>
+              Open Deals
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Clock size={14} color="#2563EB" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#1E40AF', marginTop: 6 }}>
+            {metrics.openDeals}
+          </div>
+        </div>
+
+        {/* Won Deals */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #BBF7D0',
+            boxShadow: '0 2px 6px rgba(22, 163, 74, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#166534' }}>
+              Won Deals
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckCircle size={14} color="#16A34A" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#166534', marginTop: 6 }}>
+            {metrics.wonDeals}
+          </div>
+        </div>
+
+        {/* Lost Deals */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #FECACA',
+            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#991B1B' }}>
+              Lost Deals
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <XCircle size={14} color="#DC2626" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#991B1B', marginTop: 6 }}>
+            {metrics.lostDeals}
+          </div>
+        </div>
+
+        {/* Expected Weighted Revenue */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #E9D5FF',
+            boxShadow: '0 2px 6px rgba(107, 33, 168, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#6B21A8' }}>
+              Expected Weighted Revenue
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <IndianRupee size={14} color={BRAND_PURPLE} />
+            </div>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: BRAND_PURPLE, marginTop: 6 }}>
+            ₹{(metrics.expectedWeightedRevenue / 100000).toFixed(2)} Lakhs
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Search & Filters Row (Single Unified Row) */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderRadius: 14,
+          padding: '14px 18px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 2px 8px rgba(68, 26, 135, 0.03)',
+          display: 'flex',
+          flexWrap: 'nowrap',
+          gap: 10,
+          alignItems: 'center',
+          overflowX: 'auto',
+        }}
+      >
+        {/* Search by Opportunity ID / Name / Customer */}
+        <div style={{ flex: '1 1 200px', minWidth: 170 }}>
+          <Input
+            prefix={<Search size={14} color="#94A3B8" />}
+            placeholder="Search deal ID / Name / Customer"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+            style={{ borderRadius: 8, height: 36 }}
+          />
+        </div>
+
+        {/* Pipeline Stage Filter */}
+        <div style={{ width: 155, flexShrink: 0 }}>
+          <Select
+            value={stageFilter}
+            onChange={setStageFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Stages' },
+              ...PIPELINE_STAGES.map((s) => ({ value: s, label: s })),
+            ]}
+          />
+        </div>
+
+        {/* Assigned Salesperson Filter */}
+        <div style={{ width: 145, flexShrink: 0 }}>
+          <Select
+            value={salespersonFilter}
+            onChange={setSalespersonFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Salespeople' },
+              ...SALESPERSON_LIST.map((s) => ({ value: s, label: s })),
+            ]}
+          />
+        </div>
+
+        {/* Priority Filter */}
+        <div style={{ width: 125, flexShrink: 0 }}>
+          <Select
+            value={priorityFilter}
+            onChange={setPriorityFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Priorities' },
+              { value: 'Urgent', label: 'Urgent' },
+              { value: 'High', label: 'High' },
+              { value: 'Medium', label: 'Medium' },
+              { value: 'Low', label: 'Low' },
+            ]}
+          />
+        </div>
+
+        {/* Expected Closing Date Month Filter */}
+        <div style={{ width: 145, flexShrink: 0 }}>
+          <Select
+            value={closingDateMonth}
+            onChange={setClosingDateMonth}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Closing Months' },
+              { value: '2026-11', label: 'Nov 2026' },
+              { value: '2026-12', label: 'Dec 2026' },
+              { value: '2027-01', label: 'Jan 2027' },
+            ]}
+          />
+        </div>
+
+        {/* Date Range Filter */}
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <DatePicker.RangePicker
+            value={dateRange}
+            onChange={(dates) => setDateRange(dates as any)}
+            style={{ width: '100%', height: 36, borderRadius: 8 }}
+            format="YYYY-MM-DD"
+            placeholder={['Start Date', 'End Date']}
+          />
+        </div>
+
+        {/* Reset Filter Button */}
+        {(search ||
+          stageFilter !== 'ALL' ||
+          salespersonFilter !== 'ALL' ||
+          priorityFilter !== 'ALL' ||
+          closingDateMonth !== 'ALL' ||
+          dateRange) && (
+          <Button
+            size="small"
+            icon={<RotateCcw size={12} />}
+            onClick={() => {
+              setSearch('');
+              setStageFilter('ALL');
+              setSalespersonFilter('ALL');
+              setPriorityFilter('ALL');
+              setClosingDateMonth('ALL');
+              setDateRange(null);
+            }}
+            style={{ height: 36, borderRadius: 8, fontSize: 12, color: '#64748B', flexShrink: 0 }}
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+
+      {/* 4. Sales Forecast & Revenue Tracking Card */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF8FE 100%)',
+          borderRadius: 14,
+          padding: '14px 18px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 2px 8px rgba(68, 26, 135, 0.03)',
+        }}
+      >
         <div
           style={{
             display: 'flex',
-            gap: 16,
-            overflowX: 'auto',
-            paddingBottom: 16,
-            alignItems: 'flex-start',
-            minHeight: '62vh',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 10,
           }}
         >
-          {STAGES_CONFIG.map(stage => {
-            const stageDeals = filteredDeals.filter(d => d.stage === stage.key);
-            const stageTotalValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <BarChart2 size={15} color={BRAND_PURPLE} />
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#0F172A' }}>
+              Sales Forecasting & Pipeline Health
+            </span>
+          </div>
+          <span style={{ fontSize: 11, color: '#64748B' }}>
+            Weighted Revenue = Deal Value × Win Probability / 100 (Open Deals Only)
+          </span>
+        </div>
 
-            return (
-              <div
-                key={stage.key}
-                onDragOver={handleDragOver}
-                onDrop={e => handleDrop(e, stage.key)}
-                style={{
-                  flex: '0 0 290px',
-                  backgroundColor: '#FAF9FE',
-                  borderRadius: 16,
-                  border: '1px solid #ECE8F6',
-                  boxShadow: '0 4px 14px rgba(84, 33, 168, 0.03)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  maxHeight: '75vh',
-                }}
-              >
-                {/* Stage Header */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
+            gap: 12,
+            width: '100%',
+          }}
+        >
+          <div style={{ padding: '8px 12px', background: '#F8FAFC', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+            <div style={{ fontSize: 10.5, color: '#64748B', fontWeight: 600 }}>Total Open Pipeline</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', marginTop: 2 }}>
+              ₹{(metrics.totalOpenPipelineValue / 100000).toFixed(2)} Lakhs
+            </div>
+          </div>
+          <div style={{ padding: '8px 12px', background: '#FAF5FF', borderRadius: 8, border: '1px solid #E9D5FF' }}>
+            <div style={{ fontSize: 10.5, color: '#6B21A8', fontWeight: 600 }}>Expected Weighted</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: BRAND_PURPLE, marginTop: 2 }}>
+              ₹{(metrics.expectedWeightedRevenue / 100000).toFixed(2)} Lakhs
+            </div>
+          </div>
+          <div style={{ padding: '8px 12px', background: '#EFF6FF', borderRadius: 8, border: '1px solid #BFDBFE' }}>
+            <div style={{ fontSize: 10.5, color: '#1E40AF', fontWeight: 600 }}>Nov 2026 Forecast</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#1D4ED8', marginTop: 2 }}>
+              ₹3.60 Lakhs
+            </div>
+          </div>
+          <div style={{ padding: '8px 12px', background: '#F0F9FF', borderRadius: 8, border: '1px solid #BAE6FD' }}>
+            <div style={{ fontSize: 10.5, color: '#0369A1', fontWeight: 600 }}>Q3 Quarterly Forecast</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#0284C7', marginTop: 2 }}>
+              ₹15.40 Lakhs
+            </div>
+          </div>
+          <div style={{ padding: '8px 12px', background: '#F0FDF4', borderRadius: 8, border: '1px solid #BBF7D0' }}>
+            <div style={{ fontSize: 10.5, color: '#166534', fontWeight: 600 }}>Won Revenue</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#15803D', marginTop: 2 }}>
+              ₹{(metrics.wonRevenue / 100000).toFixed(2)} Lakhs
+            </div>
+          </div>
+          <div style={{ padding: '8px 12px', background: '#FEF2F2', borderRadius: 8, border: '1px solid #FECACA' }}>
+            <div style={{ fontSize: 10.5, color: '#991B1B', fontWeight: 600 }}>Lost Deal Value</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#DC2626', marginTop: 2 }}>
+              ₹{(metrics.lostValue / 100000).toFixed(2)} Lakhs
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Main Body: Kanban View OR List View */}
+      {viewMode === 'kanban' ? (
+        <div style={{ overflowX: 'auto', paddingBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 14, minWidth: 1450 }}>
+            {PIPELINE_STAGES.map((stage) => {
+              const stageOpps = filteredOpps.filter((o) => o.stage === stage);
+              const stageValue = stageOpps.reduce((sum, o) => sum + o.dealValue, 0);
+
+              return (
                 <div
-                  style={{
-                    padding: '12px 14px',
-                    backgroundColor: '#FFFFFF',
-                    borderTopLeftRadius: 16,
-                    borderTopRightRadius: 16,
-                    borderBottom: '1px solid #ECE8F6',
-                    borderTop: `3px solid ${stage.color}`,
+                  key={stage}
+                  onDragOver={(e) => {
+                    e.preventDefault();
                   }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, color: '#211044', fontSize: 13 }}>
-                      {stage.label}
-                    </span>
-                    <span
-                      style={{
-                        backgroundColor: stage.badgeBg,
-                        color: stage.color,
-                        padding: '1px 8px',
-                        borderRadius: 10,
-                        fontSize: 11,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {stageDeals.length}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 11.5, color: '#6B7280', marginTop: 4, fontWeight: 600 }}>
-                    ₹{(stageTotalValue / 100000).toFixed(1)} Lakhs
-                  </div>
-                </div>
-
-                {/* Deal Cards Container */}
-                <div
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggedOppId) {
+                      handleStageTransition(draggedOppId, stage);
+                      setDraggedOppId(null);
+                    }
+                  }}
                   style={{
-                    padding: 10,
-                    overflowY: 'auto',
+                    flex: '1 1 0px',
+                    minWidth: 265,
+                    background: '#F8F6FC',
+                    borderRadius: 14,
+                    padding: 12,
+                    border: '1px solid #EAE4F5',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 10,
-                    flex: 1,
+                    gap: 12,
                   }}
                 >
-                  {stageDeals.length === 0 ? (
-                    <div
+                  {/* Kanban Stage Header */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '4px 6px',
+                      borderBottom: '1px solid #ECE6F8',
+                      paddingBottom: 8,
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 12.5, color: '#0F172A' }}>{stage}</div>
+                      <div style={{ fontSize: 11, color: '#64748B', fontWeight: 700, marginTop: 1 }}>
+                        ₹{(stageValue / 100000).toFixed(2)} Lakhs
+                      </div>
+                    </div>
+                    <span
                       style={{
-                        textAlign: 'center',
-                        color: '#9CA3AF',
-                        padding: '36px 12px',
-                        fontSize: 12,
-                        fontStyle: 'italic',
+                        backgroundColor: '#FFFFFF',
+                        color: BRAND_PURPLE,
+                        border: '1px solid #E9D5FF',
+                        borderRadius: 12,
+                        padding: '1px 8px',
+                        fontSize: 11,
+                        fontWeight: 800,
                       }}
                     >
-                      No deals in this stage
-                    </div>
-                  ) : (
-                    stageDeals.map(deal => {
-                      const isOverdue =
-                        deal.stage !== 'Won' &&
-                        deal.stage !== 'Lost' &&
-                        deal.expectedCloseDate &&
-                        deal.expectedCloseDate < todayStr;
+                      {stageOpps.length}
+                    </span>
+                  </div>
 
-                      const dealActionItems: MenuProps['items'] = [
-                        {
-                          key: 'view',
-                          label: 'View Details',
-                          icon: <Eye size={13} />,
-                          onClick: () => setSelectedDealForDrawer(deal),
-                        },
-                        {
-                          key: 'edit',
-                          label: 'Edit Lead',
-                          icon: <Edit size={13} />,
-                          onClick: () => {
-                            setEditingDeal(deal);
-                            editDealForm.setFieldsValue(deal);
-                          },
-                        },
-                        {
-                          type: 'divider',
-                        },
-                        {
-                          key: 'won',
-                          label: 'Mark as Won',
-                          icon: <Award size={13} color="#059669" />,
-                          disabled: deal.stage === 'Won',
-                          onClick: () => handleOpenConvertModal(deal),
-                        },
-                        {
-                          key: 'lost',
-                          label: 'Mark as Lost',
-                          icon: <XCircle size={13} color="#EF4444" />,
-                          disabled: deal.stage === 'Lost',
-                          onClick: () => handleMoveStage(deal.id, 'Lost', 'Marked as Lost'),
-                        },
-                        ...(deal.stage === 'Won' || deal.stage === 'Lost'
-                          ? [
-                              {
-                                key: 'reopen',
-                                label: 'Reopen Lead',
-                                icon: <RotateCcw size={13} color="#7544D6" />,
-                                onClick: () => handleMoveStage(deal.id, 'Negotiation', 'Reopened by Admin'),
-                              },
-                            ]
-                          : []),
-                      ];
-
-                      return (
+                  {/* Opportunities inside Stage */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 10,
+                      minHeight: 420,
+                    }}
+                  >
+                    {stageOpps.length === 0 ? (
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: '30px 10px',
+                          color: '#94A3B8',
+                          fontSize: 11.5,
+                          border: '1px dashed #E2E8F0',
+                          borderRadius: 10,
+                          margin: 'auto 0',
+                        }}
+                      >
+                        No deals in {stage}
+                      </div>
+                    ) : (
+                      stageOpps.map((opp) => (
                         <div
-                          key={deal.id}
+                          key={opp.id}
                           draggable
-                          onDragStart={e => handleDragStart(e, deal.id)}
+                          onDragStart={() => setDraggedOppId(opp.id)}
+                          onClick={() => setViewOpp(opp)}
                           style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: 14,
-                            padding: '12px 14px',
-                            border: isOverdue ? '1px solid #FECACA' : '1px solid #ECE8F6',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                            cursor: 'grab',
-                            transition: 'all 0.15s ease',
+                            background: '#FFFFFF',
+                            borderRadius: 12,
+                            padding: '14px 16px',
+                            minHeight: 220,
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 8,
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.boxShadow = '0 6px 14px rgba(84, 33, 168, 0.08)';
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            justifyContent: 'space-between',
+                            border: '1px solid #ECE6F8',
+                            boxShadow: '0 2px 8px rgba(68, 26, 135, 0.04)',
+                            cursor: 'grab',
+                            transition: 'all 0.2s ease',
                           }}
                         >
-                          {/* Card Top: ID & Priority */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span
-                              onClick={() => setSelectedDealForDrawer(deal)}
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 700,
-                                color: '#5421A8',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              {deal.leadNumber}
-                            </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              {renderPriorityBadge(deal.priority)}
-                              <Dropdown menu={{ items: dealActionItems }} trigger={['click']}>
-                                <Button
-                                  type="text"
-                                  size="small"
-                                  icon={<MoreVertical size={13} color="#9CA3AF" />}
-                                  style={{ padding: 0, width: 20, height: 20 }}
-                                />
-                              </Dropdown>
-                            </div>
-                          </div>
-
-                          {/* Company Name & Contact Person */}
+                          {/* Top Section */}
                           <div>
+                            {/* Opp ID + Priority Tag */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: 12, fontWeight: 800, color: BRAND_PURPLE, letterSpacing: '0.02em' }}>
+                                {opp.opportunityNumber}
+                              </span>
+                              {getPriorityBadge(opp.priority)}
+                            </div>
+
+                            {/* Opp Name */}
                             <div
-                              onClick={() => setSelectedDealForDrawer(deal)}
                               style={{
-                                fontWeight: 700,
-                                fontSize: 13,
-                                color: '#1E1B4B',
-                                cursor: 'pointer',
+                                fontWeight: 800,
+                                fontSize: 13.5,
+                                color: '#0F172A',
+                                marginTop: 8,
+                                lineHeight: 1.4,
                               }}
                             >
-                              {deal.companyName}
+                              {opp.name}
                             </div>
-                            <div style={{ fontSize: 11.5, color: '#6B7280', marginTop: 2 }}>
-                              👤 {deal.contactName} &bull; {deal.source}
+
+                            {/* Customer / Company */}
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: '#64748B',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6,
+                                marginTop: 4,
+                              }}
+                            >
+                              <Building size={13} color="#94A3B8" />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {opp.companyName}
+                              </span>
                             </div>
                           </div>
 
-                          {/* Deal Value */}
+                          {/* Middle Section: Value & Win Probability */}
                           <div
                             style={{
                               display: 'flex',
                               justifyContent: 'space-between',
-                              alignItems: 'baseline',
-                              paddingTop: 6,
-                              borderTop: '1px dashed #F3F4F6',
+                              alignItems: 'flex-end',
+                              marginTop: 12,
+                              paddingTop: 10,
+                              borderTop: '1px solid #F8FAFC',
                             }}
                           >
-                            <span style={{ fontSize: 14, fontWeight: 800, color: '#10B981' }}>
-                              ₹{deal.dealValue.toLocaleString()}
-                            </span>
-                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 500 }}>
-                              {deal.daysInStage}d in stage
-                            </span>
+                            <div>
+                              <div style={{ fontSize: 10.5, color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                                Value
+                              </div>
+                              <div style={{ fontWeight: 900, color: '#0F172A', fontSize: 14, marginTop: 1 }}>
+                                ₹{opp.dealValue.toLocaleString('en-IN')}
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: 10.5, color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                                Win Prob
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 800,
+                                  marginTop: 1,
+                                  color: opp.probability >= 80 ? '#10B981' : opp.probability >= 40 ? '#2563EB' : '#F59E0B',
+                                }}
+                              >
+                                {opp.probability}%
+                              </div>
+                            </div>
                           </div>
 
-                          {/* Executive & Close Date */}
+                          {/* Dates: Expected Close & Next Follow-up in clear rows */}
                           <div
                             style={{
+                              marginTop: 10,
+                              padding: '6px 8px',
+                              background: '#F9FAFB',
+                              borderRadius: 6,
+                              fontSize: 11,
+                              color: '#64748B',
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              fontSize: 11,
-                              color: '#6B7280',
                             }}
                           >
-                            <span>{deal.assignedExecutive}</span>
-                            <span
-                              style={{
-                                color: isOverdue ? '#DC2626' : '#6B7280',
-                                fontWeight: isOverdue ? 700 : 500,
-                              }}
-                            >
-                              {isOverdue ? `Overdue (${deal.expectedCloseDate})` : `Exp: ${deal.expectedCloseDate}`}
-                            </span>
+                            <span>Close: <strong style={{ color: '#334155' }}>{opp.expectedClosingDate}</strong></span>
+                            <span>Next: <strong style={{ color: '#334155' }}>{opp.nextFollowUp || '-'}</strong></span>
                           </div>
 
-                          {/* Next Follow-up Pill */}
-                          {deal.nextFollowUpDate && deal.nextFollowUpDate !== '—' && (
-                            <div
-                              style={{
-                                backgroundColor: '#FAF5FF',
-                                borderRadius: 6,
-                                padding: '3px 8px',
-                                fontSize: 10.5,
-                                color: '#7544D6',
-                                fontWeight: 600,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 4,
-                              }}
-                            >
-                              <Clock size={11} /> Next: {deal.nextFollowUpDate}
-                            </div>
-                          )}
-
-                          {/* Bottom Stage Selector Dropdown */}
-                          <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                          {/* Bottom Section: Salesperson & Stage Selector */}
+                          <div
+                            style={{
+                              marginTop: 10,
+                              paddingTop: 10,
+                              borderTop: '1px solid #F1EDF9',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <span style={{ fontSize: 12, color: '#334155', fontWeight: 600, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {opp.assignedSalesperson}
+                            </span>
                             <Select
-                              value={deal.stage}
                               size="small"
-                              style={{ flex: 1, fontSize: 11 }}
-                              onChange={newStg => handleMoveStage(deal.id, newStg)}
-                              options={STAGES_CONFIG.map(s => ({ label: s.label, value: s.key }))}
+                              value={opp.stage}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(val) => handleStageTransition(opp.id, val)}
+                              style={{ width: 124, fontSize: 11 }}
+                              options={PIPELINE_STAGES.map((s) => ({ value: s, label: s }))}
                             />
-                            {deal.stage !== 'Won' && (
-                              <Tooltip title="Convert to Customer Directory (Won)">
-                                <Button
-                                  size="small"
-                                  type="primary"
-                                  style={{ background: '#10B981', borderColor: '#10B981', padding: '0 6px' }}
-                                  icon={<Award size={12} />}
-                                  onClick={() => handleOpenConvertModal(deal)}
-                                />
-                              </Tooltip>
-                            )}
                           </div>
                         </div>
-                      );
-                    })
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       ) : (
-        /* List View - Enterprise Table Styling */
+        /* List View */
         <div
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: 18,
-            padding: '20px 24px',
-            border: '1px solid #ECE8F6',
-            boxShadow: '0 4px 20px rgba(84, 33, 168, 0.04)',
+            background: '#FFFFFF',
+            borderRadius: 16,
+            padding: '16px 20px',
+            border: '1px solid #ECE6F8',
+            boxShadow: '0 4px 16px rgba(68, 26, 135, 0.03)',
           }}
         >
-          <Table
-            dataSource={filteredDeals}
-            columns={tableColumns}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>
+                All Opportunities Table
+              </span>
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: BRAND_PURPLE,
+                  backgroundColor: BRAND_PURPLE_TINT,
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                }}
+              >
+                {filteredOpps.length} records
+              </span>
+            </div>
+          </div>
+
+          <Table<OpportunityItem>
+            columns={columns}
+            dataSource={filteredOpps}
             rowKey="id"
-            pagination={{ pageSize: 8 }}
-            scroll={{ x: 1050 }}
-            className="enterprise-crm-table"
+            pagination={{
+              pageSize: 7,
+              size: 'small',
+              showTotal: (total, range) => (
+                <span style={{ fontSize: 11.5, color: '#64748B' }}>
+                  Showing {range[0]}-{range[1]} of {total} opportunities
+                </span>
+              ),
+            }}
+            size="middle"
+            scroll={{ x: 1400 }}
           />
         </div>
       )}
 
-      {/* 5. DEAL DETAILS DRAWER */}
-      <Drawer
-        open={!!selectedDealForDrawer}
-        onClose={() => setSelectedDealForDrawer(null)}
-        width={480}
+      {/* 6. Add / Edit Opportunity Modal */}
+      <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#5421A8', fontWeight: 800 }}>
-              {selectedDealForDrawer?.leadNumber}
-            </span>
-            <span style={{ fontSize: 13, color: '#6B7280' }}>Opportunity Details</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <TrendingUp size={18} color={BRAND_PURPLE} />
+            {editingOpp ? `Edit Deal: ${editingOpp.opportunityNumber}` : 'Add New Sales Opportunity'}
           </div>
         }
+        open={isAddModalOpen || !!editingOpp}
+        onCancel={() => {
+          setIsAddModalOpen(false);
+          setEditingOpp(null);
+          form.resetFields();
+        }}
+        footer={null}
+        width={680}
+        destroyOnClose
       >
-        {selectedDealForDrawer && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Header Box */}
-            <div
-              style={{
-                backgroundColor: '#FAF7FD',
-                borderRadius: 12,
-                padding: 16,
-                border: '1px solid #ECE8F6',
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSaveOpp}
+          initialValues={{
+            stage: 'New Opportunity',
+            probability: 20,
+            priority: 'Medium',
+            assignedSalesperson: 'Vikram Seth',
+            expectedClosingDate: dayjs().add(20, 'day'),
+          }}
+          style={{ marginTop: 14 }}
+        >
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Opportunity / Project Name</span>}
+            name="name"
+            rules={[{ required: true, message: 'Please enter opportunity name' }]}
+          >
+            <Input placeholder="e.g. 15kW Heavy Inverter Synchronization Package" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Company Name</span>}
+                name="companyName"
+                rules={[{ required: true, message: 'Company name required' }]}
+              >
+                <Input placeholder="e.g. Apex Precision Tools Ltd" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Customer Contact Person</span>}
+                name="customerName"
+                rules={[{ required: true, message: 'Contact name required' }]}
+              >
+                <Input placeholder="e.g. Ramesh Sundaram" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={14}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Product / Service Scope</span>}
+                name="productService"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="e.g. Variable Frequency Drives 15kW" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={10}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Deal Value (₹)</span>}
+                name="dealValue"
+                rules={[{ required: true, message: 'Please enter deal value' }]}
+              >
+                <Input placeholder="450000" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Pipeline Stage</span>}
+                name="stage"
+                rules={[{ required: true }]}
+              >
+                <Select options={PIPELINE_STAGES.map((s) => ({ value: s, label: s }))} style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Win Probability (%)</span>}
+                name="probability"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="60" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Priority</span>}
+                name="priority"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  options={[
+                    { value: 'Urgent', label: 'Urgent' },
+                    { value: 'High', label: 'High' },
+                    { value: 'Medium', label: 'Medium' },
+                    { value: 'Low', label: 'Low' },
+                  ]}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Assigned Salesperson</span>}
+                name="assignedSalesperson"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  options={SALESPERSON_LIST.map((s) => ({ value: s, label: s }))}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Expected Close Date</span>}
+                name="expectedClosingDate"
+                rules={[{ required: true }]}
+              >
+                <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Next Follow-up</span>}
+                name="nextFollowUp"
+              >
+                <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Related Quotation #</span>}
+                name="relatedQuotation"
+              >
+                <Input placeholder="e.g. QT-2026-104" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Internal Commercial Notes</span>}
+                name="notes"
+              >
+                <Input placeholder="Discount boundaries, delivery expectations..." style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14 }}>
+            <Button
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setEditingOpp(null);
               }}
             >
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1E1B4B', margin: 0 }}>
-                {selectedDealForDrawer.companyName}
-              </h2>
-              <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
-                Contact: {selectedDealForDrawer.contactName}
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: BRAND_PURPLE, borderColor: BRAND_PURPLE, fontWeight: 700 }}
+            >
+              {editingOpp ? 'Update Deal' : 'Save Opportunity'}
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 7. Mark Deal WON Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#166534', fontWeight: 800 }}>
+            <CheckCircle size={18} color="#16A34A" />
+            Record Deal Won: {winModalOpp?.opportunityNumber}
+          </div>
+        }
+        open={!!winModalOpp}
+        onCancel={() => setWinModalOpp(null)}
+        footer={null}
+        width={500}
+        destroyOnClose
+      >
+        <Form form={winForm} layout="vertical" onFinish={handleWinDeal} style={{ marginTop: 14 }}>
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Final Closed Deal Value (₹)</span>}
+            name="finalDealValue"
+            rules={[{ required: true }]}
+          >
+            <Input style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Confirmed Quotation #</span>}
+                name="confirmedQuotation"
+                rules={[{ required: true }]}
+              >
+                <Input style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Sales Order # Generated</span>}
+                name="salesOrderNumber"
+                rules={[{ required: true }]}
+              >
+                <Input style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Closure Date</span>}
+            name="closedDate"
+            rules={[{ required: true }]}
+          >
+            <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Winning Factor / Client Feedback</span>}
+            name="winReason"
+          >
+            <Input.TextArea rows={2} placeholder="e.g. Technical capability, competitive pricing, warranty terms..." style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setWinModalOpp(null)}>Cancel</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: '#15803D', borderColor: '#15803D', fontWeight: 700 }}
+            >
+              Confirm Deal Won & Convert to Order
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 8. Mark Deal LOST Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#991B1B', fontWeight: 800 }}>
+            <XCircle size={18} color="#DC2626" />
+            Record Deal Lost: {lostModalOpp?.opportunityNumber}
+          </div>
+        }
+        open={!!lostModalOpp}
+        onCancel={() => setLostModalOpp(null)}
+        footer={null}
+        width={480}
+        destroyOnClose
+      >
+        <Form form={lostForm} layout="vertical" onFinish={handleLostDeal} style={{ marginTop: 14 }}>
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Reason for Lost Deal</span>}
+            name="lostReason"
+            rules={[{ required: true, message: 'Please specify reason for lost deal' }]}
+          >
+            <Select
+              options={[
+                { value: 'Price Sensitivity / Competitor Discount', label: 'Price Sensitivity / Competitor Discount' },
+                { value: 'Delivery Lead Time Too Long', label: 'Delivery Lead Time Too Long' },
+                { value: 'Technical Specification Mismatch', label: 'Technical Specification Mismatch' },
+                { value: 'Budget Postponed / Project Cancelled', label: 'Budget Postponed / Project Cancelled' },
+                { value: 'Customer Chose Incumbent Supplier', label: 'Customer Chose Incumbent Supplier' },
+              ]}
+              style={{ borderRadius: 6 }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Competitor Information (if known)</span>}
+            name="competitorInfo"
+          >
+            <Input placeholder="e.g. SKF Regional Distributor, ABB Industrial" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Lost Date</span>}
+            name="lostDate"
+            rules={[{ required: true }]}
+          >
+            <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setLostModalOpp(null)}>Cancel</Button>
+            <Button type="primary" danger htmlType="submit" style={{ fontWeight: 700 }}>
+              Confirm Lost Deal
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 9. Log Activity Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <PhoneCall size={18} color={BRAND_PURPLE} />
+            Log Activity: {newActivityOpp?.opportunityNumber}
+          </div>
+        }
+        open={!!newActivityOpp}
+        onCancel={() => setNewActivityOpp(null)}
+        footer={null}
+        width={500}
+        destroyOnClose
+      >
+        <Form form={activityForm} layout="vertical" onFinish={handleAddActivity} style={{ marginTop: 14 }}>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Activity Type</span>}
+                name="type"
+                rules={[{ required: true }]}
+                initialValue="Call"
+              >
+                <Select
+                  options={[
+                    { value: 'Call', label: 'Phone Call' },
+                    { value: 'Meeting', label: 'Client Meeting' },
+                    { value: 'Email', label: 'Email Follow-up' },
+                    { value: 'Discussion', label: 'Commercial Discussion' },
+                    { value: 'Note', label: 'Internal Note' },
+                  ]}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Next Follow-up Date</span>}
+                name="nextFollowUp"
+              >
+                <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Activity Title / Subject</span>}
+            name="title"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="e.g. Commercial discount negotiation with plant head" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Discussion Details</span>}
+            name="details"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={2} placeholder="Summary of what was agreed..." style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Outcome</span>}
+            name="outcome"
+          >
+            <Input placeholder="e.g. PO expected by next Monday" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setNewActivityOpp(null)}>Cancel</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: BRAND_PURPLE, borderColor: BRAND_PURPLE, fontWeight: 700 }}
+            >
+              Save Activity
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 10. Comprehensive Opportunity Details Drawer */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                style={{
+                  fontWeight: 800,
+                  color: BRAND_PURPLE,
+                  backgroundColor: BRAND_PURPLE_TINT,
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                }}
+              >
+                {viewOpp?.opportunityNumber}
+              </span>
+              <span style={{ fontWeight: 800, fontSize: 15, color: '#0F172A' }}>
+                {viewOpp?.name}
+              </span>
+            </div>
+            {viewOpp && getStageBadge(viewOpp.stage)}
+          </div>
+        }
+        open={!!viewOpp}
+        onClose={() => setViewOpp(null)}
+        width={580}
+        destroyOnClose
+      >
+        {viewOpp && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {/* Quick Metrics Bar */}
+            <div
+              style={{
+                padding: '14px 18px',
+                background: 'linear-gradient(135deg, #FAF5FF 0%, #FFFFFF 100%)',
+                borderRadius: 12,
+                border: '1px solid #ECE6F8',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 12,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Deal Value</div>
+                <div style={{ fontSize: 17, fontWeight: 900, color: '#0F172A', marginTop: 2 }}>
+                  ₹{viewOpp.dealValue.toLocaleString('en-IN')}
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-                <span style={{ fontSize: 20, fontWeight: 800, color: '#10B981' }}>
-                  ₹{selectedDealForDrawer.dealValue.toLocaleString()}
-                </span>
-                {renderPriorityBadge(selectedDealForDrawer.priority)}
-                <Tag color="purple">{selectedDealForDrawer.stage}</Tag>
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Win Probability</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: BRAND_PURPLE, marginTop: 2 }}>
+                  {viewOpp.probability}%
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Weighted Revenue</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#15803D', marginTop: 2 }}>
+                  ₹{Math.round((viewOpp.dealValue * viewOpp.probability) / 100).toLocaleString('en-IN')}
+                </div>
               </div>
             </div>
 
-            {/* Contact Details */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#211044', marginBottom: 8 }}>
-                Contact Information
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12.5 }}>
-                <div>📞 Phone: <strong>{selectedDealForDrawer.phone}</strong></div>
-                <div>✉️ Email: <strong>{selectedDealForDrawer.email}</strong></div>
-                <div>🌐 Acquisition Source: <strong>{selectedDealForDrawer.source}</strong></div>
-                <div>👤 Account Executive: <strong>{selectedDealForDrawer.assignedExecutive}</strong></div>
-                <div>📅 Expected Closing Date: <strong>{selectedDealForDrawer.expectedCloseDate}</strong></div>
-              </div>
-            </div>
-
-            <Divider style={{ margin: '8px 0' }} />
-
-            {/* Notes */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#211044', marginBottom: 6 }}>
-                Opportunity Notes
-              </h4>
-              <div style={{ backgroundColor: '#F9FAFB', padding: 12, borderRadius: 8, fontSize: 12, color: '#4B5563' }}>
-                {selectedDealForDrawer.notes || 'No notes logged for this opportunity.'}
-              </div>
-            </div>
-
-            <Divider style={{ margin: '8px 0' }} />
-
-            {/* Progression History */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#211044', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <History size={15} color="#5421A8" /> Stage Progression History
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {selectedDealForDrawer.history.map((h, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: 8,
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #ECE8F6',
-                      fontSize: 12,
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
-                      <span style={{ color: '#5421A8' }}>{h.stage}</span>
-                      <span style={{ color: '#9CA3AF', fontSize: 11 }}>{h.date}</span>
-                    </div>
-                    {h.note && <div style={{ color: '#6B7280', marginTop: 3 }}>{h.note}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Drawer Actions */}
-            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-              {selectedDealForDrawer.stage !== 'Won' && (
+            {/* Quick Actions Row */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <Button
+                size="small"
+                icon={<PhoneCall size={12} />}
+                onClick={() => {
+                  setNewActivityOpp(viewOpp);
+                  activityForm.resetFields();
+                }}
+                style={{ borderRadius: 6, fontWeight: 600, color: BRAND_PURPLE, borderColor: '#D8B4FE' }}
+              >
+                Log Activity
+              </Button>
+              {viewOpp.stage !== 'Won' && (
                 <Button
+                  size="small"
                   type="primary"
-                  icon={<Award size={14} />}
-                  style={{ background: '#10B981', borderColor: '#10B981', flex: 1, fontWeight: 700 }}
+                  icon={<CheckCircle size={12} />}
                   onClick={() => {
-                    handleOpenConvertModal(selectedDealForDrawer);
-                    setSelectedDealForDrawer(null);
+                    setWinModalOpp(viewOpp);
+                    winForm.setFieldsValue({
+                      finalDealValue: viewOpp.dealValue,
+                      confirmedQuotation: viewOpp.relatedQuotation || 'QT-2026-104',
+                      salesOrderNumber: `SO-2026-${Math.floor(400 + Math.random() * 100)}`,
+                      closedDate: dayjs(),
+                    });
                   }}
+                  style={{ backgroundColor: '#15803D', borderColor: '#15803D', borderRadius: 6, fontWeight: 700 }}
                 >
-                  Mark as Won & Convert
+                  Mark as Won
                 </Button>
               )}
-              {selectedDealForDrawer.stage !== 'Lost' && (
+              {viewOpp.stage !== 'Lost' && (
                 <Button
+                  size="small"
                   danger
-                  icon={<XCircle size={14} />}
-                  style={{ flex: 1, fontWeight: 600 }}
+                  icon={<XCircle size={12} />}
                   onClick={() => {
-                    handleMoveStage(selectedDealForDrawer.id, 'Lost', 'Marked as Lost from Details');
-                    setSelectedDealForDrawer(null);
+                    setLostModalOpp(viewOpp);
+                    lostForm.setFieldsValue({ lostDate: dayjs() });
                   }}
+                  style={{ borderRadius: 6, fontWeight: 600 }}
                 >
                   Mark as Lost
                 </Button>
               )}
             </div>
+
+            {/* 1. Basic Information */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Building size={14} color={BRAND_PURPLE} />
+                Basic Deal Information
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '10px 16px',
+                  fontSize: 12,
+                }}
+              >
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Company Name:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewOpp.companyName}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Customer Contact:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewOpp.customerName}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Assigned Salesperson:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewOpp.assignedSalesperson}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Priority:</span>
+                  <span>{getPriorityBadge(viewOpp.priority)}</span>
+                </div>
+                {viewOpp.relatedLeadNumber && (
+                  <div>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Originating Lead:</span>
+                    <span style={{ fontWeight: 700, color: BRAND_PURPLE }}>{viewOpp.relatedLeadNumber}</span>
+                  </div>
+                )}
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Created Date:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewOpp.createdDate}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Sales Progress & Follow-up */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Calendar size={14} color={BRAND_PURPLE} />
+                Sales Progress & Timelines
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '10px 16px',
+                  fontSize: 12,
+                }}
+              >
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Current Stage:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewOpp.stage}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Expected Closing Date:</span>
+                  <span style={{ fontWeight: 700, color: '#2563EB' }}>{viewOpp.expectedClosingDate}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Next Follow-up Date:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewOpp.nextFollowUp || '-'}</span>
+                </div>
+                {viewOpp.closedDate && (
+                  <div>
+                    <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Closed Date:</span>
+                    <span style={{ fontWeight: 700, color: '#166534' }}>{viewOpp.closedDate}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Commercial Details & Scope */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Briefcase size={14} color={BRAND_PURPLE} />
+                Commercial Details & Product Scope
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: 6 }}>
+                  Product Scope: {viewOpp.productService}
+                </div>
+                {viewOpp.relatedQuotation && (
+                  <div style={{ fontSize: 11.5, color: '#475569', marginBottom: 4 }}>
+                    Linked Quotation: <strong>{viewOpp.relatedQuotation}</strong>
+                  </div>
+                )}
+                {viewOpp.salesOrderNumber && (
+                  <div style={{ fontSize: 11.5, color: '#15803D', fontWeight: 600, marginBottom: 4 }}>
+                    Confirmed Sales Order: {viewOpp.salesOrderNumber}
+                  </div>
+                )}
+                {viewOpp.negotiationDetails && (
+                  <div style={{ fontSize: 11.5, color: '#475569', marginTop: 4 }}>
+                    Negotiation Notes: {viewOpp.negotiationDetails}
+                  </div>
+                )}
+                {viewOpp.winLossReason && (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      padding: 8,
+                      background: viewOpp.stage === 'Won' ? '#F0FDF4' : '#FEF2F2',
+                      border: `1px solid ${viewOpp.stage === 'Won' ? '#BBF7D0' : '#FECACA'}`,
+                      borderRadius: 6,
+                      fontSize: 11.5,
+                      color: viewOpp.stage === 'Won' ? '#166534' : '#991B1B',
+                    }}
+                  >
+                    <strong>{viewOpp.stage === 'Won' ? 'Win' : 'Loss'} Reason:</strong> {viewOpp.winLossReason}
+                    {viewOpp.competitorInfo && <span> (Competitor: {viewOpp.competitorInfo})</span>}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 4. Activity Tracking Timeline */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Clock size={14} color={BRAND_PURPLE} />
+                Activity Tracking & Communication History
+              </div>
+
+              {viewOpp.activities.length === 0 ? (
+                <div style={{ fontSize: 12, color: '#94A3B8', fontStyle: 'italic', padding: 8 }}>
+                  No activities recorded yet. Use the "Log Activity" button above to log customer discussions.
+                </div>
+              ) : (
+                <Timeline
+                  style={{ marginTop: 8 }}
+                  items={viewOpp.activities.map((a) => ({
+                    color: a.type === 'Meeting' ? '#16A34A' : a.type === 'Call' ? '#2563EB' : '#8B5CF6',
+                    children: (
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 12.5, color: '#0F172A' }}>
+                          {a.title}
+                          <Tag
+                            style={{
+                              marginLeft: 8,
+                              fontSize: 10,
+                              lineHeight: '16px',
+                              padding: '0 4px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {a.type}
+                          </Tag>
+                        </div>
+                        <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 1 }}>
+                          {a.timestamp} • by {a.performedBy}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: '#475569', marginTop: 3 }}>
+                          {a.details}
+                        </div>
+                        {a.outcome && (
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: '#15803D',
+                              fontWeight: 600,
+                              marginTop: 3,
+                              backgroundColor: '#F0FDF4',
+                              padding: '2px 6px',
+                              borderRadius: 4,
+                              display: 'inline-block',
+                            }}
+                          >
+                            Outcome: {a.outcome}
+                          </div>
+                        )}
+                      </div>
+                    ),
+                  }))}
+                />
+              )}
+            </div>
           </div>
         )}
       </Drawer>
-
-      {/* ========================================================= */}
-      {/* MODAL: ADD NEW LEAD / OPPORTUNITY                         */}
-      {/* ========================================================= */}
-      <Modal
-        open={isAddLeadModalOpen}
-        onCancel={() => setIsAddLeadModalOpen(false)}
-        title="Add New Opportunity to Pipeline"
-        footer={null}
-        destroyOnClose
-      >
-        <Form form={leadForm} layout="vertical" onFinish={handleAddDealSubmit} style={{ marginTop: 14 }}>
-          <Form.Item
-            name="companyName"
-            label="Company Name"
-            rules={[{ required: true, message: 'Please enter company name' }]}
-          >
-            <Input placeholder="e.g. Apex Precision Tools Ltd" />
-          </Form.Item>
-          <Form.Item
-            name="contactName"
-            label="Contact Person"
-            rules={[{ required: true, message: 'Please enter contact person' }]}
-          >
-            <Input placeholder="e.g. Ramesh Sundaram" />
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                <Input placeholder="contact@company.com" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                <Input placeholder="+91 98412 11002" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="dealValue" label="Estimated Deal Value (₹)" rules={[{ required: true }]}>
-                <Input type="number" placeholder="500000" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="stage" label="Initial Pipeline Stage" initialValue="New Lead">
-                <Select options={STAGES_CONFIG.map(s => ({ label: s.label, value: s.key }))} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="priority" label="Priority" initialValue="Medium">
-                <Select
-                  options={[
-                    { label: 'High Priority', value: 'High' },
-                    { label: 'Medium Priority', value: 'Medium' },
-                    { label: 'Low Priority', value: 'Low' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="source" label="Acquisition Source" initialValue="Website">
-                <Select
-                  options={[
-                    { label: 'Website', value: 'Website' },
-                    { label: 'Referral', value: 'Referral' },
-                    { label: 'Campaign', value: 'Campaign' },
-                    { label: 'Advertisement', value: 'Advertisement' },
-                    { label: 'Direct Contact', value: 'Direct Contact' },
-                    { label: 'Exhibition', value: 'Exhibition' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="assignedExecutive" label="Assigned Executive" initialValue="Vikram Seth">
-                <Select
-                  options={[
-                    { label: 'Vikram Seth', value: 'Vikram Seth' },
-                    { label: 'Ananya Sharma', value: 'Ananya Sharma' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="expectedCloseDate" label="Expected Close Date">
-                <DatePicker style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item name="notes" label="Deal Notes / Specification">
-            <Input.TextArea rows={2} placeholder="Client requirements, targets..." />
-          </Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-            <Button onClick={() => setIsAddLeadModalOpen(false)}>Cancel</Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ background: '#5421A8', borderColor: '#5421A8', fontWeight: 600 }}
-            >
-              Create Opportunity
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* ========================================================= */}
-      {/* MODAL: EDIT LEAD                                          */}
-      {/* ========================================================= */}
-      <Modal
-        open={!!editingDeal}
-        onCancel={() => setEditingDeal(null)}
-        title="Edit Opportunity Details"
-        footer={null}
-        destroyOnClose
-      >
-        <Form form={editDealForm} layout="vertical" onFinish={handleEditDealSubmit} style={{ marginTop: 14 }}>
-          <Form.Item name="companyName" label="Company Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="contactName" label="Contact Person" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="dealValue" label="Deal Value (₹)" rules={[{ required: true }]}>
-                <Input type="number" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="priority" label="Priority">
-                <Select
-                  options={[
-                    { label: 'High Priority', value: 'High' },
-                    { label: 'Medium Priority', value: 'Medium' },
-                    { label: 'Low Priority', value: 'Low' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item name="assignedExecutive" label="Account Executive">
-            <Select
-              options={[
-                { label: 'Vikram Seth', value: 'Vikram Seth' },
-                { label: 'Ananya Sharma', value: 'Ananya Sharma' },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name="notes" label="Notes">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-            <Button onClick={() => setEditingDeal(null)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ background: '#5421A8', borderColor: '#5421A8' }}>
-              Save Changes
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* ========================================================= */}
-      {/* MODAL: CONVERT OPPORTUNITY TO CUSTOMER ACCOUNT            */}
-      {/* ========================================================= */}
-      <Modal
-        open={isConvertToCustomerModalOpen}
-        onCancel={() => setIsConvertToCustomerModalOpen(false)}
-        title="Convert Opportunity to Official Customer Account"
-        footer={null}
-        destroyOnClose
-      >
-        <Form form={convertForm} layout="vertical" onFinish={handleConfirmConvert} style={{ marginTop: 14 }}>
-          <p style={{ color: '#4B5563', fontSize: 13, marginBottom: 14 }}>
-            Converting this opportunity automatically marks the pipeline deal as <strong>Won</strong> and establishes a customer record in the Customer Directory.
-          </p>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="companyName" label="Company Name" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="contactPerson" label="Contact Person" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="gstNumber" label="GSTIN / Tax ID">
-                <Input placeholder="33AABCT9988M1Z0" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="creditLimit" label="Approved Credit Limit (₹)" initialValue={500000}>
-                <Input type="number" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
-            <Button onClick={() => setIsConvertToCustomerModalOpen(false)}>Cancel</Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ background: '#10B981', borderColor: '#10B981', fontWeight: 700 }}
-            >
-              Confirm Won & Convert
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* ========================================================= */}
-      {/* MODAL: PIPELINE SETTINGS                                  */}
-      {/* ========================================================= */}
-      <Modal
-        open={isSettingsModalOpen}
-        onCancel={() => setIsSettingsModalOpen(false)}
-        title="Pipeline Stage Settings & Configuration"
-        onOk={() => setIsSettingsModalOpen(false)}
-      >
-        <p style={{ color: '#6B7280', fontSize: 13 }}>
-          Configure stages, stage order, and progression requirements for this tenant:
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-          {STAGES_CONFIG.map((s, idx) => (
-            <div
-              key={s.key}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '8px 12px',
-                borderRadius: 8,
-                backgroundColor: '#FAF9FE',
-                border: '1px solid #ECE8F6',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF' }}>0{idx + 1}</span>
-                <span style={{ fontWeight: 600, color: '#211044' }}>{s.label}</span>
-              </div>
-              <Tag color={s.key === 'Won' ? 'green' : s.key === 'Lost' ? 'red' : 'purple'}>
-                {s.key === 'Won' || s.key === 'Lost' ? 'Terminal' : 'Active'}
-              </Tag>
-            </div>
-          ))}
-        </div>
-      </Modal>
     </div>
   );
 };
+
+export default CrmPipelinePage;

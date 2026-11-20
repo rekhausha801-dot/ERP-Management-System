@@ -1,1085 +1,2096 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
-  Card,
+  Table,
   Button,
   Tag,
-  Space,
   Input,
   Select,
   Modal,
   Form,
   Row,
   Col,
-  message,
+  Space,
   Tooltip,
   Drawer,
-  Descriptions,
+  message,
+  Popconfirm,
+  Timeline,
+  DatePicker,
+  Divider,
 } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import {
   Users,
-  UserPlus,
+  Plus,
   Search,
   Eye,
-  Edit,
+  Edit3,
   Trash2,
-  Building,
-  Target,
+  Clock,
   ArrowRight,
-  DollarSign,
-  Calendar,
-  Bell,
-  ChevronDown,
-  Layers,
-  Award,
-  Sparkles,
   Phone,
   Mail,
-  UserCheck,
+  Building,
   CheckCircle,
+  XCircle,
+  Calendar,
+  UserCheck,
+  Briefcase,
+  PhoneCall,
+  RotateCcw,
 } from 'lucide-react';
-import {
-  INITIAL_EXTENDED_LEADS,
-  ExtendedLead,
-  INITIAL_LEAD_SOURCES,
-} from '../../mock/crmCustomerStore';
-import { INITIAL_CUSTOMERS, ExtendedCustomer } from '../../mock/customerData';
+import dayjs from 'dayjs';
 
-const avatarMap: Record<string, string> = {
-  'Vikram Seth': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80',
-  'Ananya Sharma': 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=60&auto=format&fit=crop&q=80',
-};
+// Enterprise Purple Palette
+const BRAND_PURPLE = '#441A87';
+const BRAND_PURPLE_LIGHT = '#6E39CB';
+const BRAND_PURPLE_TINT = '#F5EEFD';
 
-const defaultAvatar = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&auto=format&fit=crop&q=80';
+export type LeadStatusType = 'New' | 'Contacted' | 'Qualified' | 'Lost';
+export type LeadPriorityType = 'Low' | 'Medium' | 'High' | 'Urgent';
+export type LeadSourceType = 'Website' | 'Referral' | 'Campaign' | 'Social Media' | 'Cold Outreach';
+
+export interface LeadActivityItem {
+  id: string;
+  type: 'Call' | 'Email' | 'Meeting' | 'Note';
+  title: string;
+  timestamp: string;
+  performedBy: string;
+  details: string;
+  outcome?: string;
+}
+
+export interface LeadItem {
+  id: string;
+  leadNumber: string;
+  contactName: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  source: LeadSourceType;
+  interestedProduct: string;
+  assignedSalesperson: string;
+  priority: LeadPriorityType;
+  status: LeadStatusType;
+  lastContacted: string;
+  nextFollowUp: string;
+  createdDate: string;
+  estimatedBudget: number;
+  requirementNotes?: string;
+  isConverted?: boolean;
+  convertedEntity?: string;
+  activities: LeadActivityItem[];
+}
+
+const SALESPERSON_LIST = [
+  'Vikram Seth',
+  'Ananya Sharma',
+  'Murugan Selvam',
+  'Rajesh Kannan',
+  'Pooja Hegde',
+];
+
+const INITIAL_LEADS: LeadItem[] = [
+  {
+    id: 'lead-1',
+    leadNumber: 'LD-2026-001',
+    contactName: 'Ramesh Sundaram',
+    companyName: 'Apex Precision Tools Ltd',
+    email: 'ramesh@apexprecision.com',
+    phone: '+91 98412 11002',
+    source: 'Website',
+    interestedProduct: 'Heavy-Duty Variable Frequency Drives 15kW',
+    assignedSalesperson: 'Vikram Seth',
+    priority: 'High',
+    status: 'Qualified',
+    lastContacted: '2026-11-18',
+    nextFollowUp: '2026-11-24',
+    createdDate: '2026-11-10',
+    estimatedBudget: 450000,
+    requirementNotes: 'Requires 15kW Heavy Duty Frequency Drives with 2 years warranty and on-site commissioning support.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-1',
+        type: 'Call',
+        title: 'Initial Discovery Call',
+        timestamp: '2026-11-11 11:30 AM',
+        performedBy: 'Vikram Seth',
+        details: 'Explored machinery specifications and voltage tolerance.',
+        outcome: 'Budget confirmed, product specs sent',
+      },
+      {
+        id: 'act-2',
+        type: 'Meeting',
+        title: 'Technical Demonstration at Plant',
+        timestamp: '2026-11-15 02:30 PM',
+        performedBy: 'Vikram Seth',
+        details: 'Demonstrated motor inverter synchronization at Chennai facility.',
+        outcome: 'Technical team cleared specification; lead qualified',
+      },
+    ],
+  },
+  {
+    id: 'lead-2',
+    leadNumber: 'LD-2026-002',
+    contactName: 'Priya Narayanan',
+    companyName: 'Omni Infra Ventures',
+    email: 'priya@omniinfra.in',
+    phone: '+91 97890 33441',
+    source: 'Referral',
+    interestedProduct: 'High-Pressure Hydraulic Cylinders & Actuators',
+    assignedSalesperson: 'Ananya Sharma',
+    priority: 'Urgent',
+    status: 'Contacted',
+    lastContacted: '2026-11-17',
+    nextFollowUp: '2026-11-22',
+    createdDate: '2026-11-14',
+    estimatedBudget: 1200000,
+    requirementNotes: 'Urgent expansion project in Electronic City. Needs delivery in 30 days.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-3',
+        type: 'Call',
+        title: 'Requirement Clarification',
+        timestamp: '2026-11-16 10:15 AM',
+        performedBy: 'Ananya Sharma',
+        details: 'Discussed bore size 100mm and mounting flange specs.',
+        outcome: 'Awaiting CAD drawings from customer engineering team',
+      },
+    ],
+  },
+  {
+    id: 'lead-3',
+    leadNumber: 'LD-2026-003',
+    contactName: 'Karthik Raja',
+    companyName: 'Southern Automation Works',
+    email: 'karthik@southauto.com',
+    phone: '+91 94441 55667',
+    source: 'Campaign',
+    interestedProduct: 'Modular PLC & Industrial I/O Modules',
+    assignedSalesperson: 'Vikram Seth',
+    priority: 'Medium',
+    status: 'New',
+    lastContacted: '2026-11-18',
+    nextFollowUp: '2026-11-21',
+    createdDate: '2026-11-18',
+    estimatedBudget: 850000,
+    requirementNotes: 'Inquired through Industrial Expo 2026 campaign landing page.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-4',
+        type: 'Email',
+        title: 'Welcome Brochure Dispatched',
+        timestamp: '2026-11-18 04:45 PM',
+        performedBy: 'System Auto-Mailer',
+        details: 'Sent product technical catalog and company credentials.',
+      },
+    ],
+  },
+  {
+    id: 'lead-4',
+    leadNumber: 'LD-2026-004',
+    contactName: 'Dr. Ashok Kumar',
+    companyName: 'Bharat Bio Labs',
+    email: 'ashok@bharatbio.org',
+    phone: '+91 98210 99882',
+    source: 'Social Media',
+    interestedProduct: 'Laboratory Clean-Room HVAC Regulators',
+    assignedSalesperson: 'Ananya Sharma',
+    priority: 'Medium',
+    status: 'New',
+    lastContacted: '2026-11-19',
+    nextFollowUp: '2026-11-23',
+    createdDate: '2026-11-19',
+    estimatedBudget: 620000,
+    requirementNotes: 'Inquired on LinkedIn corporate page for precision environmental HVAC controllers.',
+    isConverted: false,
+    activities: [],
+  },
+  {
+    id: 'lead-5',
+    leadNumber: 'LD-2026-005',
+    contactName: 'Manish Verma',
+    companyName: 'Verma Fabricators & Co',
+    email: 'verma@vermafab.com',
+    phone: '+91 98455 12099',
+    source: 'Cold Outreach',
+    interestedProduct: 'CNC Spindle Bearings & Power Belts',
+    assignedSalesperson: 'Murugan Selvam',
+    priority: 'Low',
+    status: 'Lost',
+    lastContacted: '2026-11-10',
+    nextFollowUp: '-',
+    createdDate: '2026-11-05',
+    estimatedBudget: 310000,
+    requirementNotes: 'Decided to renew with previous vendor due to 15% discount difference.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-5',
+        type: 'Call',
+        title: 'Price Negotiation Call',
+        timestamp: '2026-11-10 11:00 AM',
+        performedBy: 'Murugan Selvam',
+        details: 'Customer finalized local supplier on 15% discount.',
+        outcome: 'Lead marked Lost (Price sensitivity)',
+      },
+    ],
+  },
+  {
+    id: 'lead-6',
+    leadNumber: 'LD-2026-006',
+    contactName: 'Suresh Menon',
+    companyName: 'Coimbatore Foundry Cluster',
+    email: 'suresh@cbfc.co.in',
+    phone: '+91 94432 88123',
+    source: 'Referral',
+    interestedProduct: '3-Phase Induction Motors 22kW Heavy Duty',
+    assignedSalesperson: 'Rajesh Kannan',
+    priority: 'High',
+    status: 'Qualified',
+    lastContacted: '2026-11-19',
+    nextFollowUp: '2026-11-25',
+    createdDate: '2026-11-12',
+    estimatedBudget: 980000,
+    requirementNotes: 'Requires replacement of 6 older induction motors with IE3 high efficiency models.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-6',
+        type: 'Meeting',
+        title: 'Audit & Site Visit',
+        timestamp: '2026-11-16 03:00 PM',
+        performedBy: 'Rajesh Kannan',
+        details: 'Checked motor footprint and electrical cabinet dimensions.',
+        outcome: 'Scope and budget confirmed',
+      },
+    ],
+  },
+  {
+    id: 'lead-7',
+    leadNumber: 'LD-2026-007',
+    contactName: 'Bala Swaminathan',
+    companyName: 'Sri Balaji Agro Equipments',
+    email: 'bala@sribalajiagro.com',
+    phone: '+91 94883 23456',
+    source: 'Website',
+    interestedProduct: 'Pneumatic Control Valves & Filter Regulators',
+    assignedSalesperson: 'Pooja Hegde',
+    priority: 'Low',
+    status: 'Contacted',
+    lastContacted: '2026-11-18',
+    nextFollowUp: '2026-11-26',
+    createdDate: '2026-11-16',
+    estimatedBudget: 240000,
+    requirementNotes: 'Looking for 24V DC solenoid valves for agricultural grain sorting machines.',
+    isConverted: false,
+    activities: [
+      {
+        id: 'act-7',
+        type: 'Call',
+        title: 'Initial Specs Discussion',
+        timestamp: '2026-11-18 02:00 PM',
+        performedBy: 'Pooja Hegde',
+        details: 'Sent product datasheets and flow rate charts.',
+      },
+    ],
+  },
+];
 
 export const LeadsListPage: React.FC = () => {
-  const [leads, setLeads] = useState<ExtendedLead[]>(INITIAL_EXTENDED_LEADS);
+  const [leads, setLeads] = useState<LeadItem[]>(INITIAL_LEADS);
+
+  // Filters State
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [sourceFilter, setSourceFilter] = useState<string>('ALL');
+  const [salespersonFilter, setSalespersonFilter] = useState<string>('ALL');
+  const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
 
   // Modals & Drawers
-  const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
-  const [editingLead, setEditingLead] = useState<ExtendedLead | null>(null);
-  const [viewingLead, setViewingLead] = useState<ExtendedLead | null>(null);
-  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
-  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
-  const [leadToConvert, setLeadToConvert] = useState<ExtendedLead | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingLead, setEditingLead] = useState<LeadItem | null>(null);
+  const [viewLead, setViewLead] = useState<LeadItem | null>(null);
+  const [convertLeadModal, setConvertLeadModal] = useState<LeadItem | null>(null);
+  const [assignModalLead, setAssignModalLead] = useState<LeadItem | null>(null);
+  const [newActivityLead, setNewActivityLead] = useState<LeadItem | null>(null);
 
   const [form] = Form.useForm();
   const [convertForm] = Form.useForm();
+  const [assignForm] = Form.useForm();
+  const [activityForm] = Form.useForm();
 
-  // Search and Filters
-  const filteredLeads = leads.filter(l => {
-    const q = search.toLowerCase();
-    const matchesSearch =
-      l.companyName.toLowerCase().includes(q) ||
-      l.contactName.toLowerCase().includes(q) ||
-      l.leadNumber.toLowerCase().includes(q) ||
-      l.email.toLowerCase().includes(q) ||
-      l.phone.includes(q);
+  // 1. Metric Calculations
+  const metrics = useMemo(() => {
+    const total = leads.length;
+    const newCount = leads.filter((l) => l.status === 'New').length;
+    const contactedCount = leads.filter((l) => l.status === 'Contacted').length;
+    const qualifiedCount = leads.filter((l) => l.status === 'Qualified').length;
+    const lostCount = leads.filter((l) => l.status === 'Lost').length;
+    return { total, newCount, contactedCount, qualifiedCount, lostCount };
+  }, [leads]);
 
-    const matchesStatus = statusFilter === 'ALL' || l.stage === statusFilter || l.status === statusFilter;
-    const matchesPriority = priorityFilter === 'ALL' || l.priority === priorityFilter;
+  // 2. Filter Leads
+  const filteredLeads = useMemo(() => {
+    return leads.filter((l) => {
+      const q = search.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        l.leadNumber.toLowerCase().includes(q) ||
+        l.contactName.toLowerCase().includes(q) ||
+        l.companyName.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        l.interestedProduct.toLowerCase().includes(q);
 
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
+      const matchStatus = statusFilter === 'ALL' || l.status === statusFilter;
+      const matchSource = sourceFilter === 'ALL' || l.source === sourceFilter;
+      const matchSalesperson =
+        salespersonFilter === 'ALL' || l.assignedSalesperson === salespersonFilter;
+      const matchPriority = priorityFilter === 'ALL' || l.priority === priorityFilter;
 
-  // KPI Calculations
-  const totalLeadsCount = leads.length;
-  const totalPipelineRevenue = leads.reduce((acc, curr) => acc + (curr.expectedRevenue || 0), 0);
-  const qualifiedLeadsCount = leads.filter(l => ['Qualified', 'Proposal', 'Negotiation', 'Won'].includes(l.stage)).length;
+      let matchDate = true;
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const leadDate = dayjs(l.createdDate);
+        matchDate =
+          leadDate.isAfter(dateRange[0].startOf('day')) &&
+          leadDate.isBefore(dateRange[1].endOf('day'));
+      }
 
-  const handleOpenAddModal = () => {
-    setEditingLead(null);
-    form.resetFields();
-    form.setFieldsValue({
-      stage: 'New',
-      priority: 'Medium',
-      source: 'Website',
-      assignedTo: 'Vikram Seth',
-      expectedRevenue: 500000,
+      return (
+        matchSearch &&
+        matchStatus &&
+        matchSource &&
+        matchSalesperson &&
+        matchPriority &&
+        matchDate
+      );
     });
-    setIsAddEditModalOpen(true);
-  };
+  }, [leads, search, statusFilter, sourceFilter, salespersonFilter, priorityFilter, dateRange]);
 
-  const handleOpenEdit = (lead: ExtendedLead) => {
-    setEditingLead(lead);
-    form.setFieldsValue({
-      companyName: lead.companyName,
-      contactName: lead.contactName,
-      email: lead.email,
-      phone: lead.phone,
-      alternatePhone: lead.alternatePhone,
-      industry: lead.industry,
-      source: lead.source,
-      stage: lead.stage,
-      priority: lead.priority,
-      expectedRevenue: lead.expectedRevenue,
-      expectedClosingDate: lead.expectedClosingDate,
-      assignedTo: lead.assignedTo,
-      address: lead.address,
-      notes: lead.notes,
-    });
-    setIsAddEditModalOpen(true);
-  };
-
+  // Handlers
   const handleSaveLead = (values: any) => {
     if (editingLead) {
-      setLeads(prev =>
-        prev.map(l =>
+      setLeads((prev) =>
+        prev.map((l) =>
           l.id === editingLead.id
             ? {
                 ...l,
-                ...values,
-                expectedRevenue: Number(values.expectedRevenue) || 0,
-                estimatedValue: Number(values.expectedRevenue) || 0,
+                contactName: values.contactName,
+                companyName: values.companyName,
+                email: values.email,
+                phone: values.phone,
+                source: values.source,
+                interestedProduct: values.interestedProduct,
+                assignedSalesperson: values.assignedSalesperson,
+                priority: values.priority,
+                status: values.status,
+                estimatedBudget: Number(values.estimatedBudget) || 0,
+                nextFollowUp: values.nextFollowUp
+                  ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+                  : l.nextFollowUp,
+                requirementNotes: values.requirementNotes,
               }
             : l
         )
       );
-      message.success(`Lead ${editingLead.leadNumber} updated successfully.`);
+      message.success(`Lead ${editingLead.leadNumber} updated successfully!`);
+      setEditingLead(null);
     } else {
-      const newLead: ExtendedLead = {
-        id: `lead_${Date.now()}`,
-        leadNumber: `LD-2026-${String(leads.length + 1).padStart(3, '0')}`,
-        companyName: values.companyName,
+      const nextNum = leads.length + 1;
+      const formattedNum = `LD-2026-${String(nextNum).padStart(3, '0')}`;
+      const newEntry: LeadItem = {
+        id: `lead-${Date.now()}`,
+        leadNumber: formattedNum,
         contactName: values.contactName,
-        email: values.email,
-        phone: values.phone,
-        alternatePhone: values.alternatePhone,
-        industry: values.industry || 'General Industry',
-        source: values.source || 'Website',
-        stage: values.stage || 'New',
-        priority: values.priority || 'Medium',
-        estimatedValue: Number(values.expectedRevenue) || 0,
-        expectedRevenue: Number(values.expectedRevenue) || 0,
-        expectedClosingDate: values.expectedClosingDate,
-        assignedTo: values.assignedTo || 'Vikram Seth',
-        address: values.address,
-        notes: values.notes,
-        createdAt: new Date().toISOString().slice(0, 10),
-        status: values.stage === 'Won' ? 'Won' : values.stage === 'Lost' ? 'Lost' : (values.stage || 'New'),
-      };
-      setLeads(prev => [newLead, ...prev]);
-      message.success(`Lead ${newLead.leadNumber} created successfully!`);
-    }
-    setIsAddEditModalOpen(false);
-  };
-
-  const handleDeleteLead = (id: string) => {
-    Modal.confirm({
-      title: 'Delete Lead',
-      content: 'Are you sure you want to permanently delete this sales lead?',
-      okType: 'danger',
-      onOk: () => {
-        setLeads(prev => prev.filter(l => l.id !== id));
-        message.success('Lead deleted successfully.');
-      },
-    });
-  };
-
-  const handleOpenConvert = (lead: ExtendedLead) => {
-    setLeadToConvert(lead);
-    convertForm.setFieldsValue({
-      companyName: lead.companyName,
-      contactPerson: lead.contactName,
-      email: lead.email,
-      phone: lead.phone,
-      gstNumber: '',
-      creditLimit: 500000,
-      source: lead.source,
-      assignedEmployee: lead.assignedTo,
-    });
-    setIsConvertModalOpen(true);
-  };
-
-  const handleConfirmConvert = (values: any) => {
-    if (!leadToConvert) return;
-
-    const existingCust = INITIAL_CUSTOMERS.find(c => c.name.toLowerCase() === leadToConvert.companyName.toLowerCase());
-    if (!existingCust) {
-      const newCust: ExtendedCustomer = {
-        id: `cust_${Date.now()}`,
-        code: `CUST-2026-${String(INITIAL_CUSTOMERS.length + 1).padStart(3, '0')}`,
-        name: values.companyName,
         companyName: values.companyName,
-        type: 'Business',
-        contactPerson: values.contactPerson,
         email: values.email,
         phone: values.phone,
-        city: 'Chennai',
-        address: leadToConvert.address || 'Standard Registered Address',
-        gstNumber: values.gstNumber || '33AABCT9988M1Z0',
-        source: (values.source as any) || 'Direct',
-        assignedEmployee: values.assignedEmployee || 'Vikram Seth',
-        creditLimit: Number(values.creditLimit) || 500000,
-        currentBalance: 0,
-        status: 'Active',
-        notes: `Converted from Lead ${leadToConvert.leadNumber}. Lead notes: ${leadToConvert.notes || 'None'}`,
-        createdAt: new Date().toISOString().slice(0, 10),
+        source: values.source || 'Website',
+        interestedProduct: values.interestedProduct,
+        assignedSalesperson: values.assignedSalesperson,
+        priority: values.priority || 'Medium',
+        status: values.status || 'New',
+        lastContacted: dayjs().format('YYYY-MM-DD'),
+        nextFollowUp: values.nextFollowUp
+          ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+          : dayjs().add(3, 'day').format('YYYY-MM-DD'),
+        createdDate: dayjs().format('YYYY-MM-DD'),
+        estimatedBudget: Number(values.estimatedBudget) || 0,
+        requirementNotes: values.requirementNotes || '',
+        isConverted: false,
+        activities: [
+          {
+            id: `act-${Date.now()}`,
+            type: 'Note',
+            title: 'Lead Created',
+            timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+            performedBy: values.assignedSalesperson,
+            details: 'Lead initialized in the system.',
+          },
+        ],
       };
-
-      INITIAL_CUSTOMERS.unshift(newCust);
+      setLeads((prev) => [newEntry, ...prev]);
+      message.success(`New lead ${formattedNum} created successfully!`);
+      setIsAddModalOpen(false);
     }
+    form.resetFields();
+  };
 
-    setLeads(prev =>
-      prev.map(l =>
-        l.id === leadToConvert.id
+  const handleDeleteLead = (id: string, num: string) => {
+    setLeads((prev) => prev.filter((l) => l.id !== id));
+    if (viewLead?.id === id) setViewLead(null);
+    message.success(`Lead ${num} deleted`);
+  };
+
+  const handleConvertLead = (values: any) => {
+    if (!convertLeadModal) return;
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === convertLeadModal.id
           ? {
               ...l,
-              stage: 'Won',
-              status: 'Won',
               isConverted: true,
-              conversionDate: new Date().toISOString().slice(0, 10),
+              convertedEntity: `${values.entityType}: ${values.opportunityName || l.companyName}`,
+              status: 'Qualified',
+              activities: [
+                ...l.activities,
+                {
+                  id: `act-${Date.now()}`,
+                  type: 'Note',
+                  title: `Converted to ${values.entityType}`,
+                  timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+                  performedBy: l.assignedSalesperson,
+                  details: `Converted by sales desk with estimated deal size ₹${Number(
+                    values.dealValue || l.estimatedBudget
+                  ).toLocaleString('en-IN')}`,
+                },
+              ],
             }
           : l
       )
     );
-
-    message.success(`Lead ${leadToConvert.companyName} successfully converted to Customer Account!`);
-    setIsConvertModalOpen(false);
+    message.success(
+      `Lead ${convertLeadModal.leadNumber} successfully converted to ${values.entityType}!`
+    );
+    setConvertLeadModal(null);
+    convertForm.resetFields();
   };
 
-  const kpiCards = [
+  const handleAssignLead = (values: any) => {
+    if (!assignModalLead) return;
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === assignModalLead.id
+          ? {
+              ...l,
+              assignedSalesperson: values.newSalesperson,
+              activities: [
+                ...l.activities,
+                {
+                  id: `act-${Date.now()}`,
+                  type: 'Note',
+                  title: 'Salesperson Reassigned',
+                  timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+                  performedBy: 'Sales Director',
+                  details: `Reassigned from ${l.assignedSalesperson} to ${values.newSalesperson}. Reason: ${
+                    values.reason || 'Territory alignment'
+                  }`,
+                },
+              ],
+            }
+          : l
+      )
+    );
+    message.success(
+      `Lead ${assignModalLead.leadNumber} assigned to ${values.newSalesperson}`
+    );
+    setAssignModalLead(null);
+    assignForm.resetFields();
+  };
+
+  const handleAddActivity = (values: any) => {
+    if (!newActivityLead) return;
+    const newAct: LeadActivityItem = {
+      id: `act-${Date.now()}`,
+      type: values.type,
+      title: values.title,
+      timestamp: dayjs().format('YYYY-MM-DD hh:mm A'),
+      performedBy: newActivityLead.assignedSalesperson,
+      details: values.details,
+      outcome: values.outcome,
+    };
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === newActivityLead.id
+          ? {
+              ...l,
+              lastContacted: dayjs().format('YYYY-MM-DD'),
+              nextFollowUp: values.nextFollowUp
+                ? dayjs(values.nextFollowUp).format('YYYY-MM-DD')
+                : l.nextFollowUp,
+              activities: [newAct, ...l.activities],
+            }
+          : l
+      )
+    );
+    message.success('Activity and communication history updated');
+    setNewActivityLead(null);
+    activityForm.resetFields();
+  };
+
+  // Badges & Tags Helpers
+  const getStatusBadge = (status: LeadStatusType) => {
+    const config: Record<
+      LeadStatusType,
+      { bg: string; color: string; border: string }
+    > = {
+      New: { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
+      Contacted: { bg: '#FDF4FF', color: '#A21CAF', border: '#F5D0FE' },
+      Qualified: { bg: '#F0FDF4', color: '#15803D', border: '#BBF7D0' },
+      Lost: { bg: '#FEF2F2', color: '#B91C1C', border: '#FECACA' },
+    };
+    const c = config[status] || { bg: '#F8FAFC', color: '#475569', border: '#E2E8F0' };
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          padding: '3px 9px',
+          borderRadius: 20,
+          fontSize: 11.5,
+          fontWeight: 700,
+          backgroundColor: c.bg,
+          color: c.color,
+          border: `1px solid ${c.border}`,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            backgroundColor: c.color,
+          }}
+        />
+        {status}
+      </span>
+    );
+  };
+
+  const getPriorityBadge = (p: LeadPriorityType) => {
+    const config: Record<LeadPriorityType, { bg: string; color: string; border: string }> = {
+      Urgent: { bg: '#FEF2F2', color: '#DC2626', border: '#FCA5A5' },
+      High: { bg: '#FFF7ED', color: '#C2410C', border: '#FDBA74' },
+      Medium: { bg: '#FEFCE8', color: '#854D0E', border: '#FDE047' },
+      Low: { bg: '#F1F5F9', color: '#475569', border: '#CBD5E1' },
+    };
+    const c = config[p] || { bg: '#F1F5F9', color: '#475569', border: '#CBD5E1' };
+    return (
+      <span
+        style={{
+          padding: '2px 8px',
+          borderRadius: 6,
+          fontSize: 11,
+          fontWeight: 700,
+          backgroundColor: c.bg,
+          color: c.color,
+          border: `1px solid ${c.border}`,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {p}
+      </span>
+    );
+  };
+
+  // Table Columns (Exact Match to Requirement 5)
+  // Generous column widths so that Interested Product and Actions do not collide
+  const columns: ColumnsType<LeadItem> = [
     {
-      title: 'Total Active Leads',
-      value: totalLeadsCount.toString(),
-      growth: '+14% MoM',
-      isDark: true,
-      cardBg: 'linear-gradient(135deg, #3A1078 0%, #5421A8 50%, #43148F 100%)',
-      titleColor: 'rgba(255, 255, 255, 0.85)',
-      valueColor: '#FFFFFF',
-      growthColor: '#4ADE80',
-      icon: <Users size={20} color="#5421A8" />,
-      iconBg: '#FFFFFF',
-      boxShadow: '0 8px 20px rgba(58, 16, 120, 0.22)',
+      title: 'Lead ID',
+      dataIndex: 'leadNumber',
+      key: 'leadNumber',
+      width: 125,
+      render: (text: string, r) => (
+        <span
+          onClick={() => setViewLead(r)}
+          style={{
+            fontWeight: 800,
+            color: BRAND_PURPLE,
+            backgroundColor: BRAND_PURPLE_TINT,
+            border: '1px solid #E9D5FF',
+            padding: '3px 8px',
+            borderRadius: 6,
+            fontSize: 11.5,
+            cursor: 'pointer',
+            display: 'inline-block',
+          }}
+        >
+          {text}
+        </span>
+      ),
     },
     {
-      title: 'Total Pipeline Value',
-      value: `₹${(totalPipelineRevenue / 100000).toFixed(1)}L`,
-      growth: '+18.5%',
-      isDark: false,
-      cardBg: '#FFFFFF',
-      titleColor: '#6B7280',
-      valueColor: '#111827',
-      growthColor: '#10B981',
-      icon: <DollarSign size={18} color="#FFFFFF" />,
-      iconBg: '#0284C7',
-      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
+      title: 'Lead Name & Company',
+      key: 'nameCompany',
+      width: 210,
+      render: (_, r) => (
+        <div>
+          <div
+            onClick={() => setViewLead(r)}
+            style={{
+              fontWeight: 700,
+              color: '#0F172A',
+              fontSize: 12.5,
+              cursor: 'pointer',
+            }}
+          >
+            {r.contactName}
+          </div>
+          <div style={{ fontSize: 11.5, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
+            <Building size={11} color="#94A3B8" />
+            <span style={{ fontWeight: 500 }}>{r.companyName}</span>
+          </div>
+        </div>
+      ),
     },
     {
-      title: 'Qualified & Progressing',
-      value: qualifiedLeadsCount.toString(),
-      growth: `${Math.round((qualifiedLeadsCount / (totalLeadsCount || 1)) * 100)}% Rate`,
-      isDark: true,
-      cardBg: 'linear-gradient(135deg, #2A0D5C 0%, #4C1D95 50%, #3B0764 100%)',
-      titleColor: 'rgba(255, 255, 255, 0.85)',
-      valueColor: '#FFFFFF',
-      growthColor: '#4ADE80',
-      icon: <Award size={20} color="#4C1D95" />,
-      iconBg: '#FFFFFF',
-      boxShadow: '0 8px 20px rgba(42, 13, 92, 0.22)',
+      title: 'Contact Details',
+      key: 'contactDetails',
+      width: 180,
+      render: (_, r) => (
+        <div>
+          <div style={{ fontSize: 11.5, color: '#334155', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Phone size={11} color="#64748B" />
+            {r.phone}
+          </div>
+          <div style={{ fontSize: 11, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
+            <Mail size={11} color="#94A3B8" />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {r.email}
+            </span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Lead Source',
+      dataIndex: 'source',
+      key: 'source',
+      width: 120,
+      render: (source: LeadSourceType) => (
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: '#334155',
+            backgroundColor: '#F8FAFC',
+            padding: '3px 8px',
+            borderRadius: 6,
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {source}
+        </span>
+      ),
+    },
+    {
+      title: 'Interested Product / Service',
+      dataIndex: 'interestedProduct',
+      key: 'interestedProduct',
+      width: 280,
+      render: (prod: string) => (
+        <span
+          style={{
+            fontWeight: 600,
+            color: '#1E293B',
+            fontSize: 12,
+            display: 'block',
+            lineHeight: 1.4,
+            paddingRight: 16,
+          }}
+        >
+          {prod}
+        </span>
+      ),
+    },
+    {
+      title: 'Assigned Salesperson',
+      dataIndex: 'assignedSalesperson',
+      key: 'assignedSalesperson',
+      width: 160,
+      render: (rep: string, r) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              backgroundColor: '#EDE9FE',
+              color: BRAND_PURPLE,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 10,
+              fontWeight: 800,
+            }}
+          >
+            {rep.charAt(0)}
+          </div>
+          <span
+            onClick={() => {
+              setAssignModalLead(r);
+              assignForm.setFieldsValue({ newSalesperson: r.assignedSalesperson });
+            }}
+            style={{
+              fontSize: 12,
+              color: '#334155',
+              fontWeight: 600,
+              cursor: 'pointer',
+              textDecoration: 'underline dotted #CBD5E1',
+            }}
+            title="Click to reassign"
+          >
+            {rep}
+          </span>
+        </div>
+      ),
+    },
+    {
+      title: 'Priority',
+      dataIndex: 'priority',
+      key: 'priority',
+      width: 95,
+      render: (p: LeadPriorityType) => getPriorityBadge(p),
+    },
+    {
+      title: 'Lead Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 120,
+      render: (s: LeadStatusType) => getStatusBadge(s),
+    },
+    {
+      title: 'Last Contacted',
+      dataIndex: 'lastContacted',
+      key: 'lastContacted',
+      width: 115,
+      render: (d: string) => (
+        <span style={{ fontSize: 11.5, color: '#475569', fontWeight: 500 }}>
+          {d}
+        </span>
+      ),
+    },
+    {
+      title: 'Next Follow-up',
+      dataIndex: 'nextFollowUp',
+      key: 'nextFollowUp',
+      width: 120,
+      render: (d: string) => {
+        if (!d || d === '-') return <span style={{ color: '#94A3B8' }}>-</span>;
+        const isPast = dayjs(d).isBefore(dayjs(), 'day');
+        return (
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: isPast ? 700 : 600,
+              color: isPast ? '#DC2626' : '#2563EB',
+            }}
+          >
+            {d} {isPast && '(!)'}
+          </span>
+        );
+      },
+    },
+    {
+      title: 'Created Date',
+      dataIndex: 'createdDate',
+      key: 'createdDate',
+      width: 110,
+      render: (d: string) => (
+        <span style={{ fontSize: 11, color: '#64748B' }}>{d}</span>
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 160,
+      fixed: 'right',
+      align: 'center',
+      render: (_, r) => (
+        <Space size={6} style={{ justifyContent: 'center' }}>
+          <Tooltip title="View Lead Details">
+            <Button
+              size="small"
+              icon={<Eye size={13} color="#475569" />}
+              style={{ borderRadius: 6, borderColor: '#E2E8F0' }}
+              onClick={() => setViewLead(r)}
+            />
+          </Tooltip>
+          <Tooltip title="Edit Lead">
+            <Button
+              size="small"
+              icon={<Edit3 size={13} color="#475569" />}
+              style={{ borderRadius: 6, borderColor: '#E2E8F0' }}
+              onClick={() => {
+                setEditingLead(r);
+                form.setFieldsValue({
+                  ...r,
+                  nextFollowUp: r.nextFollowUp && r.nextFollowUp !== '-' ? dayjs(r.nextFollowUp) : null,
+                });
+              }}
+            />
+          </Tooltip>
+          {!r.isConverted && r.status !== 'Lost' && (
+            <Tooltip title="Convert Lead">
+              <Button
+                size="small"
+                icon={<ArrowRight size={13} color="#15803D" />}
+                style={{
+                  borderRadius: 6,
+                  backgroundColor: '#F0FDF4',
+                  borderColor: '#BBF7D0',
+                }}
+                onClick={() => {
+                  setConvertLeadModal(r);
+                  convertForm.setFieldsValue({
+                    entityType: 'Opportunity',
+                    opportunityName: `${r.companyName} - Project`,
+                    dealValue: r.estimatedBudget,
+                  });
+                }}
+              />
+            </Tooltip>
+          )}
+          <Popconfirm
+            title="Delete this lead?"
+            description="Are you sure you want to delete this lead record?"
+            okText="Yes, Delete"
+            cancelText="Cancel"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => handleDeleteLead(r.id, r.leadNumber)}
+          >
+            <Tooltip title="Delete">
+              <Button
+                size="small"
+                danger
+                icon={<Trash2 size={13} />}
+                style={{ borderRadius: 6 }}
+              />
+            </Tooltip>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
-  const getStageTagStyle = (stage: string) => {
-    switch (stage) {
-      case 'New':
-        return { bg: '#E0F2FE', text: '#0284C7' };
-      case 'Contacted':
-        return { bg: '#F3E8FF', text: '#7C3AED' };
-      case 'Qualified':
-        return { bg: '#E6F4EA', text: '#137333' };
-      case 'Proposal':
-        return { bg: '#FFEDD5', text: '#C2410C' };
-      case 'Negotiation':
-        return { bg: '#EEF2FF', text: '#4338CA' };
-      case 'Won':
-        return { bg: '#DCFCE7', text: '#15803D' };
-      case 'Lost':
-        return { bg: '#FEE2E2', text: '#DC2626' };
-      default:
-        return { bg: '#F3F4F6', text: '#4B5563' };
-    }
-  };
-
-  const getPriorityStyle = (priority: string) => {
-    switch (priority) {
-      case 'Urgent':
-        return { bg: '#FEF2F2', text: '#EF4444', border: '#FCA5A5' };
-      case 'High':
-        return { bg: '#FFF7ED', text: '#EA580C', border: '#FDBA74' };
-      case 'Medium':
-        return { bg: '#FAF5FF', text: '#7544D6', border: '#D8B4FE' };
-      case 'Low':
-      default:
-        return { bg: '#F9FAFB', text: '#6B7280', border: '#E5E7EB' };
-    }
-  };
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 18,
-        minHeight: '100%',
-        paddingBottom: 24,
-      }}
-    >
-      {/* 1. Cohesive Header Bar */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. Header Banner */}
       <div
         style={{
+          background: 'linear-gradient(135deg, #FAF5FF 0%, #FFFFFF 100%)',
+          borderRadius: 16,
+          padding: '18px 24px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 2px 8px rgba(68, 26, 135, 0.04)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          rowGap: 14,
-          columnGap: 20,
-          padding: '14px 20px',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 245, 254, 0.9) 100%)',
-          borderRadius: 18,
-          border: '1px solid #EAE4F5',
-          boxShadow: '0 4px 20px rgba(84, 33, 168, 0.04)',
-          backdropFilter: 'blur(8px)',
-          width: '100%',
-          boxSizing: 'border-box',
+          gap: 12,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 260, flex: '1 1 auto' }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(84, 33, 168, 0.28)',
-              flexShrink: 0,
-            }}
-          >
-            <Users size={20} color="#FFFFFF" />
-          </div>
-          <div>
-            <h1
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
               style={{
-                fontSize: 20,
-                fontWeight: 800,
-                color: '#211044',
-                margin: 0,
-                letterSpacing: '-0.3px',
-                lineHeight: 1.25,
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                backgroundColor: BRAND_PURPLE_TINT,
+                color: BRAND_PURPLE,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Leads Management
-            </h1>
-            <p
-              style={{
-                fontSize: 12,
-                color: '#6B7280',
-                margin: '3px 0 0 0',
-                lineHeight: 1.3,
-              }}
-            >
-              Capture, track, qualify, and convert commercial sales opportunities into customer accounts.
-            </p>
+              <Users size={20} />
+            </div>
+            <div>
+              <h1
+                style={{
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  margin: 0,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Leads Management
+              </h1>
+              <p style={{ margin: 0, fontSize: 12, color: '#64748B', marginTop: 2 }}>
+                Manage sales prospects, track lead qualification, assign sales representatives and monitor conversion activities.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Right Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', flexShrink: 0 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              background: '#FFFFFF',
-              border: '1px solid #ECE8F6',
-              borderRadius: 30,
-              padding: '6px 14px',
-              width: 220,
-              boxShadow: '0 2px 6px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <Search size={14} color="#7544D6" style={{ marginRight: 8, flexShrink: 0 }} />
-            <input
-              placeholder="Search leads..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                fontSize: 12.5,
-                color: '#1F2937',
-                width: '100%',
-              }}
-            />
-          </div>
-
+        <div style={{ display: 'flex', gap: 10 }}>
           <Button
             type="primary"
-            icon={<UserPlus size={15} />}
-            onClick={handleOpenAddModal}
+            icon={<Plus size={15} />}
             style={{
-              background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-              borderColor: '#5421A8',
-              borderRadius: 24,
+              backgroundColor: BRAND_PURPLE,
+              borderColor: BRAND_PURPLE,
               fontWeight: 700,
-              height: 36,
-              padding: '0 18px',
-              boxShadow: '0 4px 12px rgba(84, 33, 168, 0.25)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12.5,
+              height: 38,
+              borderRadius: 8,
+              boxShadow: '0 4px 12px rgba(68, 26, 135, 0.2)',
+            }}
+            onClick={() => {
+              setEditingLead(null);
+              form.resetFields();
+              setIsAddModalOpen(true);
             }}
           >
-            Create Lead
+            + Add New Lead
           </Button>
         </div>
       </div>
 
-      {/* 2. Top Metric KPI Cards */}
+      {/* 2. 5 Summary Cards - Full 100% container width */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gap: 14,
+          width: '100%',
         }}
       >
-        {kpiCards.map((kpi, idx) => (
-          <div
-            key={idx}
-            style={{
-              background: kpi.cardBg,
-              borderRadius: 16,
-              padding: '16px 20px',
-              border: kpi.isDark ? 'none' : '1px solid #EAE4F5',
-              boxShadow: kpi.boxShadow,
-              position: 'relative',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: kpi.titleColor,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: 4,
-                }}
-              >
-                {kpi.title}
-              </div>
-              <div
-                style={{
-                  fontSize: 26,
-                  fontWeight: 900,
-                  color: kpi.valueColor,
-                  lineHeight: 1.1,
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                }}
-              >
-                {kpi.value}
-              </div>
-              <div
-                style={{
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: kpi.growthColor,
-                  marginTop: 6,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                }}
-              >
-                <span>{kpi.growth}</span>
-                <span
-                  style={{
-                    color: kpi.isDark ? 'rgba(255, 255, 255, 0.65)' : '#9CA3AF',
-                    fontWeight: 500,
-                  }}
-                >
-                  &bull; verified
-                </span>
-              </div>
-            </div>
+        {/* Total Leads */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FAF5FF 0%, #F5EEFD 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #E9D5FF',
+            boxShadow: '0 2px 6px rgba(68, 26, 135, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#6B21A8' }}>
+              Total Leads
+            </span>
             <div
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: kpi.iconBg,
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: kpi.isDark ? '0 4px 10px rgba(0,0,0,0.18)' : '0 3px 8px rgba(0,0,0,0.06)',
-                flexShrink: 0,
               }}
             >
-              {kpi.icon}
+              <Users size={14} color={BRAND_PURPLE} />
             </div>
           </div>
-        ))}
+          <div style={{ fontSize: 24, fontWeight: 900, color: BRAND_PURPLE, marginTop: 6 }}>
+            {metrics.total}
+          </div>
+        </div>
+
+        {/* New Leads */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #BFDBFE',
+            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#1E40AF' }}>
+              New Leads
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Clock size={14} color="#2563EB" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#1E40AF', marginTop: 6 }}>
+            {metrics.newCount}
+          </div>
+        </div>
+
+        {/* Contacted Leads */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FDF4FF 0%, #FAE8FF 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #F5D0FE',
+            boxShadow: '0 2px 6px rgba(162, 28, 175, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#86198F' }}>
+              Contacted Leads
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <PhoneCall size={14} color="#A21CAF" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#86198F', marginTop: 6 }}>
+            {metrics.contactedCount}
+          </div>
+        </div>
+
+        {/* Qualified Leads */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #BBF7D0',
+            boxShadow: '0 2px 6px rgba(22, 163, 74, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#166534' }}>
+              Qualified Leads
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckCircle size={14} color="#16A34A" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#166534', marginTop: 6 }}>
+            {metrics.qualifiedCount}
+          </div>
+        </div>
+
+        {/* Lost Leads */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
+            borderRadius: 14,
+            padding: '14px 18px',
+            border: '1px solid #FECACA',
+            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#991B1B' }}>
+              Lost Leads
+            </span>
+            <div
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <XCircle size={14} color="#DC2626" />
+            </div>
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#991B1B', marginTop: 6 }}>
+            {metrics.lostCount}
+          </div>
+        </div>
       </div>
 
-      {/* 3. Table Card with exact CRM Dashboard styling and proper alignment */}
+      {/* 3. Search & Filters Section (Single properly aligned row) */}
       <div
         style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: 16,
-          padding: '18px 20px',
-          border: '1px solid #ECE8F6',
-          boxShadow: '0 4px 18px rgba(84, 33, 168, 0.05)',
+          background: '#FFFFFF',
+          borderRadius: 14,
+          padding: '14px 18px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 2px 8px rgba(68, 26, 135, 0.03)',
           display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
+          flexWrap: 'wrap',
+          gap: 10,
+          alignItems: 'center',
         }}
       >
-        {/* Table Top Header and Filter Bar */}
+        {/* Search by Lead ID / Name / Company */}
+        <div style={{ flex: '1 1 220px', minWidth: 200 }}>
+          <Input
+            prefix={<Search size={14} color="#94A3B8" />}
+            placeholder="Search by Lead ID / Name / Company"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+            style={{ borderRadius: 8, height: 36 }}
+          />
+        </div>
+
+        {/* Lead Status Filter */}
+        <div style={{ width: 145 }}>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Statuses' },
+              { value: 'New', label: 'New' },
+              { value: 'Contacted', label: 'Contacted' },
+              { value: 'Qualified', label: 'Qualified' },
+              { value: 'Lost', label: 'Lost' },
+            ]}
+          />
+        </div>
+
+        {/* Lead Source Filter */}
+        <div style={{ width: 145 }}>
+          <Select
+            value={sourceFilter}
+            onChange={setSourceFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Sources' },
+              { value: 'Website', label: 'Website' },
+              { value: 'Referral', label: 'Referral' },
+              { value: 'Campaign', label: 'Campaign' },
+              { value: 'Social Media', label: 'Social Media' },
+              { value: 'Cold Outreach', label: 'Cold Outreach' },
+            ]}
+          />
+        </div>
+
+        {/* Assigned Salesperson Filter */}
+        <div style={{ width: 160 }}>
+          <Select
+            value={salespersonFilter}
+            onChange={setSalespersonFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Salespeople' },
+              ...SALESPERSON_LIST.map((s) => ({ value: s, label: s })),
+            ]}
+          />
+        </div>
+
+        {/* Priority Filter */}
+        <div style={{ width: 130 }}>
+          <Select
+            value={priorityFilter}
+            onChange={setPriorityFilter}
+            style={{ width: '100%', height: 36 }}
+            options={[
+              { value: 'ALL', label: 'All Priorities' },
+              { value: 'Urgent', label: 'Urgent' },
+              { value: 'High', label: 'High' },
+              { value: 'Medium', label: 'Medium' },
+              { value: 'Low', label: 'Low' },
+            ]}
+          />
+        </div>
+
+        {/* Date Range Filter */}
+        <div style={{ width: 230 }}>
+          <DatePicker.RangePicker
+            value={dateRange}
+            onChange={(dates) => setDateRange(dates as any)}
+            style={{ width: '100%', height: 36, borderRadius: 8 }}
+            format="YYYY-MM-DD"
+            placeholder={['Start Date', 'End Date']}
+          />
+        </div>
+
+        {/* Clear Filters Button if any active */}
+        {(search ||
+          statusFilter !== 'ALL' ||
+          sourceFilter !== 'ALL' ||
+          salespersonFilter !== 'ALL' ||
+          priorityFilter !== 'ALL' ||
+          dateRange) && (
+          <Button
+            size="small"
+            icon={<RotateCcw size={12} />}
+            onClick={() => {
+              setSearch('');
+              setStatusFilter('ALL');
+              setSourceFilter('ALL');
+              setSalespersonFilter('ALL');
+              setPriorityFilter('ALL');
+              setDateRange(null);
+            }}
+            style={{ height: 36, borderRadius: 8, fontSize: 12, color: '#64748B' }}
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+
+      {/* 4. Lead Management Table */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderRadius: 16,
+          padding: '16px 20px',
+          border: '1px solid #ECE6F8',
+          boxShadow: '0 4px 16px rgba(68, 26, 135, 0.03)',
+        }}
+      >
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 16,
-            paddingBottom: 14,
-            borderBottom: '1px solid #F5F3FB',
-            flexWrap: 'wrap',
-            gap: 12,
+            marginBottom: 12,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#0F172A' }}>
+              All Leads
+            </span>
+            <span
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 10,
-                background: 'linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(117, 68, 214, 0.12)',
-                flexShrink: 0,
+                fontSize: 11.5,
+                fontWeight: 700,
+                color: BRAND_PURPLE,
+                backgroundColor: BRAND_PURPLE_TINT,
+                padding: '2px 8px',
+                borderRadius: 12,
               }}
             >
-              <Users size={17} color="#7544D6" />
-            </div>
-            <div>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#1E1B4B', letterSpacing: '-0.2px' }}>
-                Active Opportunities & Leads
+              {filteredLeads.length} records
+            </span>
+          </div>
+        </div>
+
+        <Table<LeadItem>
+          columns={columns}
+          dataSource={filteredLeads}
+          rowKey="id"
+          pagination={{
+            pageSize: 7,
+            size: 'small',
+            showTotal: (total, range) => (
+              <span style={{ fontSize: 11.5, color: '#64748B' }}>
+                Showing {range[0]}-{range[1]} of {total} leads
               </span>
-              <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500 }}>
-                Enterprise deal pipelines and client conversions
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Select
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 145, height: 34 }}
-              options={[
-                { label: 'All Stages', value: 'ALL' },
-                { label: 'New Lead', value: 'New' },
-                { label: 'Contacted', value: 'Contacted' },
-                { label: 'Qualified', value: 'Qualified' },
-                { label: 'Proposal Sent', value: 'Proposal' },
-                { label: 'Negotiation', value: 'Negotiation' },
-                { label: 'Won / Converted', value: 'Won' },
-                { label: 'Lost', value: 'Lost' },
-              ]}
-            />
-            <Select
-              value={priorityFilter}
-              onChange={setPriorityFilter}
-              style={{ width: 130, height: 34 }}
-              options={[
-                { label: 'All Priorities', value: 'ALL' },
-                { label: 'Urgent', value: 'Urgent' },
-                { label: 'High', value: 'High' },
-                { label: 'Medium', value: 'Medium' },
-                { label: 'Low', value: 'Low' },
-              ]}
-            />
-            <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 600, marginLeft: 4 }}>
-              Total: <strong style={{ color: '#5421A8' }}>{filteredLeads.length}</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Clean Dashboard-Style Table */}
-        <div style={{ overflowX: 'auto', width: '100%' }}>
-          <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#FAF9FE' }}>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', borderTopLeftRadius: 8, borderBottomLeftRadius: 8, width: 90 }}>
-                  Lead ID
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', minWidth: 200 }}>
-                  Company & Contact
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', minWidth: 120 }}>
-                  Deal Value
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', width: 120, textAlign: 'center' }}>
-                  Stage
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', width: 95, textAlign: 'center' }}>
-                  Priority
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', minWidth: 140 }}>
-                  Executive
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', minWidth: 110 }}>
-                  Expected Close
-                </th>
-                <th style={{ padding: '9px 12px', fontSize: 10.5, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'right', borderTopRightRadius: 8, borderBottomRightRadius: 8, width: 140 }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLeads.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '36px', textAlign: 'center', color: '#9CA3AF', fontSize: 13, fontStyle: 'italic' }}>
-                    No leads found matching your search and filter criteria.
-                  </td>
-                </tr>
-              ) : (
-                filteredLeads.map((r) => {
-                  const stageStyle = getStageTagStyle(r.stage);
-                  const prioStyle = getPriorityStyle(r.priority);
-                  const avatarUrl = avatarMap[r.assignedTo] || defaultAvatar;
-
-                  return (
-                    <tr
-                      key={r.id}
-                      style={{
-                        transition: 'background-color 0.15s ease',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FBF9FF')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    >
-                      {/* 1. Lead ID */}
-                      <td style={{ padding: '12px 12px', borderBottom: '1px solid #F3F0FA' }}>
-                        <span
-                          style={{
-                            backgroundColor: '#F3EEFF',
-                            color: '#7544D6',
-                            fontWeight: 800,
-                            fontSize: 11.5,
-                            padding: '3px 8px',
-                            borderRadius: 6,
-                            display: 'inline-block',
-                            letterSpacing: '0.2px',
-                          }}
-                        >
-                          {r.leadNumber}
-                        </span>
-                      </td>
-
-                      {/* 2. Company & Contact */}
-                      <td style={{ padding: '12px 12px', borderBottom: '1px solid #F3F0FA' }}>
-                        <div style={{ fontWeight: 700, color: '#1F2937', fontSize: 12.5, lineHeight: 1.3 }}>
-                          {r.companyName}
-                        </div>
-                        <div style={{ fontSize: 11.5, color: '#6B7280', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span>👤 {r.contactName}</span>
-                          <span>&bull;</span>
-                          <span style={{ color: '#4B5563' }}>{r.industry}</span>
-                        </div>
-                      </td>
-
-                      {/* 3. Deal Value */}
-                      <td style={{ padding: '12px 12px', borderBottom: '1px solid #F3F0FA', whiteSpace: 'nowrap' }}>
-                        <span style={{ fontWeight: 800, color: '#10B981', fontSize: 13 }}>
-                          ₹{(r.expectedRevenue || 0).toLocaleString()}
-                        </span>
-                      </td>
-
-                      {/* 4. Stage Badge */}
-                      <td style={{ padding: '12px 12px', textAlign: 'center', borderBottom: '1px solid #F3F0FA', whiteSpace: 'nowrap' }}>
-                        <span
-                          style={{
-                            backgroundColor: stageStyle.bg,
-                            color: stageStyle.text,
-                            padding: '3px 10px',
-                            borderRadius: 14,
-                            fontSize: 10.5,
-                            fontWeight: 700,
-                            display: 'inline-block',
-                            border: `1px solid ${stageStyle.text}22`,
-                          }}
-                        >
-                          {r.stage}
-                        </span>
-                      </td>
-
-                      {/* 5. Priority */}
-                      <td style={{ padding: '12px 12px', textAlign: 'center', borderBottom: '1px solid #F3F0FA', whiteSpace: 'nowrap' }}>
-                        <span
-                          style={{
-                            backgroundColor: prioStyle.bg,
-                            color: prioStyle.text,
-                            padding: '2px 8px',
-                            borderRadius: 6,
-                            fontSize: 10.5,
-                            fontWeight: 700,
-                            display: 'inline-block',
-                            border: `1px solid ${prioStyle.border}`,
-                          }}
-                        >
-                          {r.priority}
-                        </span>
-                      </td>
-
-                      {/* 6. Executive with avatar */}
-                      <td style={{ padding: '12px 12px', borderBottom: '1px solid #F3F0FA', whiteSpace: 'nowrap' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                          <img
-                            src={avatarUrl}
-                            alt={r.assignedTo}
-                            style={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              border: '1.5px solid #FFFFFF',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                            }}
-                          />
-                          <span style={{ color: '#4B5563', fontSize: 12, fontWeight: 600 }}>
-                            {r.assignedTo || 'Unassigned'}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* 7. Expected Close */}
-                      <td style={{ padding: '12px 12px', color: '#4B5563', fontSize: 11.5, fontWeight: 500, whiteSpace: 'nowrap', borderBottom: '1px solid #F3F0FA' }}>
-                        {r.expectedClosingDate || '2026-12-31'}
-                      </td>
-
-                      {/* 8. Actions */}
-                      <td style={{ padding: '12px 12px', textAlign: 'right', borderBottom: '1px solid #F3F0FA', whiteSpace: 'nowrap' }}>
-                        <Space size={4}>
-                          <Tooltip title="View Details">
-                            <Button
-                              type="text"
-                              size="small"
-                              style={{
-                                color: '#5421A8',
-                                width: 26,
-                                height: 26,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: 0,
-                              }}
-                              icon={<Eye size={14} />}
-                              onClick={() => {
-                                setViewingLead(r);
-                                setIsViewDrawerOpen(true);
-                              }}
-                            />
-                          </Tooltip>
-                          <Tooltip title="Edit Lead">
-                            <Button
-                              type="text"
-                              size="small"
-                              style={{
-                                color: '#7544D6',
-                                width: 26,
-                                height: 26,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: 0,
-                              }}
-                              icon={<Edit size={14} />}
-                              onClick={() => handleOpenEdit(r)}
-                            />
-                          </Tooltip>
-                          {!r.isConverted && r.stage !== 'Lost' && (
-                            <Tooltip title="Mark as Won & Convert">
-                              <Button
-                                size="small"
-                                type="text"
-                                style={{
-                                  backgroundColor: '#DCFCE7',
-                                  color: '#15803D',
-                                  border: '1px solid #86EFAC',
-                                  borderRadius: 6,
-                                  fontSize: 10.5,
-                                  fontWeight: 700,
-                                  height: 26,
-                                  padding: '0 8px',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: 4,
-                                }}
-                                icon={<Award size={13} />}
-                                onClick={() => handleOpenConvert(r)}
-                              >
-                                Won
-                              </Button>
-                            </Tooltip>
-                          )}
-                          <Tooltip title="Delete Lead">
-                            <Button
-                              type="text"
-                              size="small"
-                              danger
-                              style={{
-                                width: 26,
-                                height: 26,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: 0,
-                              }}
-                              icon={<Trash2 size={14} />}
-                              onClick={() => handleDeleteLead(r.id)}
-                            />
-                          </Tooltip>
-                        </Space>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+            ),
+          }}
+          size="middle"
+          scroll={{ x: 1750 }}
+        />
       </div>
 
-      {/* ADD / EDIT LEAD MODAL */}
+      {/* 5. Add / Edit Lead Modal */}
       <Modal
-        open={isAddEditModalOpen}
-        onCancel={() => setIsAddEditModalOpen(false)}
-        title={editingLead ? `Edit Lead: ${editingLead.leadNumber}` : 'Create New Commercial Lead'}
-        width={700}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <Users size={18} color={BRAND_PURPLE} />
+            {editingLead ? `Edit Lead: ${editingLead.leadNumber}` : 'Add New Sales Lead'}
+          </div>
+        }
+        open={isAddModalOpen || !!editingLead}
+        onCancel={() => {
+          setIsAddModalOpen(false);
+          setEditingLead(null);
+          form.resetFields();
+        }}
         footer={null}
+        width={680}
         destroyOnClose
       >
-        <Form form={form} layout="vertical" onFinish={handleSaveLead} style={{ marginTop: 16 }}>
-          <Row gutter={16}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSaveLead}
+          initialValues={{
+            status: 'New',
+            priority: 'Medium',
+            source: 'Website',
+            assignedSalesperson: 'Vikram Seth',
+          }}
+          style={{ marginTop: 16 }}
+        >
+          <Row gutter={12}>
             <Col span={12}>
-              <Form.Item name="companyName" label="Company Name" rules={[{ required: true, message: 'Required' }]}>
-                <Input placeholder="e.g. Apex Precision Tools Ltd" />
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Contact Person Name</span>}
+                name="contactName"
+                rules={[{ required: true, message: 'Please enter contact person name' }]}
+              >
+                <Input placeholder="e.g. Ramesh Sundaram" style={{ borderRadius: 6 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="contactName" label="Contact Person Name" rules={[{ required: true, message: 'Required' }]}>
-                <Input placeholder="e.g. Ramesh Sundaram" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="email" label="Email Address" rules={[{ required: true, type: 'email' }]}>
-                <Input placeholder="ramesh@company.com" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="phone" label="Primary Phone" rules={[{ required: true }]}>
-                <Input placeholder="+91 98412 11002" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="alternatePhone" label="Alternate Phone">
-                <Input placeholder="+91 98412 11003" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="industry" label="Industry Sector">
-                <Input placeholder="e.g. Precision Engineering, Pharma, Retail" />
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Company Name</span>}
+                name="companyName"
+                rules={[{ required: true, message: 'Please enter company name' }]}
+              >
+                <Input placeholder="e.g. Apex Precision Tools Ltd" style={{ borderRadius: 6 }} />
               </Form.Item>
             </Col>
           </Row>
 
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={12}>
-              <Form.Item name="expectedRevenue" label="Expected Deal Value (₹)" rules={[{ required: true }]}>
-                <Input type="number" placeholder="500000" />
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Email Address</span>}
+                name="email"
+                rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
+              >
+                <Input placeholder="ramesh@apexprecision.com" style={{ borderRadius: 6 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="expectedClosingDate" label="Expected Closing Date">
-                <Input type="date" />
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Phone Number</span>}
+                name="phone"
+                rules={[{ required: true, message: 'Enter contact phone' }]}
+              >
+                <Input placeholder="+91 98412 11002" style={{ borderRadius: 6 }} />
               </Form.Item>
             </Col>
           </Row>
 
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={8}>
-              <Form.Item name="source" label="Lead Source" initialValue="Website">
-                <Select options={INITIAL_LEAD_SOURCES.map(s => ({ label: s.name, value: s.name }))} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name="stage" label="Pipeline Stage" initialValue="New">
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Lead Source</span>}
+                name="source"
+                rules={[{ required: true }]}
+              >
                 <Select
                   options={[
-                    { label: 'New', value: 'New' },
-                    { label: 'Contacted', value: 'Contacted' },
-                    { label: 'Qualified', value: 'Qualified' },
-                    { label: 'Proposal', value: 'Proposal' },
-                    { label: 'Negotiation', value: 'Negotiation' },
+                    { value: 'Website', label: 'Website' },
+                    { value: 'Referral', label: 'Referral' },
+                    { value: 'Campaign', label: 'Campaign' },
+                    { value: 'Social Media', label: 'Social Media' },
+                    { value: 'Cold Outreach', label: 'Cold Outreach' },
                   ]}
+                  style={{ borderRadius: 6 }}
                 />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="priority" label="Priority" initialValue="Medium">
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Assigned Salesperson</span>}
+                name="assignedSalesperson"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  options={SALESPERSON_LIST.map((s) => ({ value: s, label: s }))}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Priority</span>}
+                name="priority"
+                rules={[{ required: true }]}
+              >
                 <Select
                   options={[
-                    { label: 'Low', value: 'Low' },
-                    { label: 'Medium', value: 'Medium' },
-                    { label: 'High', value: 'High' },
-                    { label: 'Urgent', value: 'Urgent' },
+                    { value: 'Urgent', label: 'Urgent' },
+                    { value: 'High', label: 'High' },
+                    { value: 'Medium', label: 'Medium' },
+                    { value: 'Low', label: 'Low' },
                   ]}
+                  style={{ borderRadius: 6 }}
                 />
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item name="assignedTo" label="Lead Owner (Assigned Employee)" initialValue="Vikram Seth">
-            <Select
-              options={[
-                { label: 'Vikram Seth (Senior Sales)', value: 'Vikram Seth' },
-                { label: 'Ananya Sharma (Enterprise Specialist)', value: 'Ananya Sharma' },
-                { label: 'Admin Team', value: 'Admin Team' },
-              ]}
+          <Row gutter={12}>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Lead Status</span>}
+                name="status"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  options={[
+                    { value: 'New', label: 'New' },
+                    { value: 'Contacted', label: 'Contacted' },
+                    { value: 'Qualified', label: 'Qualified' },
+                    { value: 'Lost', label: 'Lost' },
+                  ]}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Estimated Budget (₹)</span>}
+                name="estimatedBudget"
+              >
+                <Input placeholder="450000" style={{ borderRadius: 6 }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Next Follow-up</span>}
+                name="nextFollowUp"
+              >
+                <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Interested Product / Service</span>}
+            name="interestedProduct"
+            rules={[{ required: true, message: 'Please specify interested product or service' }]}
+          >
+            <Input placeholder="e.g. Heavy-Duty Variable Frequency Drives 15kW" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Requirement Notes & Qualification Details</span>}
+            name="requirementNotes"
+          >
+            <Input.TextArea
+              rows={3}
+              placeholder="Record technical specifications, budget readiness, timeline constraints..."
+              style={{ borderRadius: 6 }}
             />
           </Form.Item>
 
-          <Form.Item name="address" label="Office / Factory Address">
-            <Input.TextArea rows={2} placeholder="Street, Industrial Area, City..." />
-          </Form.Item>
-
-          <Form.Item name="notes" label="Technical Requirements & Discussion Notes">
-            <Input.TextArea rows={2} placeholder="Equipment specs, lead time commitments..." />
-          </Form.Item>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-            <Button onClick={() => setIsAddEditModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ background: '#5421A8', borderColor: '#5421A8' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+            <Button
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setEditingLead(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: BRAND_PURPLE,
+                borderColor: BRAND_PURPLE,
+                fontWeight: 700,
+                borderRadius: 6,
+              }}
+            >
               {editingLead ? 'Update Lead' : 'Create Lead'}
             </Button>
           </div>
         </Form>
       </Modal>
 
-      {/* VIEW LEAD DETAILS DRAWER */}
-      <Drawer
-        open={isViewDrawerOpen}
-        onClose={() => setIsViewDrawerOpen(false)}
-        width={560}
-        title={
-          viewingLead ? (
-            <div>
-              <span style={{ fontWeight: 700, color: '#181433' }}>{viewingLead.companyName}</span>
-              <span style={{ marginLeft: 10, fontSize: 12, color: '#5421A8' }}>({viewingLead.leadNumber})</span>
-            </div>
-          ) : 'Lead Details'
-        }
-      >
-        {viewingLead && (
-          <Descriptions bordered size="small" column={1}>
-            <Descriptions.Item label="Contact Person">{viewingLead.contactName}</Descriptions.Item>
-            <Descriptions.Item label="Email Address">{viewingLead.email}</Descriptions.Item>
-            <Descriptions.Item label="Phone Numbers">
-              {viewingLead.phone} {viewingLead.alternatePhone && ` / ${viewingLead.alternatePhone}`}
-            </Descriptions.Item>
-            <Descriptions.Item label="Industry Sector">{viewingLead.industry || 'General Trade'}</Descriptions.Item>
-            <Descriptions.Item label="Lead Source">{viewingLead.source}</Descriptions.Item>
-            <Descriptions.Item label="Current Pipeline Stage">{viewingLead.stage}</Descriptions.Item>
-            <Descriptions.Item label="Priority Level"><Tag color="purple">{viewingLead.priority}</Tag></Descriptions.Item>
-            <Descriptions.Item label="Expected Deal Value">₹{viewingLead.expectedRevenue.toLocaleString()}</Descriptions.Item>
-            <Descriptions.Item label="Expected Close Date">{viewingLead.expectedClosingDate || 'N/A'}</Descriptions.Item>
-            <Descriptions.Item label="Assigned Account Owner">{viewingLead.assignedTo}</Descriptions.Item>
-            <Descriptions.Item label="Address">{viewingLead.address || 'N/A'}</Descriptions.Item>
-            <Descriptions.Item label="Discussion Notes">{viewingLead.notes || 'No notes added.'}</Descriptions.Item>
-            <Descriptions.Item label="Customer Conversion Status">
-              {viewingLead.isConverted ? (
-                <Tag color="green">Converted to Customer ({viewingLead.conversionDate})</Tag>
-              ) : (
-                <Tag color="blue">Active Sales Opportunity</Tag>
-              )}
-            </Descriptions.Item>
-          </Descriptions>
-        )}
-      </Drawer>
-
-      {/* CONVERT TO CUSTOMER MODAL */}
+      {/* 6. Lead Conversion Modal */}
       <Modal
-        open={isConvertModalOpen}
-        onCancel={() => setIsConvertModalOpen(false)}
-        title={`Convert Opportunity: ${leadToConvert?.companyName} to Official Customer`}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <ArrowRight size={18} color="#15803D" />
+            Convert Lead: {convertLeadModal?.leadNumber}
+          </div>
+        }
+        open={!!convertLeadModal}
+        onCancel={() => setConvertLeadModal(null)}
         footer={null}
+        width={500}
         destroyOnClose
       >
-        <Form form={convertForm} layout="vertical" onFinish={handleConfirmConvert} style={{ marginTop: 14 }}>
-          <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 14 }}>
-            Converting this lead marks it as <strong>Won</strong> and creates an active Customer Account in the Directory with shared Sales and Service history.
-          </p>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="companyName" label="Company Name" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="contactPerson" label="Primary Contact" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="gstNumber" label="GSTIN / Tax ID">
-                <Input placeholder="33AABCT9988M1Z0" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="creditLimit" label="Approved Credit Limit (₹)" initialValue={500000}>
-                <Input type="number" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
-            <Button onClick={() => setIsConvertModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ background: '#10B981', borderColor: '#10B981', fontWeight: 600 }}>
-              Confirm Customer Conversion
+        <Form form={convertForm} layout="vertical" onFinish={handleConvertLead} style={{ marginTop: 14 }}>
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Conversion Target</span>}
+            name="entityType"
+            rules={[{ required: true }]}
+            initialValue="Opportunity"
+          >
+            <Select
+              options={[
+                { value: 'Opportunity', label: 'Sales Opportunity (Pipeline)' },
+                { value: 'Customer Account', label: 'Customer Account (Active Client)' },
+              ]}
+              style={{ borderRadius: 6 }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Opportunity / Deal Name</span>}
+            name="opportunityName"
+            rules={[{ required: true }]}
+          >
+            <Input style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Expected Deal Value (₹)</span>}
+            name="dealValue"
+            rules={[{ required: true }]}
+          >
+            <Input style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <div
+            style={{
+              padding: 10,
+              backgroundColor: '#F0FDF4',
+              borderRadius: 8,
+              border: '1px solid #BBF7D0',
+              fontSize: 11.5,
+              color: '#166534',
+              marginBottom: 16,
+            }}
+          >
+            Original lead info (<strong>{convertLeadModal?.leadNumber}</strong>) and activity history will be retained and linked to the new record.
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setConvertLeadModal(null)}>Cancel</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: '#15803D', borderColor: '#15803D', fontWeight: 700 }}
+            >
+              Confirm Conversion
             </Button>
           </div>
         </Form>
       </Modal>
+
+      {/* 7. Reassign Lead Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <UserCheck size={18} color={BRAND_PURPLE} />
+            Assign Lead: {assignModalLead?.leadNumber}
+          </div>
+        }
+        open={!!assignModalLead}
+        onCancel={() => setAssignModalLead(null)}
+        footer={null}
+        width={450}
+        destroyOnClose
+      >
+        <Form form={assignForm} layout="vertical" onFinish={handleAssignLead} style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 12, color: '#64748B', marginBottom: 12 }}>
+            Currently assigned to: <strong>{assignModalLead?.assignedSalesperson}</strong>
+          </div>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Select Sales Representative</span>}
+            name="newSalesperson"
+            rules={[{ required: true, message: 'Please select a salesperson' }]}
+          >
+            <Select
+              options={SALESPERSON_LIST.map((s) => ({ value: s, label: s }))}
+              style={{ borderRadius: 6 }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Assignment Reason / Instructions</span>}
+            name="reason"
+          >
+            <Input.TextArea
+              rows={2}
+              placeholder="e.g. Industry domain specialization, regional territory reallocation..."
+              style={{ borderRadius: 6 }}
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setAssignModalLead(null)}>Cancel</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: BRAND_PURPLE, borderColor: BRAND_PURPLE, fontWeight: 700 }}
+            >
+              Assign Salesperson
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 8. Log Activity Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0F172A', fontWeight: 800 }}>
+            <PhoneCall size={18} color={BRAND_PURPLE} />
+            Log Activity: {newActivityLead?.leadNumber}
+          </div>
+        }
+        open={!!newActivityLead}
+        onCancel={() => setNewActivityLead(null)}
+        footer={null}
+        width={500}
+        destroyOnClose
+      >
+        <Form form={activityForm} layout="vertical" onFinish={handleAddActivity} style={{ marginTop: 14 }}>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Activity Type</span>}
+                name="type"
+                rules={[{ required: true }]}
+                initialValue="Call"
+              >
+                <Select
+                  options={[
+                    { value: 'Call', label: 'Phone Call' },
+                    { value: 'Email', label: 'Email Follow-up' },
+                    { value: 'Meeting', label: 'Client Meeting' },
+                    { value: 'Note', label: 'Internal Note' },
+                  ]}
+                  style={{ borderRadius: 6 }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={<span style={{ fontWeight: 600, fontSize: 12 }}>Next Follow-up Date</span>}
+                name="nextFollowUp"
+              >
+                <DatePicker style={{ width: '100%', borderRadius: 6 }} format="YYYY-MM-DD" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Activity Title / Subject</span>}
+            name="title"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="e.g. Discussion on pricing and lead time" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Discussion Details</span>}
+            name="details"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={2} placeholder="Key points discussed with customer..." style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <Form.Item
+            label={<span style={{ fontWeight: 600, fontSize: 12 }}>Call / Meeting Outcome</span>}
+            name="outcome"
+          >
+            <Input placeholder="e.g. Customer agreed to receive quote" style={{ borderRadius: 6 }} />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <Button onClick={() => setNewActivityLead(null)}>Cancel</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: BRAND_PURPLE, borderColor: BRAND_PURPLE, fontWeight: 700 }}
+            >
+              Save Activity
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* 9. Comprehensive Lead Details Drawer */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span
+                style={{
+                  fontWeight: 800,
+                  color: BRAND_PURPLE,
+                  backgroundColor: BRAND_PURPLE_TINT,
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                }}
+              >
+                {viewLead?.leadNumber}
+              </span>
+              <span style={{ fontWeight: 800, fontSize: 15, color: '#0F172A' }}>
+                {viewLead?.companyName}
+              </span>
+            </div>
+            {viewLead && getStatusBadge(viewLead.status)}
+          </div>
+        }
+        open={!!viewLead}
+        onClose={() => setViewLead(null)}
+        width={580}
+        destroyOnClose
+      >
+        {viewLead && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {/* Quick Stats Banner */}
+            <div
+              style={{
+                padding: '14px 18px',
+                background: 'linear-gradient(135deg, #FAF5FF 0%, #FFFFFF 100%)',
+                borderRadius: 12,
+                border: '1px solid #ECE6F8',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 12,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Estimated Budget</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: BRAND_PURPLE, marginTop: 2 }}>
+                  ₹{viewLead.estimatedBudget.toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Priority</div>
+                <div style={{ marginTop: 4 }}>{getPriorityBadge(viewLead.priority)}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Assigned To</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                  {viewLead.assignedSalesperson}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions Bar */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <Button
+                size="small"
+                icon={<PhoneCall size={12} />}
+                onClick={() => {
+                  setNewActivityLead(viewLead);
+                  activityForm.resetFields();
+                }}
+                style={{ borderRadius: 6, fontWeight: 600, color: BRAND_PURPLE, borderColor: '#D8B4FE' }}
+              >
+                Log Activity
+              </Button>
+              <Button
+                size="small"
+                icon={<UserCheck size={12} />}
+                onClick={() => {
+                  setAssignModalLead(viewLead);
+                  assignForm.setFieldsValue({ newSalesperson: viewLead.assignedSalesperson });
+                }}
+                style={{ borderRadius: 6, fontWeight: 600 }}
+              >
+                Reassign Rep
+              </Button>
+              {!viewLead.isConverted && viewLead.status !== 'Lost' && (
+                <Button
+                  size="small"
+                  type="primary"
+                  icon={<ArrowRight size={12} />}
+                  onClick={() => {
+                    setConvertLeadModal(viewLead);
+                    convertForm.setFieldsValue({
+                      entityType: 'Opportunity',
+                      opportunityName: `${viewLead.companyName} - Project`,
+                      dealValue: viewLead.estimatedBudget,
+                    });
+                  }}
+                  style={{ backgroundColor: '#15803D', borderColor: '#15803D', borderRadius: 6, fontWeight: 700 }}
+                >
+                  Convert Lead
+                </Button>
+              )}
+            </div>
+
+            {/* 1. Lead Information & Company Details */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Building size={14} color={BRAND_PURPLE} />
+                Company & Contact Information
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '10px 16px',
+                  fontSize: 12,
+                }}
+              >
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Contact Person:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewLead.contactName}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Company Name:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewLead.companyName}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Phone Number:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewLead.phone}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Email Address:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewLead.email}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Lead Source:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewLead.source}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Created Date:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{viewLead.createdDate}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Interested Product & Qualification */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Briefcase size={14} color={BRAND_PURPLE} />
+                Interested Products & Scope
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
+                  {viewLead.interestedProduct}
+                </div>
+                <div style={{ color: '#475569', fontSize: 11.5, lineHeight: 1.5 }}>
+                  {viewLead.requirementNotes || 'No specific requirement notes recorded.'}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Follow-up Schedule */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Calendar size={14} color={BRAND_PURPLE} />
+                Follow-up Schedule
+              </div>
+              <div
+                style={{
+                  background: '#F8FAFC',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #E2E8F0',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 12,
+                  fontSize: 12,
+                }}
+              >
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Last Contacted Date:</span>
+                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{viewLead.lastContacted}</span>
+                </div>
+                <div>
+                  <span style={{ color: '#64748B', display: 'block', fontSize: 11 }}>Next Follow-up Date:</span>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      color:
+                        viewLead.nextFollowUp &&
+                        viewLead.nextFollowUp !== '-' &&
+                        dayjs(viewLead.nextFollowUp).isBefore(dayjs(), 'day')
+                          ? '#DC2626'
+                          : '#2563EB',
+                    }}
+                  >
+                    {viewLead.nextFollowUp || 'Not scheduled'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Conversion Details (if converted) */}
+            {viewLead.isConverted && (
+              <div
+                style={{
+                  background: '#F0FDF4',
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  border: '1px solid #BBF7D0',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#166534', fontWeight: 800, fontSize: 12.5 }}>
+                  <CheckCircle size={14} />
+                  Lead Converted
+                </div>
+                <div style={{ fontSize: 11.5, color: '#14532D', marginTop: 4 }}>
+                  {viewLead.convertedEntity}
+                </div>
+              </div>
+            )}
+
+            {/* 5. Lead Activity Timeline */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  marginBottom: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Clock size={14} color={BRAND_PURPLE} />
+                Activity Timeline & Communication History
+              </div>
+
+              {viewLead.activities.length === 0 ? (
+                <div style={{ fontSize: 12, color: '#94A3B8', fontStyle: 'italic', padding: 8 }}>
+                  No activities recorded yet. Use the "Log Activity" button above to log calls or meetings.
+                </div>
+              ) : (
+                <Timeline
+                  style={{ marginTop: 8 }}
+                  items={viewLead.activities.map((a) => ({
+                    color: a.type === 'Meeting' ? '#16A34A' : a.type === 'Call' ? '#2563EB' : '#8B5CF6',
+                    children: (
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 12.5, color: '#0F172A' }}>
+                          {a.title}
+                          <Tag
+                            style={{
+                              marginLeft: 8,
+                              fontSize: 10,
+                              lineHeight: '16px',
+                              padding: '0 4px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {a.type}
+                          </Tag>
+                        </div>
+                        <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 1 }}>
+                          {a.timestamp} • by {a.performedBy}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: '#475569', marginTop: 3 }}>
+                          {a.details}
+                        </div>
+                        {a.outcome && (
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: '#15803D',
+                              fontWeight: 600,
+                              marginTop: 3,
+                              backgroundColor: '#F0FDF4',
+                              padding: '2px 6px',
+                              borderRadius: 4,
+                              display: 'inline-block',
+                            }}
+                          >
+                            Outcome: {a.outcome}
+                          </div>
+                        )}
+                      </div>
+                    ),
+                  }))}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 };
+
+export default LeadsListPage;

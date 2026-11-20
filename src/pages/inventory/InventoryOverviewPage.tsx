@@ -147,7 +147,7 @@ export const InventoryOverviewPage: React.FC = () => {
           },
           {
             title: 'In-Transit Freight',
-            value: `${totalInTransitQty} Inbound Units`,
+            value: `${totalInTransitQty} Inbound`,
             growth: 'Across 3 Transfers',
             isDark: true,
             icon: <Truck size={20} color="#0284C7" />,
@@ -756,7 +756,7 @@ export const InventoryOverviewPage: React.FC = () => {
                     </td>
                     <td style={{ padding: '14px 18px', borderBottom: '1px solid #F3F0FA' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Progress percent={c.percent} size="small" strokeColor="#7544D6" trailColor="#EDE9FE" showInfo={false} />
+                        <Progress percent={c.percent} size="small" strokeColor="#7544D6" railColor="#EDE9FE" showInfo={false} />
                         <span style={{ fontSize: 12, fontWeight: 700, color: '#475569', minWidth: 42 }}>{c.percent}%</span>
                       </div>
                     </td>
@@ -839,7 +839,7 @@ export const InventoryOverviewPage: React.FC = () => {
                         percent={w.storageUtilizationPercent}
                         size="small"
                         strokeColor={w.storageUtilizationPercent > 80 ? '#F59E0B' : '#7544D6'}
-                        trailColor="#EDE9FE"
+                        railColor="#EDE9FE"
                         showInfo={false}
                       />
                     </td>

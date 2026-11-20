@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { DebtorRecord } from './billingData';
 import { INITIAL_DEBTORS, INITIAL_RECEIVABLES } from './billingMockData';
+import { SalesKpiCardsRow } from '../../components/dashboard/SalesKpiCardsRow';
 
 const BRAND_NAVY = '#1E3A8A';
 const BRAND_PURPLE = '#5421A8';
@@ -389,155 +390,43 @@ export const DebtorsPage: React.FC = () => {
       </div>
 
       {/* 2. Exactly 4 Meaningful Summary Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        {/* Card 1: Total Debtors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #7544D6 0%, #5421A8 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <UserCheck size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Debtors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>
-              {metrics.totalCount} Customers
-            </div>
-            <div style={{ fontSize: 11, color: '#5421A8', marginTop: 4, fontWeight: 700 }}>
-              Accounts with credit facility
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 2: Active Debtors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <CheckCircle size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Active Debtors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#16A34A' }}>
-              {metrics.activeCount} Active
-            </div>
-            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-              Active credit lines in good standing
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 3: Total Receivables */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <IndianRupee size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Total Receivables</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#0F172A' }}>
-              ₹{(metrics.totalReceivables / 100000).toFixed(2)} Lakhs
-            </div>
-            <div style={{ fontSize: 11, color: '#3B82F6', marginTop: 4, fontWeight: 700 }}>
-              Expected incoming cashflow
-            </div>
-          </div>
-        </Col>
-
-        {/* Card 4: Overdue Debtors */}
-        <Col xs={24} sm={12} lg={6}>
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '18px 20px',
-              border: '1px solid #ECE6F8',
-              boxShadow: '0 6px 20px rgba(84, 33, 168, 0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                }}
-              >
-                <Clock size={22} />
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#64748B' }}>Overdue Debtors</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#DC2626' }}>
-              {metrics.overdueCount} Overdue
-            </div>
-            <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4, fontWeight: 700 }}>
-              ₹{(metrics.overdueReceivables / 100000).toFixed(2)} Lakhs past due date
-            </div>
-          </div>
-        </Col>
-      </Row>
+      <SalesKpiCardsRow
+        cards={[
+          {
+            title: 'Total Debtors',
+            value: `${metrics.totalCount}`,
+            growth: `${metrics.activeCount} Active`,
+            isDark: true,
+            icon: <UserCheck size={20} color="#5421A8" />,
+            pillExtra: 'Credit Accounts',
+          },
+          {
+            title: 'Active Debtors',
+            value: `${metrics.activeCount}`,
+            growth: 'Good Standing',
+            isDark: false,
+            icon: <CheckCircle size={20} color="#10B981" />,
+            pillExtra: 'Active Lines',
+          },
+          {
+            title: 'Total Receivables',
+            value: `₹${(metrics.totalReceivables / 100000).toFixed(2)}L`,
+            growth: 'Expected Cash',
+            isDark: true,
+            icon: <IndianRupee size={20} color="#3B82F6" />,
+            pillExtra: 'Incoming',
+          },
+          {
+            title: 'Overdue Debtors',
+            value: `${metrics.overdueCount}`,
+            growth: `₹${(metrics.overdueReceivables / 100000).toFixed(2)}L Past Due`,
+            isPositive: false,
+            isDark: false,
+            icon: <Clock size={20} color="#DC2626" />,
+            pillExtra: 'Overdue',
+          },
+        ]}
+      />
 
       {/* 3. Table */}
       <div
