@@ -32,7 +32,6 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'cm-customers', label: 'Customers', path: '/app/customers', iconName: 'Users' },
-      { key: 'cm-groups', label: 'Customer Groups', path: '/app/customers/groups', iconName: 'Boxes' },
       { key: 'cm-contacts', label: 'Customer Contacts', path: '/app/customers/contacts', iconName: 'UserCheck' },
     ],
   },
@@ -116,7 +115,7 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
     section: 'services',
     allowedPackages: ['COMPLETE', 'SERVICE'],
     children: [
-      { key: 'sm-service-overview', label: 'Service Overview', path: '/app/services/dashboard', iconName: 'Wrench' },
+      { key: 'sm-service-overview', label: 'Service Management', path: '/app/services/dashboard', iconName: 'Wrench' },
       { key: 'sm-requests', label: 'Service Requests', path: '/app/services/requests', iconName: 'FileText' },
       { key: 'sm-tickets', label: 'Service Tickets', path: '/app/services/tickets', iconName: 'Ticket' },
       { key: 'sm-quotations', label: 'Service Quotations', path: '/app/services/quotations', iconName: 'FileSpreadsheet' },
@@ -233,7 +232,6 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'rep-overview', label: 'Reports Overview', path: '/app/reports', iconName: 'BarChart3' },
-      { key: 'rep-sales', label: 'Sales Reports', path: '/app/reports/sales', iconName: 'TrendingUp' },
       { key: 'rep-service', label: 'Service Reports', path: '/app/reports/service', iconName: 'Wrench' },
       { key: 'rep-customer', label: 'Customer Reports', path: '/app/reports/customers', iconName: 'Users' },
       { key: 'rep-financial', label: 'Financial Reports', path: '/app/reports/financial', iconName: 'Receipt' },
@@ -243,8 +241,9 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
   },
 
   // ==========================================
-  // 14. ENTERPRISE PORTALS (COMMON)
+  // 14. ENTERPRISE PORTALS (COMMON) - HIDDEN
   // ==========================================
+  /*
   {
     key: 'grp-enterprise-portals',
     label: 'Enterprise Portals',
@@ -257,6 +256,7 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
       { key: 'portal-technician', label: 'Technician Mobile Workspace', path: '/app/portal/technician', iconName: 'HardHat' },
     ],
   },
+  */
 
   // ==========================================
   // 15. EMPLOYEE & HR MANAGEMENT (CONSOLIDATED 9 MAIN PAGES)
@@ -294,8 +294,10 @@ export const ADMIN_FULL_SIDEBAR_GROUPS: MenuGroupConfig[] = [
       { key: 'set-branches', label: 'Branch Management', path: '/app/settings/branches', iconName: 'MapPin' },
       { key: 'set-users', label: 'User Management', path: '/app/settings/users', iconName: 'UserCheck' },
       { key: 'set-roles', label: 'Roles & Permissions', path: '/app/settings/roles', iconName: 'ShieldAlert' },
+      /*
       { key: 'set-modules', label: 'Module Access', path: '/app/settings/modules', iconName: 'Boxes' },
       { key: 'set-subs', label: 'Subscription & Plans', path: '/app/settings/subscription', iconName: 'CreditCard' },
+      */
       { key: 'set-tax', label: 'Tax Configuration', path: '/app/settings/tax', iconName: 'Receipt' },
       { key: 'set-notifications', label: 'Notification Settings', path: '/app/settings/notifications', iconName: 'MessageSquare' },
       { key: 'set-integrations', label: 'Integrations', path: '/app/settings/integrations', iconName: 'Cpu' },

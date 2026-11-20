@@ -22,8 +22,8 @@ export const CompanyLayout: React.FC = () => {
           companyCode={selectedCompany?.code || 'ERP'}
         />
 
-        {/* Soft Lavender / Light Violet Inner Canvas */}
-        <Layout style={{ backgroundColor: '#F3F0F9', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+        {/* Clean Pure White Inner Canvas */}
+        <Layout style={{ backgroundColor: '#FFFFFF', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1, minWidth: 0 }}>
           <Navbar
             collapsed={collapsed}
             onToggleCollapse={() => setCollapsed(!collapsed)}

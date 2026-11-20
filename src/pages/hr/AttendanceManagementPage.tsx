@@ -63,7 +63,7 @@ export const AttendanceManagementPage: React.FC = () => {
   });
 
   const columns = [
-    { title: 'Emp ID', dataIndex: 'empId', key: 'empId', render: (t: string) => <Text strong style={{ color: '#6E56CF' }}>{t}</Text> },
+    { title: 'Emp ID', dataIndex: 'empId', key: 'empId', render: (t: string) => <Text strong style={{ color: '#4C1D95' }}>{t}</Text> },
     { title: 'Employee Name', dataIndex: 'name', key: 'name', render: (n: string) => <strong>{n}</strong> },
     { title: 'Date', dataIndex: 'date', key: 'date' },
     { title: 'Punch In', dataIndex: 'checkIn', key: 'checkIn' },
@@ -95,7 +95,7 @@ export const AttendanceManagementPage: React.FC = () => {
             <Button onClick={() => setIsRegularizeModal(true)}>
               Regularize Punch
             </Button>
-            <Button type="primary" icon={<Clock size={15} />} style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }} onClick={() => setIsCheckInModal(true)}>
+            <Button type="primary" icon={<Clock size={15} />} style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => setIsCheckInModal(true)}>
               Manual Punch In
             </Button>
           </Space>
@@ -121,7 +121,7 @@ export const AttendanceManagementPage: React.FC = () => {
         </Col>
         <Col xs={12} sm={6}>
           <Card bordered={false} style={{ borderRadius: 12 }}>
-            <Statistic title="On Overtime" value={records.filter(r => r.overtime !== '0 hrs').length} prefix={<Clock size={16} color="#6E56CF" />} valueStyle={{ color: '#6E56CF', fontWeight: 700 }} />
+            <Statistic title="On Overtime" value={records.filter(r => r.overtime !== '0 hrs').length} prefix={<Clock size={16} color="#4C1D95" />} valueStyle={{ color: '#4C1D95', fontWeight: 700 }} />
           </Card>
         </Col>
       </Row>
@@ -173,7 +173,7 @@ export const AttendanceManagementPage: React.FC = () => {
                 { title: 'Reason Description', dataIndex: 'reason', key: 'reason' },
                 { title: 'Proposed Punch', dataIndex: 'requestedTime', key: 'requestedTime' },
                 { title: 'Approval Status', dataIndex: 'status', key: 'status', render: (st: string) => <Tag color={st === 'Approved' ? 'green' : 'gold'}>{st}</Tag> },
-                { title: 'Actions', render: () => <Space><Button size="small" type="primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981' }} onClick={() => message.success('Punch approved')}>Approve</Button><Button size="small" danger onClick={() => message.info('Punch rejected')}>Reject</Button></Space> },
+                { title: 'Actions', render: () => <Space><Button size="small" type="primary" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => message.success('Punch approved')}>Approve</Button><Button size="small" danger onClick={() => message.info('Punch rejected')}>Reject</Button></Space> },
               ]}
               pagination={false}
             />
@@ -198,7 +198,7 @@ export const AttendanceManagementPage: React.FC = () => {
           </Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
             <Button onClick={() => setIsCheckInModal(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }}>Submit Punch</Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }}>Submit Punch</Button>
           </div>
         </Form>
       </Modal>
@@ -214,7 +214,7 @@ export const AttendanceManagementPage: React.FC = () => {
           </Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
             <Button onClick={() => setIsRegularizeModal(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }}>Submit Request</Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }}>Submit Request</Button>
           </div>
         </Form>
       </Modal>

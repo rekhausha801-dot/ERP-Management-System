@@ -119,18 +119,18 @@ body,
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(110, 86, 207, 0.3);
-  border-radius: 4px;
+  background: transparent !important;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(110, 86, 207, 0.6);
+  background: transparent !important;
 }
 
 /* Ant Design Table Wrapper Shadow & Modern Card Styling */
@@ -149,15 +149,18 @@ body,
 .ant-table-wrapper .ant-table {
   background: transparent !important;
   width: 100% !important;
-  overflow: hidden !important;
 }
 
 .ant-table-wrapper .ant-table-container {
-  overflow: hidden !important;
+  overflow-x: auto !important;
 }
 
 .ant-table-wrapper .ant-table-body {
-  overflow: hidden !important;
+  overflow-x: auto !important;
+}
+
+.ant-table-wrapper .ant-table-content {
+  overflow-x: auto !important;
 }
 
 .ant-table-wrapper .ant-table-pagination {
@@ -192,29 +195,19 @@ body,
 }
 
 .ant-table-cell {
-  /* Natural table cell wrapping */
+  white-space: nowrap !important;
 }
 
-/* Hide horizontal scrollbar in ant-table */
-.ant-table-container::-webkit-scrollbar,
-.ant-table-body::-webkit-scrollbar,
-.ant-table-content::-webkit-scrollbar {
+/* Hide scrollbars across the entire app while retaining smooth scrollability */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
-}
-
-.ant-table-container,
-.ant-table-body,
-.ant-table-content {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
-}
-
-/* Ensure smooth scrolling across the app */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(110, 86, 207, 0.3) transparent;
 }
 
 

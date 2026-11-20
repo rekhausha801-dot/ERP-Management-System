@@ -2,20 +2,24 @@ import React from 'react';
 import { Row, Col, Card, Table, Typography, Button, Tag, Progress } from 'antd';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, AreaChart, Area } from 'recharts';
 import {
-  LifeBuoy,
-  Wrench,
-  Package,
-  Users,
-  ShieldCheck,
-  CheckCircle2,
-  DollarSign,
-  ArrowRight,
-  Clock,
-  UserCheck,
-  Star,
-  IndianRupee,
-  HardHat,
-} from 'lucide-react';
+  FiLifeBuoy,
+  FiTool,
+  FiPackage,
+  FiUsers,
+  FiShield,
+  FiCheckCircle,
+  FiDollarSign,
+  FiArrowRight,
+  FiClock,
+  FiUserCheck,
+  FiStar,
+} from 'react-icons/fi';
+import {
+  TbCurrencyRupee,
+  TbTools,
+  TbHelmet,
+} from 'react-icons/tb';
+import { FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { KPICard } from '../../../components/dashboard/KPICard';
 import { ChartCard } from '../../../components/dashboard/ChartCard';
@@ -49,62 +53,6 @@ export const ServicesDashboard: React.FC = () => {
 
   return (
     <div style={{ paddingBottom: 24 }}>
-      {/* Pending Service Requests Alert for Service Admin */}
-      {pendingApprovalRequests.length > 0 && (
-        <div
-          style={{
-            backgroundColor: '#FFFBEB',
-            border: '1px solid #FDE68A',
-            borderRadius: 14,
-            padding: '14px 18px',
-            marginBottom: 16,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 12,
-            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.08)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                backgroundColor: '#F59E0B',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-              }}
-            >
-              <Clock size={18} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 800, color: '#92400E', fontSize: 14 }}>
-                {pendingApprovalRequests.length} Pending Service Request(s) Awaiting Admin Approval
-              </div>
-              <div style={{ fontSize: 12, color: '#B45309' }}>
-                Inbound customer phone requests submitted by Office Staff. Review details, approve, and assign technicians.
-              </div>
-            </div>
-          </div>
-          <Button
-            type="primary"
-            style={{
-              backgroundColor: '#D97706',
-              borderColor: '#D97706',
-              borderRadius: 8,
-              fontWeight: 700,
-            }}
-            onClick={() => navigate('/app/services/requests')}
-          >
-            Review Pending Requests &rarr;
-          </Button>
-        </div>
-      )}
-
       {/* Service Header & Status Tag */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <div>
@@ -120,14 +68,14 @@ export const ServicesDashboard: React.FC = () => {
         </Tag>
       </div>
 
-      {/* 8 Service Specific Main KPI Cards */}
+      {/* 8 Service Specific Main KPI Cards with React Icons */}
       <Row gutter={[14, 14]} style={{ marginBottom: 18 }}>
         <Col xs={24} sm={12} lg={6}>
           <KPICard
             title="Active Service Tickets"
             value={kpis.openTickets}
             trend={{ value: '3 Critical Breaches', isPositive: false }}
-            icon={<LifeBuoy size={20} color="#EF4444" />}
+            icon={<FiLifeBuoy size={20} color="#EF4444" />}
             iconBgColor="#FEE2E2"
             onClick={() => navigate('/app/services/tickets')}
           />
@@ -147,7 +95,7 @@ export const ServicesDashboard: React.FC = () => {
             title="SLA Compliance Rate"
             value="98.4%"
             trend={{ value: '+1.2% this quarter', isPositive: true }}
-            icon={<ShieldCheck size={20} color="#6E56CF" />}
+            icon={<FiShield size={20} color="#6E56CF" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/services/sla')}
           />
@@ -157,7 +105,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Customer CSAT Score"
             value="4.85 / 5"
             trend={{ value: '94% 5-Star Ratings', isPositive: true }}
-            icon={<Star size={20} color="#F59E0B" fill="#F59E0B" />}
+            icon={<FaStar size={20} color="#F59E0B" />}
             iconBgColor="#FEF3C7"
             onClick={() => navigate('/app/services/feedback')}
           />
@@ -168,7 +116,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Active AMC Contracts"
             value="184 Active"
             trend={{ value: '14 due for renewal', isPositive: true }}
-            icon={<CheckCircle2 size={20} color="#8B5CF6" />}
+            icon={<FiCheckCircle size={20} color="#8B5CF6" />}
             iconBgColor="#EDE9FE"
             onClick={() => navigate('/app/services/amc')}
           />
@@ -188,7 +136,7 @@ export const ServicesDashboard: React.FC = () => {
             title="First-Time Fix Rate"
             value={kpis.firstTimeFixRate}
             trend={{ value: '+2.4% resolution', isPositive: true }}
-            icon={<Package size={20} color="#6E56CF" />}
+            icon={<FiPackage size={20} color="#6E56CF" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/services/performance')}
           />
@@ -198,7 +146,7 @@ export const ServicesDashboard: React.FC = () => {
             title="Spare Parts Consumption"
             value="₹8.45 L"
             trend={{ value: '184 parts utilized', isPositive: true }}
-            icon={<Wrench size={20} color="#F59E0B" />}
+            icon={<TbTools size={20} color="#F59E0B" />}
             iconBgColor="#FEF3C7"
             onClick={() => navigate('/app/services/spare-parts')}
           />
@@ -255,7 +203,7 @@ export const ServicesDashboard: React.FC = () => {
                     <span>{tech.skill}</span>
                     <span>&bull;</span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, backgroundColor: '#FEF3C7', padding: '1px 6px', borderRadius: 6 }}>
-                      <Star size={11} color="#F59E0B" fill="#F59E0B" />
+                      <FaStar size={11} color="#F59E0B" />
                       <span style={{ fontWeight: 700, color: '#B45309', fontSize: 11 }}>{tech.rating}</span>
                     </span>
                   </div>
@@ -266,118 +214,6 @@ export const ServicesDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Pending Service Requests Section */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 18 }}>
-        <Col xs={24}>
-          <Card
-            bordered={false}
-            title={
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>
-                  Pending Customer Service Requests (Intake Queue)
-                </span>
-                {pendingApprovalRequests.length > 0 && (
-                  <Tag color="orange" style={{ fontWeight: 700, borderRadius: 10 }}>
-                    {pendingApprovalRequests.length} Awaiting Decision
-                  </Tag>
-                )}
-              </div>
-            }
-            extra={
-              <Button
-                type="link"
-                size="small"
-                onClick={() => navigate('/app/services/requests')}
-                style={{ color: '#6E56CF', fontWeight: 700 }}
-              >
-                Intake & Approval Center &gt;
-              </Button>
-            }
-            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)' }}
-            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '10px 22px 20px' } }}
-          >
-            <Table
-              dataSource={storedRequests.slice(0, 5)}
-              pagination={false}
-              size="small"
-              columns={[
-                {
-                  title: 'Request ID',
-                  dataIndex: 'requestNumber',
-                  key: 'requestNumber',
-                  render: (t) => <strong style={{ color: '#6E56CF' }}>{t}</strong>,
-                },
-                {
-                  title: 'Customer Name',
-                  dataIndex: 'customerName',
-                  key: 'customerName',
-                  render: (c, r) => (
-                    <div>
-                      <div style={{ fontWeight: 700, color: '#181433' }}>{c}</div>
-                      <div style={{ fontSize: 11, color: '#8C89A0' }}>{r.companyName || r.contactNumber}</div>
-                    </div>
-                  ),
-                },
-                {
-                  title: 'Service Type',
-                  dataIndex: 'serviceType',
-                  key: 'serviceType',
-                  render: (st) => <Tag color="blue">{st}</Tag>,
-                },
-                {
-                  title: 'Priority',
-                  dataIndex: 'priority',
-                  key: 'priority',
-                  render: (p) => (
-                    <Tag color={p === 'Urgent' ? 'red' : p === 'High' ? 'orange' : 'default'}>
-                      {p}
-                    </Tag>
-                  ),
-                },
-                {
-                  title: 'Intake Source',
-                  dataIndex: 'requestSource',
-                  key: 'requestSource',
-                  render: () => <Tag color="purple">Phone Call</Tag>,
-                },
-                {
-                  title: 'Status',
-                  dataIndex: 'status',
-                  key: 'status',
-                  render: (st) => (
-                    <Tag
-                      color={st === 'Approved' ? '#4C1D95' : st === 'Rejected' ? 'red' : st === 'More Information Required' ? 'purple' : 'orange'}
-                      style={{
-                        backgroundColor: st === 'Approved' ? '#F3E8FF' : undefined,
-                        borderColor: st === 'Approved' ? '#DDD6FE' : undefined,
-                        color: st === 'Approved' ? '#4C1D95' : undefined,
-                        fontWeight: st === 'Approved' ? 700 : 500,
-                      }}
-                    >
-                      {st}
-                    </Tag>
-                  ),
-                },
-                {
-                  title: 'Action',
-                  key: 'action',
-                  render: (_, r) => (
-                    <Button
-                      type="link"
-                      size="small"
-                      onClick={() => navigate('/app/services/requests')}
-                      style={{ fontWeight: 700, color: '#6E56CF', padding: 0 }}
-                    >
-                      {r.status === 'Pending Approval' ? 'Review & Decide' : 'Details'}
-                    </Button>
-                  ),
-                },
-              ]}
-            />
           </Card>
         </Col>
       </Row>
@@ -411,7 +247,7 @@ export const ServicesDashboard: React.FC = () => {
                   key: 'tech',
                   render: (tc) => (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-                      <HardHat size={16} color="#6E56CF" /> {tc}
+                      <TbHelmet size={16} color="#6E56CF" /> {tc}
                     </span>
                   ),
                 },

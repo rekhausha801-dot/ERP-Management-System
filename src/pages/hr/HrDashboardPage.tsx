@@ -33,7 +33,7 @@ const ATTENDANCE_TREND_DATA = [
 ];
 
 const DEPT_DISTRIBUTION = [
-  { name: 'Field Services', value: 48, color: '#6E56CF' },
+  { name: 'Field Services', value: 48, color: '#4C1D95' },
   { name: 'Service Contracts', value: 38, color: '#3A2E78' },
   { name: 'Customer Support Desk', value: 24, color: '#8874E8' },
   { name: 'Finance & Accounts', value: 16, color: '#10B981' },
@@ -60,7 +60,7 @@ export const HrDashboardPage: React.FC = () => {
             <Button
               type="primary"
               icon={<Plus size={14} />}
-              style={{ backgroundColor: '#6E56CF', borderRadius: 10, fontWeight: 700 }}
+              style={{ backgroundColor: '#4C1D95', borderRadius: 10, fontWeight: 700 }}
               onClick={() => setIsLeaveModalOpen(true)}
             >
               Apply Leave Request
@@ -76,7 +76,7 @@ export const HrDashboardPage: React.FC = () => {
             title="Total Employees"
             value="152"
             trend={{ value: '+4 Joined this Month', isPositive: true }}
-            icon={<Users size={20} color="#6E56CF" />}
+            icon={<Users size={20} color="#4C1D95" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/hr/all-employees')}
           />
@@ -147,7 +147,7 @@ export const HrDashboardPage: React.FC = () => {
             title="Active Assigned Tasks"
             value="84"
             trend={{ value: '72 On Track | 12 Due', isPositive: true }}
-            icon={<Briefcase size={20} color="#6E56CF" />}
+            icon={<Briefcase size={20} color="#4C1D95" />}
             iconBgColor="#EFEBFF"
             onClick={() => navigate('/app/hr/task-dashboard')}
           />
@@ -166,14 +166,18 @@ export const HrDashboardPage: React.FC = () => {
           >
             <div style={{ height: 260, width: '100%', marginTop: 8 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={ATTENDANCE_TREND_DATA} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+                <BarChart data={ATTENDANCE_TREND_DATA} barGap={4} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
                   <CartesianGrid vertical={false} stroke="rgba(110, 86, 207, 0.08)" strokeDasharray="3 3" />
                   <XAxis dataKey="day" stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} />
                   <YAxis stroke="#A5A1BE" fontSize={11} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF' }} />
-                  <Bar dataKey="present" name="Present Staff" fill="#6E56CF" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="leave" name="Approved Leave" fill="#F59E0B" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="absent" name="Unexcused Absent" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ borderRadius: 12, backgroundColor: '#1E1938', border: 'none', color: '#FFF', fontSize: 13, padding: '10px 14px' }}
+                    itemStyle={{ padding: '2px 0' }}
+                  />
+                  <Bar dataKey="present" name="Present Staff" fill="#4C1D95" barSize={26} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="leave" name="Approved Leave" fill="#F59E0B" barSize={18} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="absent" name="Unexcused Absent" fill="#EF4444" barSize={18} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -209,7 +213,7 @@ export const HrDashboardPage: React.FC = () => {
                     <div style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: d.color }} />
                     <span style={{ color: '#181433', fontWeight: 600 }}>{d.name}</span>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#6E56CF' }}>{d.value} Staff</span>
+                  <span style={{ fontWeight: 700, color: '#4C1D95' }}>{d.value} Staff</span>
                 </div>
               ))}
             </div>
@@ -218,14 +222,14 @@ export const HrDashboardPage: React.FC = () => {
       </Row>
 
       {/* Bottom Row: Pending Leave Approvals & Recent HR Activities */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={15}>
+      <Row gutter={[16, 16]} style={{ display: 'flex', alignItems: 'stretch' }}>
+        <Col xs={24} lg={15} style={{ display: 'flex', flexDirection: 'column' }}>
           <Card
             bordered={false}
             title={<span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Pending Leave Requests (Awaiting Action)</span>}
-            extra={<Button type="link" size="small" onClick={() => navigate('/app/hr/leave-approval')} style={{ color: '#6E56CF', fontWeight: 700 }}>Leave Desk &gt;</Button>}
-            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)' }}
-            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '10px 22px 20px' } }}
+            extra={<Button type="link" size="small" onClick={() => navigate('/app/hr/leave-approval')} style={{ color: '#4C1D95', fontWeight: 700 }}>Leave Desk &gt;</Button>}
+            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)', height: '100%', display: 'flex', flexDirection: 'column' }}
+            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '10px 22px 20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}
           >
             <Table
               dataSource={[
@@ -245,7 +249,7 @@ export const HrDashboardPage: React.FC = () => {
                   key: 'act',
                   render: () => (
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <Button size="small" type="primary" style={{ backgroundColor: '#10B981', borderRadius: 8, fontSize: 11 }} onClick={() => message.success('Leave Request Approved!')}>
+                      <Button size="small" type="primary" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95', borderRadius: 8, fontSize: 11 }} onClick={() => message.success('Leave Request Approved!')}>
                         Approve
                       </Button>
                       <Button size="small" danger style={{ borderRadius: 8, fontSize: 11 }} onClick={() => message.info('Leave Request Rejected')}>
@@ -259,18 +263,18 @@ export const HrDashboardPage: React.FC = () => {
           </Card>
         </Col>
 
-        {/* Upcoming Work Anniversaries & Birthdays */}
-        <Col xs={24} lg={9}>
+        {/* Upcoming Service Schedules & Milestones */}
+        <Col xs={24} lg={9} style={{ display: 'flex', flexDirection: 'column' }}>
           <Card
             bordered={false}
             title={<span style={{ fontWeight: 800, color: '#181433', fontSize: 16 }}>Upcoming Events & Milestones</span>}
-            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)' }}
-            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '12px 22px 20px' } }}
+            style={{ borderRadius: 20, backgroundColor: '#FFFFFF', boxShadow: '0 8px 24px rgba(25, 21, 59, 0.04)', height: '100%', display: 'flex', flexDirection: 'column' }}
+            styles={{ header: { borderBottom: 'none', padding: '18px 22px 0' }, body: { padding: '12px 22px 20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around' } }}
           >
             {[
-              { name: 'Murugan K.', event: 'Work Anniversary (3 Years)', date: 'Nov 18, 2026', tag: '3 Years Service' },
-              { name: 'Vikram Seth', event: 'Birthday Celebration 🎂', date: 'Nov 21, 2026', tag: 'Birthday' },
-              { name: 'Ananya Sharma', event: 'Work Anniversary (2 Years)', date: 'Nov 25, 2026', tag: '2 Years Service' },
+              { name: 'Apex Precision Tools', event: 'Machine Repair & Calibration', date: 'Nov 20, 2026', tag: 'High Priority' },
+              { name: 'ABC Industries', event: 'Quarterly IT Maintenance Visit', date: 'Nov 21, 2026', tag: 'AMC Service' },
+              { name: 'Sri Traders', event: 'Electrical Wiring Inspection', date: 'Nov 23, 2026', tag: 'Inspection' },
             ].map((ev, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < 2 ? '1px solid #FAF7FC' : 'none', fontSize: 12 }}>
                 <div>
@@ -278,7 +282,7 @@ export const HrDashboardPage: React.FC = () => {
                   <div style={{ fontSize: 11, color: '#7E7A9B' }}>{ev.event}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <Tag color="cyan" style={{ borderRadius: 8, fontSize: 10 }}>{ev.tag}</Tag>
+                  <Tag color="purple" style={{ borderRadius: 8, fontSize: 10, backgroundColor: '#F3E8FF', color: '#6D28D9', border: '1px solid #E9D5FF', fontWeight: 600 }}>{ev.tag}</Tag>
                   <div style={{ fontSize: 10, color: '#A5A1BE', marginTop: 2 }}>{ev.date}</div>
                 </div>
               </div>
@@ -297,7 +301,7 @@ export const HrDashboardPage: React.FC = () => {
           setIsLeaveModalOpen(false);
         }}
         okText="Submit Leave Request"
-        okButtonProps={{ style: { backgroundColor: '#6E56CF', borderRadius: 10 } }}
+        okButtonProps={{ style: { backgroundColor: '#4C1D95', borderRadius: 10 } }}
       >
         <Form layout="vertical" style={{ marginTop: 14 }}>
           <Form.Item label="Select Employee" required>

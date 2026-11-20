@@ -1,801 +1,523 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Typography,
-  Row,
-  Col,
-  Divider,
-  Tag,
-  Tabs,
-  Switch,
-  Select,
-  InputNumber,
-  Table,
-  message,
-  Tooltip,
-} from 'antd';
+import { Card, Form, Input, Button, Typography, Row, Col, Tag, message, Modal } from 'antd';
 import {
   Building2,
   Save,
-  Shield,
-  Sliders,
-  Receipt,
-  Bell,
-  Cpu,
-  FileSpreadsheet,
-  History,
-  CheckCircle,
-  MapPin,
-  Lock,
+  Edit3,
   Mail,
   Phone,
   Globe,
-  Database,
-  RefreshCw,
-  Plus,
-  Trash2,
-  AlertCircle,
+  Headphones,
+  Scale,
+  FileText,
+  CreditCard,
+  Briefcase,
+  Settings,
+  DollarSign,
   Clock,
-  Sparkles,
+  Calendar,
+  Info,
 } from 'lucide-react';
-import { SalesModuleHeader } from '../sales/SalesPages';
-import { SalesKpiCardsRow } from '../../components/dashboard/SalesKpiCardsRow';
+import { IoLocationSharp, IoLocationOutline } from 'react-icons/io5';
+import { MdLocationOn, MdPhone, MdEmail, MdLanguage, MdGavel, MdSettings, MdBusiness } from 'react-icons/md';
+import { PageHeader } from '../../components';
 import { useAuth } from '../../context/AuthContext';
 
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
 export const CompanyProfileSettingsPage: React.FC = () => {
-  const { selectedCompany } = useAuth();
-  const [activeTab, setActiveTab] = useState('company');
+  const { selectedCompany, updateCompanyProfile } = useAuth() as any;
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [form] = Form.useForm();
 
-  // Branch management mock state
-  const [branches, setBranches] = useState([
-    {
-      key: '1',
-      code: 'HQ-CHN-01',
-      name: 'Chennai Corporate Headquarters',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      gstin: '33AABCT9988M1Z0',
-      isPrimary: true,
-      status: 'Active',
-    },
-    {
-      key: '2',
-      code: 'BR-BLR-02',
-      name: 'Bengaluru Tech & Sales Hub',
-      city: 'Bengaluru',
-      state: 'Karnataka',
-      gstin: '29AABCT9988M1Z8',
-      isPrimary: false,
-      status: 'Active',
-    },
-    {
-      key: '3',
-      code: 'BR-HYD-03',
-      name: 'Hyderabad Distribution Depot',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      gstin: '36AABCT9988M1Z4',
-      isPrimary: false,
-      status: 'Active',
-    },
-  ]);
+  const comp = selectedCompany || {
+    name: 'PQR Solutions & Services',
+    code: 'PQR',
+    packageType: 'SERVICE',
+    subscriptionPlan: 'Professional',
+    businessType: 'IT & Service Solutions',
+    email: 'support@pqrsolutions.com',
+    phone: '+91 98200 11223',
+    website: 'www.pqrsolutions.com',
+    helpEmail: 'help@pqrsolutions.com',
+    registrationNumber: 'REG-2024-9988',
+    taxId: 'GSTIN33AABCT9988M1Z0',
+    panNumber: 'AAABCT9988M',
+    companyType: 'Private Limited',
+    address: '12 Tech Park Avenue,\nAndheri East,\nMumbai – 400069, India',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    country: 'India',
+    postalCode: '400069',
+    currency: 'INR (₹)',
+    timezone: 'Asia/Kolkata (IST)',
+    workingHours: 'Mon – Sat: 9:00 AM – 6:00 PM',
+    businessSupport: '24/7 Support',
+  };
 
-  // Integrations state
-  const [integrations, setIntegrations] = useState([
-    {
-      id: 'gstn',
-      name: 'Government GSTN & E-Way Portal',
-      desc: 'Real-time e-invoicing and automated e-way bill generation via NIC GSP',
-      icon: <Receipt size={20} color="#5421A8" />,
-      connected: true,
-      lastSync: '10 mins ago',
-    },
-    {
-      id: 'email',
-      name: 'Enterprise SMTP & Gmail Relay',
-      desc: 'Automated quotation dispatch, invoice PDFs and payment reminders',
-      icon: <Mail size={20} color="#10B981" />,
-      connected: true,
-      lastSync: 'Realtime',
-    },
-    {
-      id: 'sms',
-      name: 'Transactional SMS & WhatsApp API',
-      desc: 'Instant order confirmations and technician dispatch alerts to clients',
-      icon: <Phone size={20} color="#0284C7" />,
-      connected: true,
-      lastSync: 'Realtime',
-    },
-    {
-      id: 'bank',
-      name: 'Bank Direct Reconciliation (ICICI / HDFC API)',
-      desc: 'Automated bank feed synchronization and virtual account NEFT matching',
-      icon: <Building2 size={20} color="#F59E0B" />,
-      connected: false,
-      lastSync: 'Not Connected',
-    },
-  ]);
+  const handleEditSave = (values: any) => {
+    if (updateCompanyProfile) {
+      updateCompanyProfile(values);
+    }
+    message.success('Company profile updated successfully!');
+    setIsEditModalOpen(false);
+  };
+
+  const headerCardStyle: React.CSSProperties = {
+    backgroundColor: '#4C1D95',
+    color: '#FFFFFF',
+    padding: '10px 16px',
+    borderRadius: '12px 12px 0 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    fontSize: 14,
+    fontWeight: 700,
+  };
+
+  const bodyCardStyle: React.CSSProperties = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '0 0 12px 12px',
+    border: '1px solid #E2E8F0',
+    borderTop: 'none',
+    padding: '16px 20px',
+    boxShadow: '0 4px 16px rgba(15, 39, 68, 0.04)',
+    height: 'calc(100% - 42px)',
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* 1. Header Bar matching Sales Dashboard */}
-      <SalesModuleHeader
-        title="Settings & System Administration"
-        subtitle="Manage business identity, tax configurations, multi-branch operations, security policies, and integrations."
-        icon={<Sliders size={20} />}
-        primaryActionLabel="Save All Changes"
-        onPrimaryAction={() => message.success('Tenant settings saved successfully!')}
+    <div style={{ paddingBottom: 30 }}>
+      <PageHeader
+        title="Company Profile"
+        subtitle="Manage business credentials, address, and legal registrations."
       />
 
-      {/* 2. Top 4 High-Impact Metric Cards matching Sales Dashboard Exactly */}
-      <SalesKpiCardsRow
-        cards={[
-          {
-            title: 'System Uptime',
-            value: '99.9%',
-            growth: 'SOC-2',
-            isDark: true,
-            icon: <Shield size={20} color="#5421A8" />,
-            pillExtra: 'Encrypted',
-          },
-          {
-            title: 'Branch Hubs',
-            value: `${branches.length} Active`,
-            growth: 'Pan-India',
-            isDark: false,
-            icon: <MapPin size={20} color="#10B981" />,
-            pillExtra: 'HQ Primary',
-          },
-          {
-            title: 'Live APIs',
-            value: `${integrations.filter((i) => i.connected).length} Linked`,
-            growth: 'GSTN Live',
-            isDark: true,
-            icon: <Cpu size={20} color="#F59E0B" />,
-            pillExtra: 'Auto Sync',
-          },
-          {
-            title: 'Audit & Access',
-            value: 'Protected',
-            growth: '2FA On',
-            isPositive: true,
-            isDark: false,
-            icon: <Lock size={20} color="#6D28D9" />,
-            pillExtra: 'RBAC Active',
-          },
-        ]}
-      />
-
-      {/* 3. Settings Navigation Tabs Card */}
-      <div
-        style={{
-          background: '#FFFFFF',
-          borderRadius: 20,
-          border: '1px solid #ECE8F6',
-          boxShadow: '0 4px 18px rgba(84, 33, 168, 0.04)',
-          overflow: 'hidden',
-          padding: '16px 20px',
-        }}
-      >
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          type="card"
-          items={[
-            {
-              key: 'company',
-              label: (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                  <Building2 size={15} /> Company Profile
-                </span>
-              ),
-              children: (
-                <div style={{ padding: '16px 4px' }}>
-                  {/* Tenant Branding Capsule */}
-                  <div
+      {/* TOP ROW: Brand Hero Card (Left) & Company Information (Right) */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        {/* 1. Left Brand Hero Card */}
+        <Col xs={24} lg={9}>
+          <div
+            style={{
+              borderRadius: 16,
+              background: 'linear-gradient(180deg, #3B0764 0%, #4C1D95 60%, #EAD8B1 60%, #F5E7CA 100%)',
+              border: '1px solid #CBD5E1',
+              boxShadow: '0 8px 24px rgba(76, 29, 149, 0.12)',
+              height: '100%',
+              minHeight: 220,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              padding: '18px 20px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Top Brand Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 58,
+                  height: 58,
+                  borderRadius: 12,
+                  backgroundColor: '#4C1D95',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: 18,
+                  boxShadow: '0 4px 12px rgba(76, 29, 149, 0.3)',
+                  border: '2px solid #FFFFFF',
+                  flexShrink: 0,
+                }}
+              >
+                {comp.code || 'PQR'}
+              </div>
+              <div>
+                <h3 style={{ margin: 0, color: '#FFFFFF', fontSize: 16, fontWeight: 800 }}>
+                  {comp.name || 'PQR Solutions & Services'}
+                </h3>
+                <div style={{ marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <span
                     style={{
-                      background: 'linear-gradient(135deg, #FAF8FE 0%, #F4EEFD 100%)',
-                      border: '1px solid #ECE8F6',
-                      borderRadius: 16,
-                      padding: '18px 24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: 24,
+                      backgroundColor: '#FFFFFF',
+                      color: '#0D233A',
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      fontSize: 10,
+                      fontWeight: 800,
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-                      <div
-                        style={{
-                          width: 58,
-                          height: 58,
-                          borderRadius: 16,
-                          background: 'linear-gradient(135deg, #3B1678 0%, #581C87 50%, #6D28D9 100%)',
-                          color: '#FFFFFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 900,
-                          fontSize: 22,
-                          boxShadow: '0 8px 18px rgba(88, 28, 135, 0.25)',
-                        }}
-                      >
-                        {selectedCompany?.code || 'ERP'}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: '#1E1B4B' }}>
-                          {selectedCompany?.name || 'Apex Precision Tools Ltd'}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                          <Tag
-                            style={{
-                              background: '#EDE9FE',
-                              color: '#5421A8',
-                              border: '1px solid #DDD6FE',
-                              borderRadius: 12,
-                              fontWeight: 700,
-                              fontSize: 11,
-                              padding: '1px 10px',
-                            }}
-                          >
-                            Package: {selectedCompany?.packageType || 'COMPLETE ERP'}
-                          </Tag>
-                          <Tag
-                            style={{
-                              background: '#E0F2FE',
-                              color: '#0369A1',
-                              border: '1px solid #BAE6FD',
-                              borderRadius: 12,
-                              fontWeight: 700,
-                              fontSize: 11,
-                              padding: '1px 10px',
-                            }}
-                          >
-                            Plan: {selectedCompany?.subscriptionPlan || 'Enterprise Multi-Tenant'}
-                          </Tag>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button
-                      type="primary"
-                      icon={<Save size={15} />}
-                      onClick={() => message.success('Company profile updated successfully!')}
-                      style={{
-                        background: 'linear-gradient(135deg, #3B1678 0%, #581C87 50%, #6D28D9 100%)',
-                        border: 'none',
-                        borderRadius: 20,
-                        fontWeight: 700,
-                        height: 38,
-                        padding: '0 20px',
-                        boxShadow: '0 4px 14px rgba(88, 28, 135, 0.25)',
-                      }}
-                    >
-                      Save Profile
-                    </Button>
-                  </div>
-
-                  {/* Form Details */}
-                  <Form layout="vertical">
-                    <Row gutter={[20, 16]}>
-                      <Col xs={24} sm={12}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Registered Legal Entity Name
-                        </div>
-                        <Input
-                          defaultValue={selectedCompany?.name || 'Apex Precision Tools Private Limited'}
-                          size="large"
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={6}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Company Code / Prefix
-                        </div>
-                        <Input
-                          defaultValue={selectedCompany?.code || 'APEX'}
-                          size="large"
-                          disabled
-                          style={{ borderRadius: 10, background: '#F8FAFC' }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={6}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Default System Currency
-                        </div>
-                        <Select
-                          defaultValue="INR"
-                          size="large"
-                          style={{ width: '100%' }}
-                          options={[
-                            { value: 'INR', label: 'INR (₹) - Indian Rupee' },
-                            { value: 'USD', label: 'USD ($) - US Dollar' },
-                            { value: 'EUR', label: 'EUR (€) - Euro' },
-                            { value: 'AED', label: 'AED (د.إ) - UAE Dirham' },
-                          ]}
-                        />
-                      </Col>
-                      <Col xs={24} sm={12}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Corporate Billing Email
-                        </div>
-                        <Input
-                          defaultValue={selectedCompany?.email || 'accounts@apexprecision.com'}
-                          size="large"
-                          prefix={<Mail size={15} color="#94A3B8" />}
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={12}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Corporate Telephone / Desk
-                        </div>
-                        <Input
-                          defaultValue={selectedCompany?.phone || '+91 44 2841 9900'}
-                          size="large"
-                          prefix={<Phone size={15} color="#94A3B8" />}
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={12}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          GSTIN / Federal Tax Identification Number
-                        </div>
-                        <Input
-                          defaultValue={(selectedCompany as any)?.taxId || '33AABCT9988M1Z0'}
-                          size="large"
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={12}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Corporate Identity Number (CIN) / Registration No.
-                        </div>
-                        <Input
-                          defaultValue={(selectedCompany as any)?.registrationNumber || 'U29253TN2018PTC123456'}
-                          size="large"
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                      <Col xs={24}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 }}>
-                          Registered Office & Principal Place of Business
-                        </div>
-                        <Input.TextArea
-                          rows={3}
-                          defaultValue={
-                            selectedCompany?.address ||
-                            'Plot No. 44, SIDCO Industrial Estate, Ambattur, Chennai - 600058, Tamil Nadu, India.'
-                          }
-                          style={{ borderRadius: 10, borderColor: '#ECE8F6' }}
-                        />
-                      </Col>
-                    </Row>
-                  </Form>
+                    Package: {comp.packageType || 'SERVICE'}
+                  </span>
+                  <span
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Plan: {comp.subscriptionPlan || 'Professional'}
+                  </span>
                 </div>
-              ),
-            },
-            {
-              key: 'branches',
-              label: (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                  <MapPin size={15} /> Branch Management
-                </span>
-              ),
-              children: (
-                <div style={{ padding: '16px 4px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              </div>
+            </div>
+
+            {/* Bottom Motto on Golden Cream Section */}
+            <div style={{ textAlign: 'center', paddingTop: 30, paddingBottom: 4 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  fontStyle: 'italic',
+                  color: '#0F2744',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Delivering Smart Solutions
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  fontStyle: 'italic',
+                  color: '#0F2744',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                for a Better Tomorrow
+              </div>
+            </div>
+          </div>
+        </Col>
+
+        {/* 2. Right: Company Information */}
+        <Col xs={24} lg={15}>
+          <div style={{ height: '100%' }}>
+            <div style={{ ...headerCardStyle, justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ backgroundColor: '#F59E0B', color: '#000', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900 }}>i</span>
+                <span>Company Information</span>
+              </div>
+              <Button
+                size="small"
+                icon={<Edit3 size={13} />}
+                style={{
+                  backgroundColor: '#F59E0B',
+                  borderColor: '#F59E0B',
+                  color: '#000',
+                  fontWeight: 700,
+                  borderRadius: 16,
+                  fontSize: 11,
+                  padding: '0 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+                onClick={() => {
+                  form.setFieldsValue(comp);
+                  setIsEditModalOpen(true);
+                }}
+              >
+                Edit Profile
+              </Button>
+            </div>
+            <div style={bodyCardStyle}>
+              <Row gutter={[20, 16]}>
+                <Col span={14}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Company Name</div>
+                  <div style={{ fontSize: 13, color: '#334155', marginTop: 2 }}>{comp.name || 'PQR Solutions & Services'}</div>
+                </Col>
+                <Col span={10}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Company Short Code</div>
+                  <div style={{ fontSize: 13, color: '#334155', marginTop: 2 }}>{comp.code || 'PQR'}</div>
+                </Col>
+                <Col span={14}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Business Category</div>
+                  <div style={{ fontSize: 13, color: '#334155', marginTop: 2 }}>{comp.businessType || 'IT & Service Solutions'}</div>
+                </Col>
+                <Col span={10}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Package</div>
+                  <div style={{ fontSize: 13, color: '#334155', marginTop: 2 }}>{comp.packageType || 'SERVICE'}</div>
+                </Col>
+                <Col span={14}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Company Logo</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#4C1D95', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800 }}>
+                      {comp.code || 'PQR'}
+                    </div>
                     <div>
-                      <h4 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#1E1B4B' }}>
-                        Operational Branches & Warehouses
-                      </h4>
-                      <div style={{ fontSize: 12, color: '#64748B' }}>
-                        Configure regional GSTIN registration, billing dispatch addresses, and warehouse hubs.
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#334155' }}>Logo</div>
+                      <div style={{ fontSize: 10, color: '#64748B' }}>(Visible in Reports)</div>
+                    </div>
+                  </div>
+                </Col>
+                <Col span={10}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>Plan</div>
+                  <div style={{ fontSize: 13, color: '#334155', marginTop: 2 }}>{comp.subscriptionPlan || 'Professional'}</div>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+      {/* MIDDLE ROW: Contact Information & Legal / Tax Information */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        {/* Contact Information */}
+        <Col xs={24} lg={12}>
+          <div>
+            <div style={headerCardStyle}>
+              <Phone size={16} color="#F59E0B" />
+              <span>Contact Information</span>
+            </div>
+            <div style={bodyCardStyle}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <Mail size={16} color="#0F2744" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Official Business Email</div>
+                    <div style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>{comp.email || 'support@pqrsolutions.com'}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <Phone size={16} color="#0F2744" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Official Phone</div>
+                    <div style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>{comp.phone || '+91 98200 11223'}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <Globe size={16} color="#0F2744" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Website</div>
+                    <div style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>{comp.website || 'www.pqrsolutions.com'}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <Headphones size={16} color="#0F2744" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Support Email</div>
+                    <div style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>{comp.helpEmail || 'help@pqrsolutions.com'}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Col>
+
+        {/* Legal & Tax Information */}
+        <Col xs={24} lg={12}>
+          <div>
+            <div style={headerCardStyle}>
+              <Scale size={16} color="#F59E0B" />
+              <span>Legal & Tax Information</span>
+            </div>
+            <div style={bodyCardStyle}>
+              <Row gutter={[16, 12]}>
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FileText size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Registration Number</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
+                    {(comp as any).registrationNumber || 'REG-2024-9988'}
+                  </span>
+                </Col>
+
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <CreditCard size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Tax ID / GSTIN</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
+                    {(comp as any).taxId || 'GSTIN33AABCT9988M1Z0'}
+                  </span>
+                </Col>
+
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Building2 size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>PAN Number</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
+                    {(comp as any).panNumber || 'AAABCT9988M'}
+                  </span>
+                </Col>
+
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Briefcase size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Business Type</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
+                    {(comp as any).companyType || 'Private Limited'}
+                  </span>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+      {/* BOTTOM ROW: Address Information & Business Settings */}
+      <Row gutter={[16, 16]}>
+        {/* Address Information */}
+        <Col xs={24} lg={12}>
+          <div>
+            <div style={headerCardStyle}>
+              <IoLocationOutline size={18} color="#F59E0B" />
+              <span>Address Information</span>
+            </div>
+            <div style={bodyCardStyle}>
+              <Row gutter={[16, 14]}>
+                <Col span={12}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <IoLocationSharp size={18} color="#4C1D95" style={{ marginTop: 2, flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Registered Address</div>
+                      <div style={{ fontSize: 12, color: '#0F172A', fontWeight: 600, lineHeight: 1.5, marginTop: 2 }}>
+                        {comp.address || '12 Tech Park Avenue,\nAndheri East,\nMumbai – 400069, India'}
                       </div>
                     </div>
-                    <Button
-                      type="primary"
-                      icon={<Plus size={14} />}
-                      onClick={() => message.success('Add Branch Drawer opened')}
-                      style={{
-                        background: 'linear-gradient(135deg, #3B1678 0%, #581C87 50%, #6D28D9 100%)',
-                        border: 'none',
-                        borderRadius: 20,
-                        fontWeight: 700,
-                        fontSize: 12,
-                        padding: '0 16px',
-                        height: 36,
-                      }}
-                    >
-                      Add New Branch
-                    </Button>
                   </div>
-
-                  <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #ECE8F6' }}>
-                    <Table
-                      dataSource={branches}
-                      pagination={false}
-                      size="middle"
-                      columns={[
-                        {
-                          title: 'Branch Code',
-                          dataIndex: 'code',
-                          key: 'code',
-                          render: (code, record) => (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <span style={{ fontWeight: 800, color: '#5421A8' }}>{code}</span>
-                              {record.isPrimary && (
-                                <Tag color="purple" style={{ borderRadius: 8, fontSize: 10, fontWeight: 700 }}>
-                                  Headquarters
-                                </Tag>
-                              )}
-                            </div>
-                          ),
-                        },
-                        {
-                          title: 'Branch Name',
-                          dataIndex: 'name',
-                          key: 'name',
-                          render: (t) => <span style={{ fontWeight: 700, color: '#1E1B4B' }}>{t}</span>,
-                        },
-                        {
-                          title: 'Location',
-                          key: 'location',
-                          render: (_, r) => (
-                            <span style={{ color: '#475569' }}>
-                              {r.city}, {r.state}
-                            </span>
-                          ),
-                        },
-                        {
-                          title: 'State GSTIN',
-                          dataIndex: 'gstin',
-                          key: 'gstin',
-                          render: (gst) => (
-                            <Tag style={{ background: '#F8FAFC', borderRadius: 6, fontWeight: 600 }}>{gst}</Tag>
-                          ),
-                        },
-                        {
-                          title: 'Status',
-                          dataIndex: 'status',
-                          key: 'status',
-                          render: (st) => (
-                            <Tag color="success" style={{ borderRadius: 10, fontWeight: 700 }}>
-                              {st}
-                            </Tag>
-                          ),
-                        },
-                        {
-                          title: 'Actions',
-                          key: 'actions',
-                          render: () => (
-                            <Button
-                              type="text"
-                              size="small"
-                              style={{ color: '#5421A8', fontWeight: 700 }}
-                              onClick={() => message.info('Edit Branch configuration')}
-                            >
-                              Edit
-                            </Button>
-                          ),
-                        },
-                      ]}
-                    />
-                  </div>
-                </div>
-              ),
-            },
-            {
-              key: 'tax',
-              label: (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                  <Receipt size={15} /> Tax & GST Configuration
-                </span>
-              ),
-              children: (
-                <div style={{ padding: '16px 4px' }}>
-                  <Row gutter={[20, 20]}>
-                    <Col xs={24} md={12}>
-                      <div
-                        style={{
-                          background: '#FAF8FE',
-                          borderRadius: 16,
-                          padding: 20,
-                          border: '1px solid #ECE8F6',
-                        }}
-                      >
-                        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#1E1B4B' }}>
-                          Goods and Services Tax (GST) Defaults
-                        </h4>
-                        <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, marginBottom: 16 }}>
-                          Standard statutory rates applied across quotations, sales orders and invoices.
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>Auto E-Invoice Generation</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Generate IRN & QR Code for invoices above ₹5 Cr</div>
-                            </div>
-                            <Switch defaultChecked />
-                          </div>
-                          <Divider style={{ margin: '6px 0' }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>E-Way Bill Generation</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Auto-generate for shipments exceeding ₹50,000</div>
-                            </div>
-                            <Switch defaultChecked />
-                          </div>
-                          <Divider style={{ margin: '6px 0' }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>Reverse Charge Mechanism (RCM)</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Enable for unregistered vendor transactions</div>
-                            </div>
-                            <Switch />
-                          </div>
-                        </div>
-                      </div>
-                    </Col>
-
-                    <Col xs={24} md={12}>
-                      <div
-                        style={{
-                          background: '#FAF8FE',
-                          borderRadius: 16,
-                          padding: 20,
-                          border: '1px solid #ECE8F6',
-                        }}
-                      >
-                        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#1E1B4B' }}>
-                          Standard Tax Rates Setup
-                        </h4>
-                        <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, marginBottom: 16 }}>
-                          Preset GST tax slabs selectable in line items.
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-                          {['0% (Nil / Exempt)', '5% (Essential Commodities)', '12% (Standard Lower)', '18% (Standard Higher / Services)', '28% (Luxury / High Tech)'].map(
-                            (rate, idx) => (
-                              <div
-                                key={idx}
-                                style={{
-                                  background: '#FFFFFF',
-                                  padding: '12px 14px',
-                                  borderRadius: 12,
-                                  border: '1px solid #E2E8F0',
-                                  fontWeight: 700,
-                                  fontSize: 12,
-                                  color: '#334155',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                }}
-                              >
-                                <span>{rate}</span>
-                                <CheckCircle size={14} color="#16A34A" />
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    </Col>
+                </Col>
+                <Col span={12}>
+                  <Row gutter={[8, 8]}>
+                    <Col span={10} style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>City</Col>
+                    <Col span={14} style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{comp.city || 'Mumbai'}</Col>
+                    <Col span={10} style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>State</Col>
+                    <Col span={14} style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{comp.state || 'Maharashtra'}</Col>
+                    <Col span={10} style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Country</Col>
+                    <Col span={14} style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{comp.country || 'India'}</Col>
+                    <Col span={10} style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Postal Code</Col>
+                    <Col span={14} style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>{(comp as any).postalCode || '400069'}</Col>
                   </Row>
-                </div>
-              ),
-            },
-            {
-              key: 'integrations',
-              label: (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                  <Cpu size={15} /> Integrations & APIs
-                </span>
-              ),
-              children: (
-                <div style={{ padding: '16px 4px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 16 }}>
-                    {integrations.map((item) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          background: '#FFFFFF',
-                          borderRadius: 16,
-                          padding: '18px 20px',
-                          border: '1px solid #ECE8F6',
-                          boxShadow: '0 4px 14px rgba(84, 33, 168, 0.03)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                              <div
-                                style={{
-                                  width: 42,
-                                  height: 42,
-                                  borderRadius: 12,
-                                  background: '#FAF8FE',
-                                  border: '1px solid #ECE8F6',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                {item.icon}
-                              </div>
-                              <div>
-                                <div style={{ fontWeight: 800, fontSize: 13.5, color: '#1E1B4B' }}>{item.name}</div>
-                                <div style={{ fontSize: 11, color: '#94A3B8' }}>Sync: {item.lastSync}</div>
-                              </div>
-                            </div>
-                            <Tag
-                              color={item.connected ? 'success' : 'default'}
-                              style={{ borderRadius: 10, fontWeight: 700, margin: 0 }}
-                            >
-                              {item.connected ? 'Connected' : 'Disconnected'}
-                            </Tag>
-                          </div>
-                          <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.5 }}>{item.desc}</div>
-                        </div>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </Col>
 
-                        <div
-                          style={{
-                            marginTop: 16,
-                            paddingTop: 12,
-                            borderTop: '1px solid #F1F5F9',
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                          }}
-                        >
-                          <Button
-                            size="small"
-                            type={item.connected ? 'default' : 'primary'}
-                            style={{
-                              borderRadius: 14,
-                              fontWeight: 700,
-                              fontSize: 11.5,
-                              borderColor: item.connected ? '#E2E8F0' : '#5421A8',
-                              background: item.connected ? '#FFFFFF' : '#5421A8',
-                              color: item.connected ? '#475569' : '#FFFFFF',
-                            }}
-                            onClick={() => message.info(`Configured ${item.name}`)}
-                          >
-                            {item.connected ? 'Configure Keys' : 'Connect API'}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ),
-            },
-            {
-              key: 'security',
-              label: (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                  <Lock size={15} /> Security & Audit Controls
-                </span>
-              ),
-              children: (
-                <div style={{ padding: '16px 4px' }}>
-                  <Row gutter={[20, 20]}>
-                    <Col xs={24} md={12}>
-                      <div
-                        style={{
-                          background: '#FAF8FE',
-                          borderRadius: 16,
-                          padding: 20,
-                          border: '1px solid #ECE8F6',
-                        }}
-                      >
-                        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#1E1B4B' }}>
-                          Tenant Security & Two-Factor Authentication
-                        </h4>
-                        <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, marginBottom: 16 }}>
-                          Enforce authentication boundaries for employees and sales managers.
-                        </div>
+        {/* Business Settings */}
+        <Col xs={24} lg={12}>
+          <div>
+            <div style={headerCardStyle}>
+              <Settings size={16} color="#F59E0B" />
+              <span>Business Settings</span>
+            </div>
+            <div style={bodyCardStyle}>
+              <Row gutter={[16, 12]}>
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <DollarSign size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Currency</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>INR (₹)</span>
+                </Col>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>Enforce 2FA for All Staff</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Require Authenticator App or SMS OTP on login</div>
-                            </div>
-                            <Switch defaultChecked />
-                          </div>
-                          <Divider style={{ margin: '6px 0' }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>IP Address Whitelisting</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Restrict ERP access to authorized office VPN IPs</div>
-                            </div>
-                            <Switch />
-                          </div>
-                          <Divider style={{ margin: '6px 0' }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1E1B4B' }}>Session Timeout (Inactivity)</div>
-                              <div style={{ fontSize: 11.5, color: '#64748B' }}>Auto logout after 30 minutes of idle time</div>
-                            </div>
-                            <Switch defaultChecked />
-                          </div>
-                        </div>
-                      </div>
-                    </Col>
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Clock size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Timezone</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>Asia/Kolkata (IST)</span>
+                </Col>
 
-                    <Col xs={24} md={12}>
-                      <div
-                        style={{
-                          background: '#FAF8FE',
-                          borderRadius: 16,
-                          padding: 20,
-                          border: '1px solid #ECE8F6',
-                        }}
-                      >
-                        <h4 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#1E1B4B' }}>
-                          Immutable Audit Trail & Data Backup
-                        </h4>
-                        <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, marginBottom: 16 }}>
-                          System integrity logs tracking user transactions and modifications.
-                        </div>
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Calendar size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Working Hours</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>Mon – Sat: 9:00 AM – 6:00 PM</span>
+                </Col>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                          <div
-                            style={{
-                              background: '#FFFFFF',
-                              padding: '12px 14px',
-                              borderRadius: 12,
-                              border: '1px solid #E2E8F0',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 12.5, color: '#1E1B4B' }}>Daily Automated Database Snapshot</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>Last snapshot taken at 03:00 AM IST (Cloud Encrypted)</div>
-                            </div>
-                            <Tag color="success" style={{ fontWeight: 700, borderRadius: 8 }}>Healthy</Tag>
-                          </div>
-                          <div
-                            style={{
-                              background: '#FFFFFF',
-                              padding: '12px 14px',
-                              borderRadius: 12,
-                              border: '1px solid #E2E8F0',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <div>
-                              <div style={{ fontWeight: 700, fontSize: 12.5, color: '#1E1B4B' }}>Audit Event Retention Period</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>Preserved for 7 Years (Statutory Tax Compliance)</div>
-                            </div>
-                            <Tag color="purple" style={{ fontWeight: 700, borderRadius: 8 }}>7 Years</Tag>
-                          </div>
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </div>
-              ),
-            },
-          ]}
-        />
-      </div>
+                <Col span={10} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Headphones size={15} color="#0F2744" />
+                  <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Business Support</span>
+                </Col>
+                <Col span={14}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>24/7 Support</span>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        title="Edit Company Profile"
+        open={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        footer={null}
+        width={650}
+      >
+        <Form form={form} layout="vertical" onFinish={handleEditSave}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Company Name" name="name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Company Short Code" name="code">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Business Email" name="email" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Phone" name="phone">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Website" name="website">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Tax ID / GSTIN" name="taxId">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item label="Registered Address" name="address">
+                <Input.TextArea rows={2} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
+            <Button onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }}>
+              Save Profile
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 };
 
 export const CompanyGeneralSettingsPage: React.FC = () => {
-  return <CompanyProfileSettingsPage />;
+  return (
+    <div>
+      <PageHeader
+        title="Tenant System Settings"
+        subtitle="Configure currency, invoice prefixes, notification preferences, and working hours."
+      />
+      <Card style={{ borderRadius: 8, maxWidth: 800 }}>
+        <p style={{ color: '#5C526A' }}>
+          Configured Currency: <strong>INR (₹)</strong> &bull; Date Format: <strong>DD/MM/YYYY</strong> &bull; Timezone: <strong>Asia/Kolkata (IST)</strong>
+        </p>
+      </Card>
+    </div>
+  );
 };

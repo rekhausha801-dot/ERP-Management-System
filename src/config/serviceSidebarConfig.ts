@@ -12,7 +12,7 @@ export const SERVICE_SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     section: 'services',
     allowedPackages: ['SERVICE', 'COMPLETE'],
     children: [
-      { key: 'sm-service-overview', label: 'Service Overview', path: '/app/services/dashboard', iconName: 'Wrench' },
+      { key: 'sm-service-overview', label: 'Service Management', path: '/app/services/dashboard', iconName: 'Wrench' },
       { key: 'sm-requests', label: 'Service Requests', path: '/app/services/requests', iconName: 'FileText' },
       { key: 'sm-tickets', label: 'Service Tickets', path: '/app/services/tickets', iconName: 'Ticket' },
       { key: 'sm-quotations', label: 'Service Quotations', path: '/app/services/quotations', iconName: 'FileSpreadsheet' },
@@ -34,7 +34,16 @@ export const SERVICE_SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['SERVICE', 'COMPLETE'],
     children: [
       { key: 'rep-service', label: 'Service Reports', path: '/app/reports/service', iconName: 'Wrench' },
-      { key: 'rep-overview', label: 'Reports Overview', path: '/app/reports', iconName: 'BarChart3' },
+    ],
+  },
+  {
+    key: 'grp-service-settings',
+    label: 'Service Settings',
+    iconName: 'SlidersHorizontal',
+    section: 'services',
+    allowedPackages: ['SERVICE', 'COMPLETE'],
+    children: [
+      { key: 'sm-company-settings', label: 'Company Profile', path: '/app/services/settings/company', iconName: 'Briefcase' },
     ],
   },
 ];

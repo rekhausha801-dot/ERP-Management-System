@@ -28,19 +28,16 @@ import { ServicesDashboard } from '../modules/services-erp/dashboard/ServicesDas
 
 // Sales Pages
 import {
+  SalesCrmPage,
+  SalesEnquiriesPage,
   SalesQuotationsPage,
-  SalesQuotationTemplatesPage,
   SalesOrdersPage,
-  SalesOrderTrackingPage,
-  SalesProformaInvoicesPage,
-  SalesTargetsPage,
-  SalesCommissionsPage,
-  SalesReturnsPage,
-  SalesTeamPage,
   SalesInvoicesPage as InvoicesPage,
   SalesPaymentsPage as PaymentsPage,
   SalesCustomersPage as CustomersPage,
   SalesProductsPage,
+  SalesReturnsPage,
+  SalesTeamPage,
 } from '../pages/sales/SalesPages';
 import { SalesOverviewPage } from '../pages/sales/SalesOverviewPage';
 import { ConfirmedSalesOrdersPage } from '../pages/sales/ConfirmedSalesOrdersPage';
@@ -89,25 +86,16 @@ import { OutstandingPayablesPage } from '../pages/billing/OutstandingPayablesPag
 import { OutstandingReceivablesPage } from '../pages/billing/OutstandingReceivablesPage';
 
 import { CompanyProfileSettingsPage as SettingsPage } from '../pages/settings/CompanySettingsPages';
-import { TaxConfigurationPage } from '../pages/settings/TaxConfigurationPage';
-import { CompanyCalendarPage } from '../pages/calendar/CompanyCalendarPage';
-import { CustomerManagementPage } from '../pages/customers/CustomerManagementPage';
+import { BranchManagementPage } from '../pages/settings/BranchManagementPage';
+import { CompanyCalendarPage } from '../pages/CompanyCalendarPage';
+import { NoticesAnnouncementsPage } from '../pages/communication/NoticesAnnouncementsPage';
 import { CustomerGroupsPage } from '../pages/customers/CustomerGroupsPage';
-import { CustomerContactsPage } from '../pages/customers/CustomerContactsPage';
-import { CustomerActivitiesHistoryPage } from '../pages/customers/CustomerActivitiesHistoryPage';
-import { CrmDashboardPage } from '../pages/crm/CrmDashboardPage';
-import { CrmPipelinePage } from '../pages/crm/CrmPipelinePage';
-import { LeadsListPage } from '../pages/crm/LeadsListPage';
-import { LeadSourcesPage } from '../pages/crm/LeadSourcesPage';
-import { LeadAssignmentsPage } from '../pages/crm/LeadAssignmentsPage';
-import { EnquiriesListPage } from '../pages/crm/EnquiriesListPage';
-import { SalesActivitiesPage } from '../pages/crm/SalesActivitiesPage';
-import { CentralFollowUpsPage } from '../pages/crm/CentralFollowUpsPage';
 
 
 // Service Pages
 import {
   ServiceTicketsPage,
+  ServiceOrdersPage,
   ServiceJobsPage,
   ServiceTechniciansPage,
   ServiceSchedulingPage,
@@ -121,6 +109,7 @@ import {
 import { ServiceQuotationsPage } from '../pages/service/ServiceQuotationsPage';
 import { CustomerServiceRequestsPage } from '../pages/service/CustomerServiceRequestsPage';
 import { OfficeStaffPortalPage } from '../pages/service/OfficeStaffPortalPage';
+import { ServiceCompanySettingsPage } from '../pages/service/ServiceCompanySettingsPage';
 
 // Generic Active Module Viewer for dynamic features
 import { GenericModuleView } from '../pages/GenericModuleView';
@@ -243,16 +232,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="calendar" element={<CompanyCalendarPage />} />
 
         {/* 02. CUSTOMER MANAGEMENT */}
-        <Route path="customers" element={<CustomerManagementPage />} />
+        <Route path="customers" element={<CustomersPage />} />
         <Route path="customers/groups" element={<CustomerGroupsPage />} />
-        <Route path="customers/contacts" element={<CustomerContactsPage />} />
-        <Route path="customers/activities" element={<CustomerActivitiesHistoryPage />} />
-        <Route path="customers/follow-ups" element={<Navigate to="/app/sales/lead-follow-ups" replace />} />
+        <Route path="customers/contacts" element={<GenericModuleView title="Customer Contacts" />} />
+        <Route path="customers/activities" element={<GenericModuleView title="Customer Activities" />} />
+        <Route path="customers/follow-ups" element={<GenericModuleView title="Customer Follow-ups" />} />
 
         {/* 03. COMMUNICATION */}
         <Route path="communication/messages" element={<GenericModuleView title="Messages" />} />
         <Route path="communication/emails" element={<GenericModuleView title="Email History" />} />
-        <Route path="communication/announcements" element={<GenericModuleView title="Announcements" />} />
+        <Route path="communication/announcements" element={<NoticesAnnouncementsPage />} />
         <Route path="communication/tasks" element={<Navigate to="/app/hr/tasks" replace />} />
 
         {/* 04. DOCUMENT MANAGEMENT */}
@@ -264,33 +253,29 @@ export const AppRoutes: React.FC = () => {
         {/* 05. SALES MANAGEMENT (SALES & COMPLETE) */}
         <Route path="sales/overview" element={<ModuleAccessRoute><SalesOverviewPage /></ModuleAccessRoute>} />
         <Route path="sales/dashboard" element={<ModuleAccessRoute><SalesDashboard /></ModuleAccessRoute>} />
-        <Route path="sales/targets" element={<ModuleAccessRoute><SalesTargetsPage /></ModuleAccessRoute>} />
-        <Route path="sales/performance" element={<ModuleAccessRoute><SalesTargetsPage /></ModuleAccessRoute>} />
+        <Route path="sales/targets" element={<ModuleAccessRoute><GenericModuleView title="Sales Targets" /></ModuleAccessRoute>} />
+        <Route path="sales/performance" element={<ModuleAccessRoute><GenericModuleView title="Sales Performance" /></ModuleAccessRoute>} />
         <Route path="sales/team" element={<ModuleAccessRoute><SalesTeamPage /></ModuleAccessRoute>} />
-        <Route path="sales/commissions" element={<ModuleAccessRoute><SalesCommissionsPage /></ModuleAccessRoute>} />
-        <Route path="sales/activities" element={<ModuleAccessRoute><SalesActivitiesPage /></ModuleAccessRoute>} />
-        <Route path="sales/follow-ups" element={<ModuleAccessRoute><CentralFollowUpsPage /></ModuleAccessRoute>} />
-        <Route path="sales/proforma-invoices" element={<ModuleAccessRoute><SalesProformaInvoicesPage /></ModuleAccessRoute>} />
+        <Route path="sales/commissions" element={<ModuleAccessRoute><GenericModuleView title="Sales Commissions" /></ModuleAccessRoute>} />
+        <Route path="sales/activities" element={<ModuleAccessRoute><GenericModuleView title="Sales Activities" /></ModuleAccessRoute>} />
 
         {/* 06. CRM MANAGEMENT (SALES & COMPLETE) */}
-        <Route path="sales/crm" element={<ModuleAccessRoute><CrmDashboardPage /></ModuleAccessRoute>} />
-        <Route path="sales/crm-pipeline" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
-        <Route path="sales/pipeline" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
-        <Route path="sales/leads" element={<ModuleAccessRoute><LeadsListPage /></ModuleAccessRoute>} />
-        <Route path="sales/lead-sources" element={<ModuleAccessRoute><LeadSourcesPage /></ModuleAccessRoute>} />
-        <Route path="sales/lead-assignments" element={<ModuleAccessRoute><LeadAssignmentsPage /></ModuleAccessRoute>} />
-        <Route path="sales/lead-follow-ups" element={<ModuleAccessRoute><CentralFollowUpsPage /></ModuleAccessRoute>} />
-        <Route path="sales/lead-conversion" element={<ModuleAccessRoute><CrmPipelinePage /></ModuleAccessRoute>} />
+        <Route path="sales/crm" element={<ModuleAccessRoute><SalesCrmPage /></ModuleAccessRoute>} />
+        <Route path="sales/leads" element={<ModuleAccessRoute><SalesCrmPage /></ModuleAccessRoute>} />
+        <Route path="sales/lead-sources" element={<ModuleAccessRoute><GenericModuleView title="Lead Sources" /></ModuleAccessRoute>} />
+        <Route path="sales/lead-assignments" element={<ModuleAccessRoute><GenericModuleView title="Lead Assignments" /></ModuleAccessRoute>} />
+        <Route path="sales/lead-follow-ups" element={<ModuleAccessRoute><GenericModuleView title="Lead Follow-ups" /></ModuleAccessRoute>} />
+        <Route path="sales/lead-conversion" element={<ModuleAccessRoute><GenericModuleView title="Lead Conversion" /></ModuleAccessRoute>} />
 
-        <Route path="sales/enquiries" element={<ModuleAccessRoute><EnquiriesListPage /></ModuleAccessRoute>} />
+        <Route path="sales/enquiries" element={<ModuleAccessRoute><SalesEnquiriesPage /></ModuleAccessRoute>} />
         <Route path="sales/enquiry-assignments" element={<ModuleAccessRoute><GenericModuleView title="Enquiry Assignments" /></ModuleAccessRoute>} />
-        <Route path="sales/enquiry-follow-ups" element={<ModuleAccessRoute><Navigate to="/app/sales/lead-follow-ups" replace /></ModuleAccessRoute>} />
+        <Route path="sales/enquiry-follow-ups" element={<ModuleAccessRoute><GenericModuleView title="Enquiry Follow-ups" /></ModuleAccessRoute>} />
         <Route path="sales/enquiry-status" element={<ModuleAccessRoute><GenericModuleView title="Enquiry Status" /></ModuleAccessRoute>} />
 
         <Route path="sales/quotations" element={<ModuleAccessRoute><SalesQuotationsPage /></ModuleAccessRoute>} />
-        <Route path="sales/quotation-templates" element={<ModuleAccessRoute><SalesQuotationTemplatesPage /></ModuleAccessRoute>} />
-        <Route path="sales/quotation-approvals" element={<ModuleAccessRoute><SalesQuotationsPage /></ModuleAccessRoute>} />
-        <Route path="sales/quotation-history" element={<ModuleAccessRoute><SalesQuotationsPage /></ModuleAccessRoute>} />
+        <Route path="sales/quotation-templates" element={<ModuleAccessRoute><GenericModuleView title="Quotation Templates" /></ModuleAccessRoute>} />
+        <Route path="sales/quotation-approvals" element={<ModuleAccessRoute><GenericModuleView title="Quotation Approvals" /></ModuleAccessRoute>} />
+        <Route path="sales/quotation-history" element={<ModuleAccessRoute><GenericModuleView title="Quotation History" /></ModuleAccessRoute>} />
 
         <Route path="sales/orders" element={<ModuleAccessRoute><ConfirmedSalesOrdersPage /></ModuleAccessRoute>} />
         <Route path="sales/order-approvals" element={<ModuleAccessRoute><SalesOrdersPage /></ModuleAccessRoute>} />
@@ -299,29 +284,6 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/payments-received" element={<ModuleAccessRoute><PaymentsReceivedPage /></ModuleAccessRoute>} />
         <Route path="sales/delivery-management" element={<ModuleAccessRoute><GenericModuleView title="Delivery Management" /></ModuleAccessRoute>} />
         <Route path="sales/returns" element={<ModuleAccessRoute><SalesReturnsPage /></ModuleAccessRoute>} />
-
-        {/* 05. DELIVERY MANAGEMENT */}
-        <Route path="delivery/overview" element={<ModuleAccessRoute><GenericModuleView title="Delivery Overview" /></ModuleAccessRoute>} />
-        <Route path="delivery/orders" element={<ModuleAccessRoute><GenericModuleView title="Delivery Orders" /></ModuleAccessRoute>} />
-        <Route path="delivery/tracking" element={<ModuleAccessRoute><GenericModuleView title="Delivery Tracking" /></ModuleAccessRoute>} />
-        <Route path="delivery/shipments" element={<ModuleAccessRoute><GenericModuleView title="Shipment Management" /></ModuleAccessRoute>} />
-        <Route path="delivery/returns" element={<ModuleAccessRoute><GenericModuleView title="Delivery Returns" /></ModuleAccessRoute>} />
-
-        {/* 06. CRM EXTENDED */}
-        <Route path="sales/crm-pipeline" element={<ModuleAccessRoute><GenericModuleView title="CRM Pipeline" /></ModuleAccessRoute>} />
-        <Route path="sales/supplier-groups" element={<ModuleAccessRoute><GenericModuleView title="Supplier Groups" /></ModuleAccessRoute>} />
-        <Route path="sales/supplier-contacts" element={<ModuleAccessRoute><GenericModuleView title="Supplier Contacts" /></ModuleAccessRoute>} />
-
-        {/* 09. FINANCE EXTENDED */}
-        <Route path="finance/dashboard" element={<FinanceBillingPage />} />
-
-        {/* 14. REPORTS EXTENDED */}
-        <Route path="reports/revenue" element={<GenericModuleView title="Revenue Reports" />} />
-        <Route path="reports/quotations" element={<GenericModuleView title="Quotation Reports" />} />
-        <Route path="reports/orders" element={<GenericModuleView title="Order Reports" />} />
-        <Route path="reports/products" element={<GenericModuleView title="Product Reports" />} />
-        <Route path="reports/inventory" element={<GenericModuleView title="Inventory Reports" />} />
-        <Route path="reports/purchase" element={<GenericModuleView title="Purchase Reports" />} />
 
         {/* 07. SERVICE MANAGEMENT (SERVICE & COMPLETE) */}
         <Route path="services/dashboard" element={<ModuleAccessRoute><ServicesDashboard /></ModuleAccessRoute>} />
@@ -334,21 +296,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="services/ticket-priorities" element={<ModuleAccessRoute><GenericModuleView title="Ticket Priorities" /></ModuleAccessRoute>} />
         <Route path="services/enquiries" element={<ModuleAccessRoute><GenericModuleView title="Service Enquiries" /></ModuleAccessRoute>} />
         <Route path="services/quotations" element={<ModuleAccessRoute><ServiceQuotationsPage /></ModuleAccessRoute>} />
-        <Route path="services/orders" element={<ModuleAccessRoute><GenericModuleView title="Service Orders" /></ModuleAccessRoute>} />
+        <Route path="services/orders" element={<ModuleAccessRoute><ServiceOrdersPage /></ModuleAccessRoute>} />
         <Route path="services/jobs" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
         <Route path="services/work-orders" element={<ModuleAccessRoute><ServiceJobsPage /></ModuleAccessRoute>} />
         <Route path="services/scheduling" element={<ModuleAccessRoute><ServiceSchedulingPage /></ModuleAccessRoute>} />
         <Route path="services/technicians" element={<ModuleAccessRoute><ServiceTechniciansPage /></ModuleAccessRoute>} />
-        <Route path="services/technician-assignments" element={<ModuleAccessRoute><GenericModuleView title="Technician Assignment" /></ModuleAccessRoute>} />
+        <Route path="services/technician-assignments" element={<ModuleAccessRoute><GenericModuleView title="Technician Assignments" /></ModuleAccessRoute>} />
         <Route path="services/visit-management" element={<ModuleAccessRoute><GenericModuleView title="Service Visits" /></ModuleAccessRoute>} />
-        <Route path="services/job-cards" element={<ModuleAccessRoute><GenericModuleView title="Job Cards" /></ModuleAccessRoute>} />
         <Route path="services/warranty" element={<ModuleAccessRoute><ServiceWarrantyPage /></ModuleAccessRoute>} />
         <Route path="services/amc" element={<ModuleAccessRoute><ServiceAmcPage /></ModuleAccessRoute>} />
         <Route path="services/service-contracts" element={<ModuleAccessRoute><GenericModuleView title="Service Contracts" /></ModuleAccessRoute>} />
-        <Route path="services/preventive-maintenance" element={<ModuleAccessRoute><GenericModuleView title="Preventive Maintenance" /></ModuleAccessRoute>} />
-        <Route path="services/complaints" element={<ModuleAccessRoute><GenericModuleView title="Complaint Management" /></ModuleAccessRoute>} />
-        <Route path="services/tracking" element={<ModuleAccessRoute><GenericModuleView title="Service Tracking" /></ModuleAccessRoute>} />
-        <Route path="services/completion" element={<ModuleAccessRoute><GenericModuleView title="Service Completion" /></ModuleAccessRoute>} />
         <Route path="services/sla-management" element={<ModuleAccessRoute><GenericModuleView title="SLA Management" /></ModuleAccessRoute>} />
         <Route path="services/feedback" element={<ModuleAccessRoute><ServiceFeedbackPage /></ModuleAccessRoute>} />
         <Route path="services/history" element={<ModuleAccessRoute><GenericModuleView title="Service History" /></ModuleAccessRoute>} />
@@ -409,6 +366,10 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/purchase-returns" element={<ModuleAccessRoute><PurchaseReturnsPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-analytics" element={<ModuleAccessRoute><PurchaseAnalyticsPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-requisitions" element={<ModuleAccessRoute><GenericModuleView title="Purchase Requisitions" /></ModuleAccessRoute>} />
+        <Route path="sales/suppliers" element={<ModuleAccessRoute><CustomersPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-orders" element={<ModuleAccessRoute><GenericModuleView title="Purchase Orders" /></ModuleAccessRoute>} />
+        <Route path="sales/grn" element={<ModuleAccessRoute><GenericModuleView title="Goods Received Notes (GRN)" /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-returns" element={<ModuleAccessRoute><GenericModuleView title="Purchase Returns" /></ModuleAccessRoute>} />
         <Route path="sales/supplier-payments" element={<ModuleAccessRoute><GenericModuleView title="Supplier Payments" /></ModuleAccessRoute>} />
 
         {/* 13. FINANCE & ACCOUNTS */}
@@ -443,8 +404,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="finance/receivables" element={<OutstandingReceivablesPage />} />
         <Route path="finance/payables" element={<OutstandingPayablesPage />} />
         <Route path="finance/expenses" element={<GenericModuleView title="Expenses" />} />
-        <Route path="finance/tax" element={<TaxConfigurationPage />} />
-        <Route path="finance/bank-cash" element={<GenericModuleView title="Cash & Bank" />} />
+        <Route path="finance/tax" element={<GenericModuleView title="Tax & GST Management" />} />
+        <Route path="finance/bank-cash" element={<GenericModuleView title="Bank & Cash Management" />} />
         <Route path="finance/profit-loss" element={<GenericModuleView title="Profit & Loss" />} />
 
         {/* 12. APPROVAL MANAGEMENT */}
@@ -486,7 +447,6 @@ export const AppRoutes: React.FC = () => {
         <Route path="hr/attendance" element={<AttendanceManagementPage />} />
         <Route path="hr/leave" element={<LeaveManagementPage />} />
         <Route path="hr/payroll" element={<PayrollManagementPage />} />
-        <Route path="hr/payslips" element={<GenericModuleView title="Employee Payslips" />} />
         <Route path="hr/tasks" element={<TaskManagementPage />} />
         <Route path="hr/performance" element={<PerformanceManagementPage />} />
         <Route path="hr/expenses" element={<ExpenseManagementPage />} />
@@ -577,13 +537,12 @@ export const AppRoutes: React.FC = () => {
 
         {/* 16. SETTINGS */}
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="settings/branches" element={<GenericModuleView title="Branch Management" />} />
+        <Route path="settings/branches" element={<BranchManagementPage />} />
         <Route path="settings/users" element={<UserManagementPage />} />
         <Route path="settings/roles" element={<RolesPermissionsPage />} />
         <Route path="settings/modules" element={<ERPPlans />} />
         <Route path="settings/subscription" element={<SubscriptionManagementPage />} />
-        <Route path="settings/tax" element={<TaxConfigurationPage />} />
-        <Route path="settings/payments" element={<GenericModuleView title="Payment Settings" />} />
+        <Route path="settings/tax" element={<GenericModuleView title="Tax Configuration" />} />
         <Route path="settings/notifications" element={<GenericModuleView title="Notification Settings" />} />
         <Route path="settings/integrations" element={<GenericModuleView title="Integrations" />} />
         <Route path="settings/import-export" element={<GenericModuleView title="Import / Export" />} />

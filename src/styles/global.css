@@ -4,9 +4,9 @@
   --erp-primary-hover: #1D4ED8;
   --erp-navy: #172554;
   --erp-navy-light: #1E3A8A;
-  --erp-bg: #F8FAFC;
+  --erp-bg: #FFFFFF;
   --erp-surface: #FFFFFF;
-  --erp-surface-subtle: #F1F5F9;
+  --erp-surface-subtle: #FFFFFF;
 
   --erp-text-primary: #0F172A;
   --erp-text-secondary: #64748B;
@@ -65,6 +65,29 @@ body,
 .ant-card {
   border-radius: var(--erp-radius) !important;
   border-color: var(--erp-border) !important;
+}
+
+/* User Management, Customer Management & Specific Module Table Header Styling */
+.user-management-table .ant-table-thead > tr > th,
+.customer-management-table .ant-table-thead > tr > th,
+.service-scheduling-table .ant-table-thead > tr > th {
+  background-color: #F3E8FF !important; /* Soft light purple header */
+  color: #3B0764 !important; /* Rich deep purple text */
+  font-weight: 700 !important;
+  border-bottom: 1px solid #E9D5FF !important;
+}
+.user-management-table .ant-table-tbody > tr > td,
+.customer-management-table .ant-table-tbody > tr > td,
+.service-scheduling-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* Service Portal Table Container Card Style Matching Image */
+.service-portal-card {
+  border-radius: 20px !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 
 /* Custom scrollbars */

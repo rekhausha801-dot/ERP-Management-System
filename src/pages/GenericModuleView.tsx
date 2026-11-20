@@ -119,7 +119,7 @@ export const GenericModuleView: React.FC<{
             return <Tag color="red" style={{ borderRadius: 10, fontWeight: 600 }}>{val}</Tag>;
           }
           if (typeof val === 'string' && (val.startsWith('EMP-') || val.startsWith('PO-') || val.startsWith('SKU-') || val.startsWith('AST-') || val.startsWith('TXN-') || val.startsWith('REC-'))) {
-            return <span style={{ fontWeight: 700, color: '#6E56CF' }}>{val}</span>;
+            return <span style={{ fontWeight: 700, color: '#4C1D95' }}>{val}</span>;
           }
           if (typeof val === 'string' && val.startsWith('₹')) {
             return <span style={{ fontWeight: 700, color: '#181433' }}>{val}</span>;
@@ -173,7 +173,7 @@ export const GenericModuleView: React.FC<{
             <Button
               type="primary"
               icon={<Plus size={15} />}
-              style={{ backgroundColor: '#6E56CF', borderRadius: 12, fontWeight: 600 }}
+              style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95', borderRadius: 12, fontWeight: 600 }}
               onClick={() => setIsModalOpen(true)}
             >
               Add New Record
@@ -248,7 +248,7 @@ export const GenericModuleView: React.FC<{
           form.resetFields();
         }}
         okText="Submit & Save"
-        okButtonProps={{ style: { backgroundColor: '#6E56CF', borderRadius: 10 } }}
+        okButtonProps={{ style: { backgroundColor: '#4C1D95', borderColor: '#4C1D95', borderRadius: 10 } }}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item label="Record Code / Reference #" required>
@@ -284,7 +284,7 @@ export const GenericModuleView: React.FC<{
               {autoTitle} – Record Details
             </span>
             {selectedRecord && selectedRecord.code && (
-              <span style={{ color: '#6E56CF', fontWeight: 600, fontSize: 13 }}>
+              <span style={{ color: '#A855F7', fontWeight: 600, fontSize: 13 }}>
                 ({selectedRecord.code})
               </span>
             )}
@@ -311,8 +311,8 @@ export const GenericModuleView: React.FC<{
                   icon={<CheckCircle size={15} />}
                   onClick={() => handleAcceptRecord(selectedRecord)}
                   style={{
-                    backgroundColor: '#10B981',
-                    borderColor: '#10B981',
+                    backgroundColor: '#4C1D95',
+                    borderColor: '#4C1D95',
                     borderRadius: 6,
                     fontWeight: 600,
                   }}
@@ -355,7 +355,7 @@ export const GenericModuleView: React.FC<{
                       ) : key === 'amount' || key === 'baseAmount' || key === 'finalAmount' ? (
                         <span style={{ fontWeight: 700, color: '#181433', fontSize: 14 }}>{String(val)}</span>
                       ) : key === 'code' ? (
-                        <span style={{ fontWeight: 700, color: '#6E56CF' }}>{String(val)}</span>
+                        <span style={{ fontWeight: 700, color: '#A855F7' }}>{String(val)}</span>
                       ) : (
                         <span>{String(val)}</span>
                       )}
