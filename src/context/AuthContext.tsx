@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (u) => u.email.toLowerCase() === normalizedInput || u.name.toLowerCase().includes(normalizedInput)
     );
 
-    let displayName = 'Janani';
+    let displayName = 'Rekha';
     if (matchedUser) {
       // Use clean proper name
       displayName = matchedUser.name.replace(/\s*\(.*?\)\s*/g, '').trim();
@@ -146,9 +146,9 @@ export const useAuth = () => {
       selectedCompany: SAMPLE_COMPANIES[0],
       companies: SAMPLE_COMPANIES,
       login: () => true,
-      logout: () => {},
-      selectCompany: () => {},
-      updateCompanyPackage: () => {},
+      logout: () => { },
+      selectCompany: () => { },
+      updateCompanyPackage: () => { },
       addCompany: () => SAMPLE_COMPANIES[0],
       isAuthenticated: true,
       isSuperAdmin: false,

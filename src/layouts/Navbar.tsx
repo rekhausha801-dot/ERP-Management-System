@@ -137,7 +137,8 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#F3F0F9',
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid #F1F5F9',
         flexWrap: 'nowrap',
         width: '100%',
         boxSizing: 'border-box',
@@ -181,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggleCollapse }) =
               whiteSpace: 'nowrap',
             }}
           >
-            Welcome, {user?.name ? user.name.replace(/\s*\(.*?\)\s*/g, '').split('@')[0].split(' ')[0] : 'Janani'}!
+            Welcome, {user?.name ? user.name.replace(/\s*\(.*?\)\s*/g, '').split('@')[0].split(' ')[0] : 'Rekha'}!
           </h1>
         </div>
       </div>

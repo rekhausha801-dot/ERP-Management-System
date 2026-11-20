@@ -54,7 +54,7 @@ export const ExpenseManagementPage: React.FC = () => {
   };
 
   const columns = [
-    { title: 'Claim ID', dataIndex: 'claimId', key: 'claimId', render: (t: string) => <Text strong style={{ color: '#6E56CF' }}>{t}</Text> },
+    { title: 'Claim ID', dataIndex: 'claimId', key: 'claimId', render: (t: string) => <Text strong style={{ color: '#4C1D95' }}>{t}</Text> },
     { title: 'Employee', dataIndex: 'empName', key: 'empName', render: (n: string) => <strong>{n}</strong> },
     { title: 'Category', dataIndex: 'category', key: 'category', render: (c: string) => <Tag color="blue">{c}</Tag> },
     { title: 'Amount', dataIndex: 'amount', key: 'amount', render: (a: number) => <span style={{ fontWeight: 700, color: '#19153B' }}>₹{a.toLocaleString()}</span> },
@@ -74,7 +74,7 @@ export const ExpenseManagementPage: React.FC = () => {
       key: 'actions',
       render: (_: any, r: ExpenseItem) => r.status === 'Pending Approval' ? (
         <Space>
-          <Button size="small" type="primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981' }} onClick={() => handleStatusChange(r.claimId, 'Approved')}>
+          <Button size="small" type="primary" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => handleStatusChange(r.claimId, 'Approved')}>
             Approve
           </Button>
           <Button size="small" danger onClick={() => handleStatusChange(r.claimId, 'Reimbursed')}>
@@ -82,7 +82,7 @@ export const ExpenseManagementPage: React.FC = () => {
           </Button>
         </Space>
       ) : r.status === 'Approved' ? (
-        <Button size="small" type="primary" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }} onClick={() => handleStatusChange(r.claimId, 'Reimbursed')}>
+        <Button size="small" type="primary" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => handleStatusChange(r.claimId, 'Reimbursed')}>
           Mark Paid
         </Button>
       ) : <Text type="secondary" style={{ fontSize: 12 }}>Settled</Text>,
@@ -99,7 +99,7 @@ export const ExpenseManagementPage: React.FC = () => {
             <Button icon={<Download size={15} />} onClick={() => message.success('Expense register exported')}>
               Export
             </Button>
-            <Button type="primary" icon={<Plus size={15} />} style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }} onClick={() => setIsClaimModal(true)}>
+            <Button type="primary" icon={<Plus size={15} />} style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }} onClick={() => setIsClaimModal(true)}>
               File Expense Claim
             </Button>
           </Space>
@@ -110,7 +110,7 @@ export const ExpenseManagementPage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
         <Col xs={12} sm={6}>
           <Card bordered={false} style={{ borderRadius: 12 }}>
-            <Statistic title="Total Claims (MTD)" value="₹12,100" prefix={<Receipt size={16} color="#6E56CF" />} valueStyle={{ color: '#19153B', fontWeight: 700 }} />
+            <Statistic title="Total Claims (MTD)" value="₹12,100" prefix={<Receipt size={16} color="#4C1D95" />} valueStyle={{ color: '#19153B', fontWeight: 700 }} />
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -171,7 +171,7 @@ export const ExpenseManagementPage: React.FC = () => {
           </Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
             <Button onClick={() => setIsClaimModal(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#6E56CF', borderColor: '#6E56CF' }}>Submit Claim</Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#4C1D95', borderColor: '#4C1D95' }}>Submit Claim</Button>
           </div>
         </Form>
       </Modal>

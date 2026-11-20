@@ -45,6 +45,7 @@ import {
   RotateCcw,
   ShieldCheck,
   Building,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -245,7 +246,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
   const infoReqCount = requests.filter((r) => r.status === 'More Information Required').length;
 
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div>
       {/* 1. Header Banner */}
       <div
         style={{
@@ -262,7 +263,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
             style={{
               width: 48,
               height: 48,
-              borderRadius: 14,
+              borderRadius: 20,
               background: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
               display: 'flex',
               alignItems: 'center',
@@ -308,52 +309,231 @@ export const OfficeStaffPortalPage: React.FC = () => {
         </Space>
       </div>
 
-      {/* 2. Top Metric Cards */}
+      {/* 2. Top Metric Cards - Soft Pill Theme matching Leave Management */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <Statistic
-              title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Total Call Requests</span>}
-              value={totalCount}
-              prefix={<PhoneCall size={16} color="#6E56CF" style={{ marginRight: 6 }} />}
-              valueStyle={{ fontWeight: 800, color: '#181433' }}
-            />
-          </Card>
+        {/* Card 1: Total Call Requests - Soft Sky Blue Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #F9FBFF 0%, #EFF6FF 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#DBEAFE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#2563EB',
+                }}
+              >
+                <PhoneCall size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Total Call Requests
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#1D4ED8', lineHeight: 1 }}>
+                  {totalCount}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2563EB',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <Statistic
-              title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Pending Admin Review</span>}
-              value={pendingCount}
-              prefix={<Clock size={16} color="#F59E0B" style={{ marginRight: 6 }} />}
-              valueStyle={{ fontWeight: 800, color: '#F59E0B' }}
-            />
-          </Card>
+
+        {/* Card 2: Pending Admin Review - Soft Peach / Warm Amber Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #FFFDF8 0%, #FFF5EB 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(245, 158, 11, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#FFE8CC',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#EA580C',
+                }}
+              >
+                <Clock size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Pending Review
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#D97706', lineHeight: 1 }}>
+                  {pendingCount}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#D97706',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <Statistic
-              title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Approved & Tickets Created</span>}
-              value={approvedCount}
-              prefix={<CheckCircle size={16} color="#4C1D95" style={{ marginRight: 6 }} />}
-              valueStyle={{ fontWeight: 800, color: '#4C1D95' }}
-            />
-          </Card>
+
+        {/* Card 3: Approved & Tickets - Soft Pastel Green Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #F8FFF9 0%, #EEFDF3 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(16, 185, 129, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  backgroundColor: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              >
+                <CheckCircle size={22} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Approved & Tickets
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#059669', lineHeight: 1 }}>
+                  {approvedCount}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#059669',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
-        <Col xs={12} sm={6}>
-          <Card bordered={false} style={{ borderRadius: 14 }}>
-            <Statistic
-              title={<span style={{ fontSize: 13, color: '#8C89A0' }}>Needs More Info</span>}
-              value={infoReqCount}
-              prefix={<AlertCircle size={16} color="#7C3AED" style={{ marginRight: 6 }} />}
-              valueStyle={{ fontWeight: 800, color: '#7C3AED' }}
-            />
-          </Card>
+
+        {/* Card 4: Needs More Info - Soft Violet / Purple Pill */}
+        <Col xs={24} sm={12} lg={6}>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #FAF7FF 0%, #F3E8FF 100%)',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
+              borderRadius: 20,
+              padding: '16px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 6px 20px rgba(124, 58, 237, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  backgroundColor: '#EDE9FE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#7C3AED',
+                }}
+              >
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1E1B4B', marginBottom: 2 }}>
+                  Needs More Info
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#7C3AED', lineHeight: 1 }}>
+                  {infoReqCount}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#7C3AED',
+              }}
+            >
+              <ChevronRight size={16} />
+            </div>
+          </div>
         </Col>
       </Row>
 
       {/* 3. Main Navigation Card with 4 Distinct Portal Views */}
-      <Card bordered={false} style={{ borderRadius: 14 }}>
+      <Card bordered={false}  style={{ borderRadius: 20 }}>
         <Tabs
           activeKey={activeTab}
           onChange={(k: any) => setActiveTab(k)}
@@ -431,8 +611,7 @@ export const OfficeStaffPortalPage: React.FC = () => {
                 />
               </Col>
               <Col xs={24} md={8}>
-                <Card
-                  style={{
+                <Card  style={{
                     backgroundColor: '#FBF9FE',
                     border: '1px solid #ECE8F6',
                     borderRadius: 12,
@@ -817,28 +996,6 @@ export const OfficeStaffPortalPage: React.FC = () => {
                 </Descriptions.Item>
               )}
             </Descriptions>
-
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#181433', marginBottom: 12 }}>
-              Approval & Audit Timeline
-            </div>
-            <Timeline
-              items={selectedReq.timeline.map((item) => ({
-                color: item.status === 'Approved' ? '#4C1D95' : item.status === 'Rejected' ? 'red' : 'blue',
-                children: (
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: '#181433' }}>
-                      {item.title}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
-                      {item.description}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
-                      {item.timestamp} &bull; Actor: <strong>{item.actor}</strong>
-                    </div>
-                  </div>
-                ),
-              }))}
-            />
           </div>
         )}
       </Modal>

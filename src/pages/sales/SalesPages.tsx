@@ -1,6 +1,31 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Select, Tag, message } from 'antd';
-import { Plus, Target, UserCheck, HelpCircle, FileSpreadsheet, ShoppingBag, Receipt, CreditCard, Users, Package, Boxes, Undo2, Briefcase, BarChart3 } from 'lucide-react';
+import {
+  Plus,
+  Target,
+  UserCheck,
+  HelpCircle,
+  FileSpreadsheet,
+  ShoppingBag,
+  Receipt,
+  CreditCard,
+  Users,
+  Package,
+  Boxes,
+  Undo2,
+  Briefcase,
+  BarChart3,
+  Tag as TagIcon,
+  Building2,
+  Mail,
+  MapPin,
+  Scale,
+  Settings,
+  Phone,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+} from 'lucide-react';
 import { PageHeader, StatusBadge, GenericCrudToolbar } from '../../components';
 import {
   MOCK_LEADS,
@@ -190,20 +215,258 @@ export const SalesPaymentsPage: React.FC = () => {
 export const SalesCustomersPage: React.FC = () => {
   const [data] = useState<Customer[]>(MOCK_CUSTOMERS);
   const [search, setSearch] = useState('');
+
   const columns = [
-    { title: 'Customer Code', dataIndex: 'code', key: 'code', render: (t: string) => <Tag color="purple">{t}</Tag> },
-    { title: 'Company Name', dataIndex: 'name', key: 'name', render: (t: string, r: Customer) => <div><div style={{ fontWeight: 600 }}>{t}</div><div style={{ fontSize: 12, color: '#6B7280' }}>Contact: {r.contactPerson}</div></div> },
-    { title: 'Email & Phone', key: 'contact', render: (_: any, r: Customer) => <div><div>{r.email}</div><div style={{ fontSize: 12, color: '#6B7280' }}>{r.phone}</div></div> },
-    { title: 'City', dataIndex: 'city', key: 'city' },
-    { title: 'Credit Limit', dataIndex: 'creditLimit', key: 'creditLimit', render: (v: number) => `₹${v.toLocaleString()}` },
-    { title: 'Current Balance', dataIndex: 'currentBalance', key: 'currentBalance', render: (v: number) => <span style={{ fontWeight: 600 }}>₹{v.toLocaleString()}</span> },
-    { title: 'Status', dataIndex: 'status', key: 'status', render: (st: string) => <StatusBadge status={st} /> },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <TagIcon size={15} color="#3B0764" />
+          Customer Code
+        </span>
+      ),
+      dataIndex: 'code',
+      key: 'code',
+      render: (t: string) => (
+        <span
+          style={{
+            display: 'inline-block',
+            backgroundColor: '#F3E8FF',
+            color: '#6D28D9',
+            padding: '3px 12px',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 12.5,
+          }}
+        >
+          {t}
+        </span>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <Building2 size={15} color="#3B0764" />
+          Company Name
+        </span>
+      ),
+      dataIndex: 'name',
+      key: 'name',
+      render: (t: string, r: Customer) => (
+        <div>
+          <div style={{ fontWeight: 700, color: '#0F172A', fontSize: 13.5 }}>{t}</div>
+          <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>Contact: {r.contactPerson}</div>
+        </div>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <Mail size={15} color="#3B0764" />
+          Email & Phone
+        </span>
+      ),
+      key: 'contact',
+      render: (_: any, r: Customer) => (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#1E293B' }}>
+            <Mail size={13} color="#6D28D9" />
+            <span>{r.email}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#64748B', marginTop: 3 }}>
+            <Phone size={13} color="#6D28D9" />
+            <span style={{ fontFamily: 'monospace' }}>{r.phone}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <MapPin size={15} color="#3B0764" />
+          City
+        </span>
+      ),
+      dataIndex: 'city',
+      key: 'city',
+      render: (city: string) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#1E293B', fontWeight: 500 }}>
+          <MapPin size={14} color="#6D28D9" />
+          <span>{city}</span>
+        </div>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <CreditCard size={15} color="#3B0764" />
+          Credit Limit
+        </span>
+      ),
+      dataIndex: 'creditLimit',
+      key: 'creditLimit',
+      render: (v: number) => (
+        <span style={{ fontWeight: 700, color: '#0F172A', fontSize: 13.5 }}>
+          ₹{v.toLocaleString()}
+        </span>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <Scale size={15} color="#3B0764" />
+          Current Balance
+        </span>
+      ),
+      dataIndex: 'currentBalance',
+      key: 'currentBalance',
+      render: (v: number) => (
+        <span style={{ fontWeight: 700, color: '#6D28D9', fontSize: 13.5 }}>
+          ₹{v.toLocaleString()}
+        </span>
+      ),
+    },
+    {
+      title: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#3B0764', fontWeight: 700 }}>
+          <Settings size={15} color="#3B0764" />
+          Status
+        </span>
+      ),
+      dataIndex: 'status',
+      key: 'status',
+      render: (st: string) => (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            backgroundColor: '#DCFCE7',
+            color: '#15803D',
+            padding: '4px 14px',
+            borderRadius: 20,
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+        >
+          <span
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              backgroundColor: '#16A34A',
+              display: 'inline-block',
+            }}
+          />
+          {st}
+        </span>
+      ),
+    },
   ];
+
+  const filteredData = data.filter((d) => d.name.toLowerCase().includes(search.toLowerCase()));
+
   return (
-    <div>
-      <PageHeader title="Customer Directory" subtitle="Comprehensive customer accounts, credit ceilings, and historical transaction logs." />
-      <GenericCrudToolbar searchPlaceholder="Search customers..." onSearch={setSearch} />
-      <Table dataSource={data.filter(d => d.name.toLowerCase().includes(search.toLowerCase()))} columns={columns} rowKey="id" bordered />
+    <div style={{ paddingBottom: 24 }}>
+      <PageHeader
+        title="Customer Directory"
+        subtitle="Comprehensive customer accounts, credit ceilings, and historical transaction logs."
+      />
+      <div style={{ marginBottom: 16 }}>
+        <GenericCrudToolbar searchPlaceholder="Search customers..." onSearch={setSearch} />
+      </div>
+
+      <div
+        style={{
+          borderRadius: 24,
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)',
+          border: '1px solid rgba(226, 232, 240, 0.9)',
+          overflow: 'hidden',
+          padding: '4px 8px 16px 8px',
+        }}
+      >
+        <Table
+          dataSource={filteredData}
+          columns={columns}
+          rowKey="id"
+          pagination={false}
+          bordered={false}
+          size="middle"
+          className="customer-management-table"
+        />
+
+        {/* Bottom Pagination Bar */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 20px 4px 20px',
+            borderTop: '1px solid #F1F5F9',
+            marginTop: 8,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748B', fontWeight: 600 }}>
+            <BarChart3 size={16} color="#6D28D9" />
+            <span>Showing 1 – {filteredData.length} of {filteredData.length} customers</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button
+              disabled
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'not-allowed',
+                color: '#94A3B8',
+              }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: '#4C1D95',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: 'pointer',
+              }}
+            >
+              1
+            </button>
+            <button
+              disabled
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'not-allowed',
+                color: '#94A3B8',
+              }}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
