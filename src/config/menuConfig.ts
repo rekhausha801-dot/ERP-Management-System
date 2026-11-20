@@ -62,6 +62,8 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     children: [
       { key: 'pur-overview', label: 'Purchase Overview', path: '/app/sales/purchases', iconName: 'BarChart3' },
       { key: 'pur-orders', label: 'Purchase Orders', path: '/app/sales/purchase-orders', iconName: 'ShoppingCart' },
+      { key: 'pur-invoices', label: 'Purchase Invoices / Bills', path: '/app/sales/purchase-bills', iconName: 'Receipt' },
+      { key: 'pur-payments-made', label: 'Payments Made', path: '/app/sales/payments-made', iconName: 'CreditCard' },
       { key: 'pur-grn', label: 'Goods Received (GRN)', path: '/app/sales/grn', iconName: 'FileCheck' },
       { key: 'pur-suppliers', label: 'Suppliers', path: '/app/sales/suppliers', iconName: 'Users' },
       { key: 'pur-returns', label: 'Purchase Returns', path: '/app/sales/purchase-returns', iconName: 'Undo2' },
@@ -113,8 +115,11 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'sm-overview', label: 'Sales Overview', path: '/app/sales/overview', iconName: 'BarChart3' },
+      { key: 'sm-customers', label: 'Customers', path: '/app/sales/customers-mgmt', iconName: 'Users' },
       { key: 'sm-quotations', label: 'Quotations', path: '/app/sales/quotations', iconName: 'FileText' },
       { key: 'sm-orders', label: 'Sales Orders', path: '/app/sales/orders', iconName: 'ShoppingBag' },
+      { key: 'sm-invoices', label: 'Sales Invoices', path: '/app/sales/invoices', iconName: 'Receipt' },
+      { key: 'sm-payments-received', label: 'Payments Received', path: '/app/sales/payments-received', iconName: 'CreditCard' },
       { key: 'sm-delivery', label: 'Delivery Management', path: '/app/delivery/overview', iconName: 'Truck' },
       { key: 'sm-returns', label: 'Sales Returns', path: '/app/sales/returns', iconName: 'Undo2' },
       { key: 'sm-targets', label: 'Sales Targets', path: '/app/sales/targets', iconName: 'Target' },
@@ -192,12 +197,19 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
     children: [
       { key: 'fin-overview', label: 'Finance Overview', path: '/app/finance/dashboard', iconName: 'BarChart3' },
+      { key: 'fin-coa', label: 'Chart of Accounts', path: '/app/finance/chart-of-accounts', iconName: 'FileSpreadsheet' },
       { key: 'fin-bank-cash', label: 'Cash & Bank', path: '/app/finance/bank-cash', iconName: 'CreditCard' },
+      { key: 'fin-bank-recon', label: 'Bank Reconciliation', path: '/app/finance/bank-reconciliation', iconName: 'CheckCircle' },
+      { key: 'fin-ar-ap', label: 'Accounts Receivable / Payable', path: '/app/finance/ar-ap', iconName: 'TrendingUp' },
+      { key: 'fin-credit-debit-notes', label: 'Credit Notes / Debit Notes', path: '/app/finance/notes', iconName: 'Undo2' },
       { key: 'fin-expenses', label: 'Expenses', path: '/app/finance/expenses', iconName: 'Receipt' },
       { key: 'fin-income', label: 'Income', path: '/app/finance/income', iconName: 'TrendingUp' },
       { key: 'fin-gl', label: 'General Ledger', path: '/app/finance/general-ledger', iconName: 'FileSpreadsheet' },
       { key: 'fin-journal', label: 'Journal Entries', path: '/app/finance/journal-entries', iconName: 'FileText' },
       { key: 'fin-gst', label: 'GST Management', path: '/app/finance/tax', iconName: 'Receipt' },
+      { key: 'fin-gst-einvoice', label: 'E-Invoice (IRN / QR)', path: '/app/finance/gst/e-invoice', iconName: 'FileText' },
+      { key: 'fin-gst-ewaybill', label: 'E-Way Bill', path: '/app/finance/gst/e-way-bill', iconName: 'Truck' },
+      { key: 'fin-gst-reports', label: 'GST Reports (GSTR-1/3B/2B)', path: '/app/finance/gst/reports', iconName: 'BarChart3' },
     ],
   },
 
@@ -238,7 +250,22 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = [
     ],
   },
 
-  // 14. Settings
+  // 14. Delivery, Approvals & Documents
+  {
+    key: 'grp-operations',
+    label: 'Operations & Desk',
+    iconName: 'ShieldCheck',
+    section: 'sales',
+    allowedPackages: ['COMPLETE', 'SALES', 'SERVICE'],
+    children: [
+      { key: 'op-delivery', label: 'Delivery & Dispatch', path: '/app/delivery', iconName: 'Truck' },
+      { key: 'op-approvals', label: 'Approval Workflows', path: '/app/approvals', iconName: 'ShieldCheck' },
+      { key: 'op-documents', label: 'Document Vault (EDM)', path: '/app/documents', iconName: 'FileText' },
+      { key: 'op-communication', label: 'Communication & Tasks', path: '/app/communication', iconName: 'MessageSquare' },
+    ],
+  },
+
+  // 15. Settings
   {
     key: 'grp-settings',
     label: 'Settings',
