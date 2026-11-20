@@ -20,6 +20,7 @@ import {
   TbHelmet,
 } from 'react-icons/tb';
 import { FaStar } from 'react-icons/fa';
+import { Wrench, IndianRupee } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { KPICard } from '../../../components/dashboard/KPICard';
 import { ChartCard } from '../../../components/dashboard/ChartCard';
