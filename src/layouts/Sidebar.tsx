@@ -95,10 +95,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { logout, user, selectedCompany } = useAuth();
+  const effectivePackage: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || packageType || 'COMPLETE';
 
-  const menuGroups = getMenuGroupsForPackage(packageType, user?.role);
-  const pkgMeta = ERP_PACKAGES[packageType] || ERP_PACKAGES.COMPLETE;
+  const menuGroups = getMenuGroupsForPackage(effectivePackage, user?.role);
+  const pkgMeta = ERP_PACKAGES[effectivePackage] || ERP_PACKAGES.COMPLETE;
 
   const buildAntMenuItem = (item: any): any => {
     if (item.children && item.children.length > 0) {
@@ -272,7 +273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            {companyCode?.slice(0, 2) || (packageType === 'SERVICE' ? 'SV' : packageType === 'SALES' ? 'SL' : 'SE')}
+            {companyCode?.slice(0, 2) || (effectivePackage === 'SERVICE' ? 'SV' : effectivePackage === 'SALES' ? 'SL' : 'SE')}
           </div>
           {!collapsed && (
             <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -285,7 +286,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   lineHeight: 1.2,
                 }}
               >
-                {pkgMeta?.name || (packageType === 'SERVICE' ? 'Service ERP' : packageType === 'SALES' ? 'Sales ERP' : 'Complete ERP')}
+                {pkgMeta?.name || (effectivePackage === 'SERVICE' ? 'Service ERP' : effectivePackage === 'SALES' ? 'Sales ERP' : 'Complete ERP')}
               </div>
               <div
                 style={{
