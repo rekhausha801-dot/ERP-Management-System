@@ -69,6 +69,33 @@ import { LowStockAlertsPage } from '../pages/inventory/LowStockAlertsPage';
 import { WarehouseManagementPage } from '../pages/inventory/WarehouseManagementPage';
 import { InventoryAnalyticsReportsPage } from '../pages/inventory/InventoryAnalyticsReportsPage';
 
+// Product & Brand Management Pages
+import { AllProductsPage } from '../pages/products/AllProductsPage';
+import { BrandManagementPage } from '../pages/products/BrandManagementPage';
+import { BrandWiseProductsPage } from '../pages/products/BrandWiseProductsPage';
+import { ProductCategoriesPage } from '../pages/products/ProductCategoriesPage';
+import { ProductPricingPage } from '../pages/products/ProductPricingPage';
+
+// Invoicing, Billing, Creditors & Debtors Pages
+import { AllInvoicesPage } from '../pages/billing/AllInvoicesPage';
+import { CreateInvoicePage } from '../pages/billing/CreateInvoicePage';
+import { CreditNotesPage } from '../pages/billing/CreditNotesPage';
+import { DebitNotesPage } from '../pages/billing/DebitNotesPage';
+import { UnifiedNotesPage } from '../pages/billing/UnifiedNotesPage';
+import { PaymentsReceivedPage } from '../pages/billing/PaymentsReceivedPage';
+import { PurchaseInvoicesBillsPage } from '../pages/purchases/PurchaseInvoicesBillsPage';
+import { PaymentsMadePage } from '../pages/purchases/PaymentsMadePage';
+import { ChartOfAccountsPage } from '../pages/finance/ChartOfAccountsPage';
+import { BankReconciliationPage } from '../pages/finance/BankReconciliationPage';
+import { AccountsReceivablePayablePage } from '../pages/finance/AccountsReceivablePayablePage';
+import { EInvoicePage } from '../pages/gst/EInvoicePage';
+import { EWayBillPage } from '../pages/gst/EWayBillPage';
+import { GstReportsPage } from '../pages/gst/GstReportsPage';
+import { CreditorsPage } from '../pages/billing/CreditorsPage';
+import { DebtorsPage } from '../pages/billing/DebtorsPage';
+import { OutstandingPayablesPage } from '../pages/billing/OutstandingPayablesPage';
+import { OutstandingReceivablesPage } from '../pages/billing/OutstandingReceivablesPage';
+
 import { CompanyProfileSettingsPage as SettingsPage } from '../pages/settings/CompanySettingsPages';
 import { TaxConfigurationPage } from '../pages/settings/TaxConfigurationPage';
 import { CompanyCalendarPage } from '../pages/calendar/CompanyCalendarPage';
@@ -112,12 +139,41 @@ import { SupplierPortal } from '../pages/portals/SupplierPortal';
 import { EmployeePortal } from '../pages/portals/EmployeePortal';
 import { FinanceBillingPage } from '../pages/finance/FinanceBillingPage';
 
+// Reports & Analytics Suite (All 7 Dedicated Pages)
+import {
+  SalesReportsPage,
+  PurchaseReportsPage,
+  InventoryReportsPage,
+  CustomerReportsPage,
+  FinancialReportsPage,
+  OutstandingReportsPage,
+  HrReportsPage,
+} from '../pages/reports';
+
+// Asset Management Suite (All 8 Dedicated Pages)
+import {
+  AssetOverviewPage,
+  AllAssetsPage,
+  AssetCategoriesPage,
+  AssetAllocationPage,
+  AssetTransfersPage,
+  AssetMaintenancePage,
+  AssetDisposalPage,
+  AssetHistoryPage,
+} from '../pages/assets';
+
+// Additional Enterprise Suite Pages
+import { DeliveryManagementPage } from '../pages/delivery/DeliveryManagementPage';
+import { ApprovalManagementPage } from '../pages/approvals/ApprovalManagementPage';
+import { DocumentManagementPage } from '../pages/documents/DocumentManagementPage';
+import { CommunicationTaskManagementPage } from '../pages/communication/CommunicationTaskManagementPage';
+
 // Consolidated Employee & HR Management Pages
 import { HrDashboardPage } from '../pages/hr/HrDashboardPage';
 import { EmployeeManagementPage } from '../pages/hr/EmployeeManagementPage';
 import { AttendanceManagementPage } from '../pages/hr/AttendanceManagementPage';
 import { LeaveManagementPage } from '../pages/hr/LeaveManagementPage';
-import { PayrollManagementPage } from '../pages/hr/PayrollManagementPage';
+import { PayrollManagementPage } from '../pages/payroll/PayrollManagementPage';
 import { TaskManagementPage } from '../pages/hr/TaskManagementPage';
 import { PerformanceManagementPage } from '../pages/hr/PerformanceManagementPage';
 import { ExpenseManagementPage } from '../pages/hr/ExpenseManagementPage';
@@ -214,6 +270,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="documents/history" element={<GenericModuleView title="Document History" />} />
 
         {/* 05. SALES MANAGEMENT (SALES & COMPLETE) */}
+        <Route path="sales/overview" element={<ModuleAccessRoute><SalesOverviewPage /></ModuleAccessRoute>} />
         <Route path="sales/dashboard" element={<ModuleAccessRoute><SalesDashboard /></ModuleAccessRoute>} />
         <Route path="sales/targets" element={<ModuleAccessRoute><SalesTargetsPage /></ModuleAccessRoute>} />
         <Route path="sales/performance" element={<ModuleAccessRoute><SalesTargetsPage /></ModuleAccessRoute>} />
@@ -249,6 +306,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/orders" element={<ModuleAccessRoute><ConfirmedSalesOrdersPage /></ModuleAccessRoute>} />
         <Route path="sales/order-approvals" element={<ModuleAccessRoute><SalesOrdersPage /></ModuleAccessRoute>} />
         <Route path="sales/order-tracking" element={<ModuleAccessRoute><SalesOrderTrackingPage /></ModuleAccessRoute>} />
+        <Route path="sales/customers-mgmt" element={<ModuleAccessRoute><CustomerManagementPage /></ModuleAccessRoute>} />
+        <Route path="sales/payments-received" element={<ModuleAccessRoute><PaymentsReceivedPage /></ModuleAccessRoute>} />
         <Route path="sales/delivery-management" element={<ModuleAccessRoute><GenericModuleView title="Delivery Management" /></ModuleAccessRoute>} />
         <Route path="sales/returns" element={<ModuleAccessRoute><SalesReturnsPage /></ModuleAccessRoute>} />
 
@@ -317,15 +376,16 @@ export const AppRoutes: React.FC = () => {
         <Route path="projects/milestones" element={<GenericModuleView title="Project Milestones" />} />
         <Route path="projects/progress" element={<GenericModuleView title="Project Progress" />} />
 
-        {/* 09. ASSET MANAGEMENT */}
-        <Route path="assets/overview" element={<GenericModuleView title="Asset Overview" />} />
-        <Route path="assets/register" element={<GenericModuleView title="All Assets" />} />
-        <Route path="assets/categories" element={<GenericModuleView title="Asset Categories" />} />
-        <Route path="assets/allocation" element={<GenericModuleView title="Asset Allocation" />} />
-        <Route path="assets/transfers" element={<GenericModuleView title="Asset Transfers" />} />
-        <Route path="assets/maintenance" element={<GenericModuleView title="Asset Maintenance" />} />
-        <Route path="assets/disposal" element={<GenericModuleView title="Asset Disposal" />} />
-        <Route path="assets/history" element={<GenericModuleView title="Asset History" />} />
+        {/* 09. ASSET MANAGEMENT (ALL 8 DEDICATED SUITE PAGES) */}
+        <Route path="assets" element={<Navigate to="/app/assets/overview" replace />} />
+        <Route path="assets/overview" element={<AssetOverviewPage />} />
+        <Route path="assets/register" element={<AllAssetsPage />} />
+        <Route path="assets/categories" element={<AssetCategoriesPage />} />
+        <Route path="assets/allocation" element={<AssetAllocationPage />} />
+        <Route path="assets/transfers" element={<AssetTransfersPage />} />
+        <Route path="assets/maintenance" element={<AssetMaintenancePage />} />
+        <Route path="assets/disposal" element={<AssetDisposalPage />} />
+        <Route path="assets/history" element={<AssetHistoryPage />} />
 
         {/* 08. PRODUCT MANAGEMENT */}
         <Route path="sales/products" element={<ModuleAccessRoute><AllProductsPage /></ModuleAccessRoute>} />
@@ -362,6 +422,8 @@ export const AppRoutes: React.FC = () => {
         {/* 12. PURCHASE MANAGEMENT */}
         <Route path="sales/purchases" element={<ModuleAccessRoute><PurchaseOverviewPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-orders" element={<ModuleAccessRoute><PurchaseOrdersPage /></ModuleAccessRoute>} />
+        <Route path="sales/purchase-bills" element={<ModuleAccessRoute><PurchaseInvoicesBillsPage /></ModuleAccessRoute>} />
+        <Route path="sales/payments-made" element={<ModuleAccessRoute><PaymentsMadePage /></ModuleAccessRoute>} />
         <Route path="sales/grn" element={<ModuleAccessRoute><GoodsReceivedPage /></ModuleAccessRoute>} />
         <Route path="sales/suppliers" element={<ModuleAccessRoute><SuppliersPage /></ModuleAccessRoute>} />
         <Route path="sales/purchase-returns" element={<ModuleAccessRoute><PurchaseReturnsPage /></ModuleAccessRoute>} />
@@ -371,10 +433,18 @@ export const AppRoutes: React.FC = () => {
         <Route path="sales/supplier-payments" element={<ModuleAccessRoute><GenericModuleView title="Supplier Payments" /></ModuleAccessRoute>} />
 
         {/* 13. FINANCE & ACCOUNTS */}
-        <Route path="billing" element={<FinanceBillingPage />} />
-        <Route path="finance/invoices" element={<FinanceBillingPage />} />
-        <Route path="finance/create-invoice" element={<FinanceBillingPage />} />
-        <Route path="sales/invoices" element={<FinanceBillingPage />} />
+        <Route path="billing" element={<AllInvoicesPage />} />
+        <Route path="finance/invoices" element={<AllInvoicesPage />} />
+        <Route path="finance/create-invoice" element={<CreateInvoicePage />} />
+        <Route path="sales/invoices" element={<AllInvoicesPage />} />
+        <Route path="finance/chart-of-accounts" element={<ChartOfAccountsPage />} />
+        <Route path="finance/bank-reconciliation" element={<BankReconciliationPage />} />
+        <Route path="finance/ar-ap" element={<AccountsReceivablePayablePage />} />
+        <Route path="finance/notes" element={<UnifiedNotesPage />} />
+        <Route path="finance/credit-debit-notes" element={<UnifiedNotesPage />} />
+        <Route path="finance/gst/e-invoice" element={<EInvoicePage />} />
+        <Route path="finance/gst/e-way-bill" element={<EWayBillPage />} />
+        <Route path="finance/gst/reports" element={<GstReportsPage />} />
         <Route path="finance/proforma-invoices" element={<GenericModuleView title="Proforma Invoices" />} />
         <Route path="finance/credit-notes" element={<CreditNotesPage />} />
         <Route path="finance/debit-notes" element={<DebitNotesPage />} />
@@ -391,8 +461,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="finance/payment-history" element={<GenericModuleView title="Payment History" />} />
         <Route path="finance/refunds" element={<GenericModuleView title="Refund Management" />} />
         <Route path="finance/reconciliation" element={<GenericModuleView title="Payment Reconciliation" />} />
-        <Route path="finance/receivables" element={<GenericModuleView title="Outstanding Receivables" />} />
-        <Route path="finance/payables" element={<GenericModuleView title="Outstanding Payables" />} />
+        <Route path="finance/receivables" element={<OutstandingReceivablesPage />} />
+        <Route path="finance/payables" element={<OutstandingPayablesPage />} />
         <Route path="finance/expenses" element={<GenericModuleView title="Expenses" />} />
         <Route path="finance/tax" element={<TaxConfigurationPage />} />
         <Route path="finance/bank-cash" element={<GenericModuleView title="Cash & Bank" />} />
