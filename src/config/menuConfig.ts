@@ -39,7 +39,13 @@ export const SIDEBAR_MENU_GROUPS: MenuGroupConfig[] = SIDEBAR_NAVIGATION_CONFIG.
   })),
 }));
 
+import { SERVICE_SIDEBAR_MENU_GROUPS } from './serviceSidebarConfig';
+
 export function getMenuGroupsForPackage(packageType: ErpPackageId, userRole?: string): MenuGroupConfig[] {
+  if (packageType === 'SERVICE') {
+    return SERVICE_SIDEBAR_MENU_GROUPS;
+  }
+
   const filtered = getFilteredNavigation(userRole);
   return filtered.map((nav) => ({
     key: nav.key,
