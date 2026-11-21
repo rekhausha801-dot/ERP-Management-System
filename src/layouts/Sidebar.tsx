@@ -37,6 +37,14 @@ import {
   FileBox,
   ClipboardList,
   PhoneCall,
+  BarChart3,
+  Cpu,
+  HardHat,
+  HelpCircle,
+  LifeBuoy,
+  Shield,
+  ThumbsUp,
+  Wrench,
 } from 'lucide-react';
 import { getMenuGroupsForPackage } from '../config/menuConfig';
 import { ERP_PACKAGES } from '../config/erpPackageConfig';
@@ -83,6 +91,14 @@ const renderIcon = (name?: string) => {
     case 'MapPin': return <MapPin {...props} />;
     case 'MessageSquare': return <MessageSquare {...props} />;
     case 'History': return <History {...props} />;
+    case 'BarChart3': return <BarChart3 {...props} />;
+    case 'Cpu': return <Cpu {...props} />;
+    case 'HardHat': return <HardHat {...props} />;
+    case 'HelpCircle': return <HelpCircle {...props} />;
+    case 'LifeBuoy': return <LifeBuoy {...props} />;
+    case 'Shield': return <Shield {...props} />;
+    case 'ThumbsUp': return <ThumbsUp {...props} />;
+    case 'Wrench': return <Wrench {...props} />;
     default: return <Package {...props} />;
   }
 };
@@ -95,11 +111,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user, selectedCompany } = useAuth();
-  const effectivePackage: ErpPackageId = (selectedCompany?.packageType as ErpPackageId) || packageType || 'COMPLETE';
+  const { logout, user } = useAuth();
 
-  const menuGroups = getMenuGroupsForPackage(effectivePackage, user?.role);
-  const pkgMeta = ERP_PACKAGES[effectivePackage] || ERP_PACKAGES.COMPLETE;
+  const menuGroups = getMenuGroupsForPackage(packageType, user?.role);
+  const pkgMeta = ERP_PACKAGES[packageType] || ERP_PACKAGES.COMPLETE;
 
   const buildAntMenuItem = (item: any): any => {
     if (item.children && item.children.length > 0) {
@@ -273,7 +288,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            {companyCode?.slice(0, 2) || (effectivePackage === 'SERVICE' ? 'SV' : effectivePackage === 'SALES' ? 'SL' : 'SE')}
+            {companyCode?.slice(0, 2) || (packageType === 'SERVICE' ? 'SV' : packageType === 'SALES' ? 'SL' : 'SE')}
           </div>
           {!collapsed && (
             <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -286,7 +301,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   lineHeight: 1.2,
                 }}
               >
-                {pkgMeta?.name || (effectivePackage === 'SERVICE' ? 'Service ERP' : effectivePackage === 'SALES' ? 'Sales ERP' : 'Complete ERP')}
+                {pkgMeta?.name || (packageType === 'SERVICE' ? 'Service ERP' : packageType === 'SALES' ? 'Sales ERP' : 'Complete ERP')}
               </div>
               <div
                 style={{
